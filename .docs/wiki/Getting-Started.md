@@ -25,7 +25,12 @@ On Windows: `formskills_oc_install.bat`, then `formskills.bat`, `formskills.bat 
 ./formskills cli skills formvis   # one app
 ./formskills cli fetch            # download every app's latest release again
 ./formskills cli where            # the folder released skills are kept in
+./formskills cli read formvis formvis-harness/SKILL.md      # one file, as text
+./formskills cli download formvis                           # the app's set as a zip in Downloads
+./formskills cli download formvis formvis-harness --to .    # one skill, into this folder
 ```
+
+A download is shaped like the release asset (`<skill folder>/<files>`, fixed dates) and never replaces a file: the next free name gets ` (2)`. In the window, open an app for Download all, or a skill for Download skill; the status line says where it was saved.
 
 Each app's source is `release` (its latest released skills asset, digest checked), `kept` (an earlier release kept on this computer, with why the latest could not be read), `dev` (a checkout, dev mode only) or `missing` (with the reason). The window shows the same on each card and in the detail pane; Refresh downloads again.
 
@@ -49,6 +54,7 @@ A checkout counts when `<folder>/<app repository name>/<skills folder>` exists (
 | `FORMPORTAL_ROOT` | where FormPortal keeps its data, for that copy |
 | `FORMSKILLS_ALLOW_UNSIGNED` | `1`: accept an unsigned catalogue (development only) |
 | `FORMSKILLS_DEV`, `FORMSKILLS_DEV_ROOTS` | dev mode, and the folders holding checkouts (`./formskills dev` sets both) |
+| `FORMSKILLS_DOWNLOADS` | where downloads are saved (default: the Downloads folder, else home) |
 
 ## Refreshing the list
 

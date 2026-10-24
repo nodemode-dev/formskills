@@ -8,7 +8,8 @@ Rules for agents working in this repository. Read the in-tree HASHOUT logs (`cor
 - The one place for skills in the family. formMCP handles the apps' MCP tools and carries nothing about skills; keep it that way from this side too.
 - Every list formskills carries is generated. `core/data/apps.json` comes from formcompiler's registry through `setup/apps.py` (`./formskills apps --compiler PATH`); `--check` fails while it drifts. Never copy an app's skills into this repository.
 - The engine owns all logic and works with no window: `formskills-core` holds the list, the catalogue, fetching and keeping, and the index; `cli` and `src-tauri` are thin.
-- The catalogue is trusted exactly as FormPortal trusts it; never loosen the signature, digest or unpacking checks in `catalog.rs` and `fetch.rs`. Dev mode stays opt-in.
+- The catalogue is trusted exactly as FormPortal trusts it; never loosen the signature, digest or unpacking checks in `catalog.rs` and `fetch.rs`, or the path check in `library::read_text`. Dev mode stays opt-in.
+- Skills are shown as text, never run. `markdown.ts` builds DOM nodes and never parses HTML; keep it that way (no `innerHTML` with skill content).
 
 ## Building
 

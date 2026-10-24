@@ -3,7 +3,7 @@
 ```
 formskills/
 ├── core/            formskills-core: the list (core/data/apps.json, compiled in), catalogue, fetch, index, library
-├── cli/             formskills-cli: apps, app, skills, fetch, catalog, where, version
+├── cli/             formskills-cli: apps, app, skills, fetch, read, download, catalog, where, version
 ├── src-tauri/       the shell: the window
 ├── frontend/        the window: tokens, layers, chips, cards, the detail pane
 ├── setup/apps.py    core/data/apps.json from formcompiler's registry
@@ -28,6 +28,10 @@ formcompiler attaches `<app>-skills-vX.Y.Z.zip` to every release, built from the
 - `library.rs` gives every app one source (`release`, `kept`, `dev` or `missing`) and its skills. Dev mode, off by default, reads checkouts instead.
 
 The shell's `library` and `refresh` commands return that, off the main thread.
+
+## Reading and downloading (v0.3.0)
+
+The shell keeps the last library, with each app's skills folder, and never sends a folder to the page. `read_file` takes an app id and a path in the set; `library::read_text` refuses anything that is not plain path parts or that resolves outside the folder, and returns text or a note. `download` packs one skill or the set with `pack.rs`, shaped like formcompiler's asset, into the Downloads folder without replacing a file. The page renders Markdown with `markdown.ts` (the family's renderer), which builds DOM nodes and never parses HTML.
 
 ## The window
 

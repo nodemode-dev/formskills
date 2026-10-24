@@ -1,5 +1,12 @@
 # Changelog
 
+## v0.3.0 · 2026-10-24
+
+- Open a skill to read it: its SKILL.md as formatted text, with its sub-skills, references and other files listed beside it, and links between them followed.
+- Download one skill, or all of an app's skills, as a zip shaped like the release asset; it is saved to your Downloads folder and never replaces a file.
+- `./formskills cli read` and `./formskills cli download` do the same on the command line.
+- The chip row keeps its scrollbar below the chips, and the mouse wheel scrolls it sideways; on a narrow window the reader takes the whole area.
+
 ## v0.2.0 · 2026-10-24
 
 - formskills reads the signed family catalogue (checked against the same keys FormPortal and formMCP trust) and downloads each app's latest released skills, checks each file against the catalogue's digest, and keeps them on this computer until a new release changes them.

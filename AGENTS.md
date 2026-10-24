@@ -4,7 +4,7 @@ formskills is the Form family's viewer of released skills: a Rust engine (`forms
 
 ## Finding a Form app's skills
 
-`./formskills cli apps` lists the Form apps that ship skills, with the folder each app keeps them in. `./formskills cli skills <app>` gives that app's latest released skills (name, description, files) and where they came from; the files themselves are in the folder `./formskills cli where` prints. Released skills only, unless dev mode is asked for (`./formskills dev cli skills`), which reads checkouts beside this one.
+`./formskills cli apps` lists the Form apps that ship skills, with the folder each app keeps them in. `./formskills cli skills <app>` gives that app's latest released skills (name, description, files) and where they came from; `./formskills cli read <app> <skill>/<path>` prints one of its files, and `./formskills cli download <app> [skill]` saves them as a zip. Released skills only, unless dev mode is asked for (`./formskills dev cli skills`), which reads checkouts beside this one.
 
 ## Changing formskills' code
 
