@@ -21,6 +21,10 @@
         </div>
         <span class="version" id="version" translate="no"></span>
       </header>
+      <div class="status-row">
+        <p class="status" id="status" aria-live="polite"></p>
+        <button class="btn" id="refresh" type="button" disabled>Refresh</button>
+      </div>
       <div class="tools">
         <div class="chips" id="chips" role="group" aria-label="Show skills from"></div>
         <p class="count" id="count" aria-live="polite"></p>
@@ -48,6 +52,7 @@
               <dt>Skills here</dt>
               <dd data-f="here"></dd>
             </dl>
+            <ul class="skill-list" id="skill-list" aria-label="Skills"></ul>
           </article>
         </section>
       </main>

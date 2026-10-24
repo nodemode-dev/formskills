@@ -73,6 +73,50 @@ html.booting body {
   font-variant-numeric: tabular-nums;
 }
 
+.status-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--sp-3);
+  height: 40px;
+  border-top: 1px solid var(--edge);
+}
+
+.status {
+  margin: 0;
+  overflow: hidden;
+  color: var(--ink-soft);
+  font-size: var(--fs-s);
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.btn {
+  min-width: 96px;
+  height: 28px;
+  padding: 0 var(--sp-3);
+  border: 1px solid var(--edge-strong);
+  border-radius: var(--radius-pill);
+  background: var(--control);
+  color: var(--ink);
+  font: inherit;
+  cursor: pointer;
+}
+
+.btn:hover:not(:disabled) {
+  background: var(--control-hover);
+}
+
+.btn:disabled {
+  cursor: default;
+  opacity: 0.45;
+}
+
+.btn:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+}
+
 .tools {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
@@ -210,11 +254,14 @@ html.booting body {
 
 .card-where {
   overflow: hidden;
-  color: var(--ink-faint);
-  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  color: var(--ink-soft);
   font-size: var(--fs-s);
   white-space: nowrap;
   text-overflow: ellipsis;
+}
+
+.card-where.is-missing {
+  color: var(--ink-faint);
 }
 
 .state {
@@ -304,6 +351,44 @@ html.booting body {
 .facts dd {
   margin: 0;
   overflow-wrap: anywhere;
+}
+
+.skill-list {
+  display: grid;
+  gap: var(--sp-2);
+  margin: var(--sp-5) 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.skill {
+  padding: var(--sp-3) var(--sp-4);
+  border: 1px solid var(--edge);
+  border-radius: var(--radius-m);
+  background: var(--ground);
+}
+
+.skill-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--sp-3);
+}
+
+.skill-name {
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+.skill-files {
+  flex: none;
+  color: var(--ink-faint);
+  font-size: var(--fs-s);
+}
+
+.skill-desc {
+  margin: var(--sp-1) 0 0;
+  color: var(--ink-soft);
 }
 
 .foot {

@@ -11,9 +11,15 @@ cli() {
   exec "$bin" "$@"
 }
 
+dev() {
+  export FORMSKILLS_DEV=1
+  export FORMSKILLS_DEV_ROOTS="${FORMSKILLS_DEV_ROOTS-$(cd .. && pwd)}"
+}
+
 case "${1:-}" in
   cli) shift; cli "$@" ;;
   apps) shift; exec python3 setup/apps.py "$@" ;;
+  dev) shift; dev; [ "${1:-}" = "cli" ] && { shift; cli "$@"; } ;;
 esac
 
 command -v cargo >/dev/null || { echo "Rust is required: https://rustup.rs. Then run ./formskills_oc_install"; exit 1; }

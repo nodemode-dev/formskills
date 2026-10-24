@@ -2,6 +2,11 @@
 setlocal
 cd /d "%~dp0"
 
+if /I "%~1"=="dev" (
+  set "FORMSKILLS_DEV=1"
+  if not defined FORMSKILLS_DEV_ROOTS for %%I in ("%~dp0..") do set "FORMSKILLS_DEV_ROOTS=%%~fI"
+  shift
+)
 if /I "%~1"=="cli" (
   shift
   cargo build -q --release --locked -p formskills-cli 1>&2 || exit /b 1

@@ -2,8 +2,17 @@
 
 Living log for formskills' window. Source files stay comment-free; what they would have said lives here.
 
-Current build version: v0.1.0
-Last updated: 2026-10-24 · chips, cards and the detail pane
+Current build version: v0.2.0
+Last updated: 2026-10-24 · where each app's skills come from; chips, cards and the detail pane
+
+## v0.2.0 · where each app's skills come from {#v0-2-0}
+
+### index.html, main.ts · live values in slots that already have their size
+- refers-to: index.html :: .status-row, #status, #refresh, #skill-list · src/main.ts :: shortText, longText, showLibrary, showSkills, load · src/styles/app.css :: .status-row, .btn, .card-where, .skill-list
+- kind: decision
+- logged: v0.2.0 · 2026-10-24
+
+A status row (40 px, one line with ellipsis and the full text as its title) says whether only released skills are shown or the dev mode is on, how many skills from how many apps, and where the catalogue came from; Refresh beside it (at least 96 px, disabled while it runs) downloads every app's latest release again. Each card's foot line, one line from the first frame ("Checking the latest release"), becomes "4 skills · release 1.97.2", "kept 2.10.1", "checkout" or "No released skills yet" in a fainter colour. The detail pane's "Skills here" says the source in full (digest checked, kept and why, the checkout's path, or why there are none), and below it each skill is a card with its name, file, sub-skill and reference counts, and description; the list is rebuilt only when the chosen app or its skill count changes, inside the pane's own scroll. The count line was left as it is so its column never changes width. Measured in Chromium at 4x CPU and a slow network with a stub bridge returning real dev-mode data (library after 900 ms, refresh after 1500 ms), dark, light and 640 by 480, choosing FormVis before the data arrived, then Refresh and the FormWeb chip: no partial first frame, CLS 0, no page error. In a browser without the bridge the status and cards say to open the app: CLS 0.
 
 ## v0.1.0 · chips, cards and the detail pane {#v0-1-0}
 

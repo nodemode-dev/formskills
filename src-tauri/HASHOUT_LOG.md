@@ -2,8 +2,17 @@
 
 Living log for formskills' desktop shell. Source files stay comment-free; what they would have said lives here.
 
-Current build version: v0.1.0
-Last updated: 2026-10-24 · the shell
+Current build version: v0.2.0
+Last updated: 2026-10-24 · library and refresh; the shell
+
+## v0.2.0 · library and refresh {#v0-2-0}
+
+### lib.rs · two commands, off the main thread
+- refers-to: src/lib.rs :: read, library, refresh, run
+- kind: decision
+- logged: v0.2.0 · 2026-10-24
+
+`library` returns the engine's `Library` (the catalogue's note, the dev mode and its folders, and for each app its source and skills); `refresh` is the same with every asset downloaded again. Both run in `spawn_blocking`, because the catalogue may wait 8 s and each asset up to 60 s. Checked in the real window under Xvfb in dev mode against 17 checkouts: the status line and every card show the real counts and sources. This file was rewritten whole for v0.2.0 instead of edited by region (it was 15 lines); recorded in the sidecar's BUILD_NOTES.
 
 ## v0.1.0 · the shell {#v0-1-0}
 
