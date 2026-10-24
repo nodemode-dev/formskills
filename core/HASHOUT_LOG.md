@@ -2,8 +2,44 @@
 
 Living log for `formskills-core`, `formskills-cli` and `setup/apps.py`. Source files stay comment-free; what they would have said lives here.
 
-Current build version: v0.1.0
-Last updated: 2026-10-24 · the generated list of apps that ship skills
+Current build version: v0.2.0
+Last updated: 2026-10-24 · released skills fetched, checked and kept, and the dev mode; the generated list of apps that ship skills
+
+## v0.2.0 · fetch {#v0-2-0}
+
+### catalog.rs · the same trust as FormPortal and formMCP
+- refers-to: core/src/catalog.rs :: load, verify, keys, get, released · core/catalog_keys.txt
+- kind: decision
+- logged: v0.2.0 · 2026-10-24
+
+The signed family catalogue (formcompiler's `catalog` release, or `FORMSKILLS_CATALOG`: https, loopback http or a file) is read with its `.sig`, checked against the compiled-in keys plus `FORMAI_CATALOG_PUBKEY`, the same contract as FormPortal and formMCP; FormPortal's kept copy is used when the network fails, or only that with `FORMSKILLS_OFFLINE`; `FORMSKILLS_ALLOW_UNSIGNED` admits an unsigned one for development. From each product it takes the stable channel (the beta channel only when there is no stable) and that release's `agents.skills` asset: `file`, `url`, `bytes`, `sha256`, as formcompiler's `catalog.py` writes it. Released versions only: unreleased `main` is never read here.
+
+### fetch.rs · download, check, unpack, keep
+- refers-to: core/src/fetch.rs :: ensure, kept, unpack, Record · core/src/places.rs :: data_dir, cache_dir
+- kind: decision
+- logged: v0.2.0 · 2026-10-24
+
+Kept in `released/<app>/<version>/` under formskills' data folder (`FORMSKILLS_HOME`, else Application Support `ai.nodemode.formskills`, `%LOCALAPPDATA%\formskills`, or `~/.local/share/formskills`): the unpacked `skills/` tree and `asset.json` (the catalogue's asset record and when it was fetched). A version already kept with the same digest is reused without a download; `fetch` (and the window's Refresh) downloads again. A download is refused unless its address is https (or loopback), it is at most 64 MB, and its SHA-256 equals the catalogue's. Unpacking refuses an entry that leaves the folder (`enclosed_name`) or is a link, more than 10 000 entries, or more than 256 MB unpacked; it goes into a hidden `.part` folder that is renamed into place only when complete, and then other versions of that app are removed (personal edits, v0.4.0, will live elsewhere). App ids and versions must be plain names before they become folder names. When the catalogue or a download fails, the newest kept version is shown with the reason (`kept`).
+
+### library.rs · where each app's skills come from
+- refers-to: core/src/library.rs :: load, checkout, from_release, Source · core/src/places.rs :: dev_mode, dev_roots
+- kind: decision
+- logged: v0.2.0 · 2026-10-24
+
+Each app gets one source: `release` (the latest released asset, `downloaded` when it was fetched now), `kept` (an earlier release, with why the latest could not be read), `dev` or `missing` (with the reason: no release yet, a release without a skills asset, an untrusted catalogue, a bad digest). The dev mode is opt-in (`FORMSKILLS_DEV=1`; `./formskills dev` sets it with the folder that holds this checkout as `FORMSKILLS_DEV_ROOTS`), so released-only stays the default the owner set: in it, `<root>/<app>/<skills folder>` is read when present and releases are used for the rest. The catalogue is not read when every chosen app came from a checkout.
+
+### skills.rs · the same index formcompiler builds
+- refers-to: core/src/skills.rs :: index, front_matter, walk, kind_of
+- kind: rationale
+- logged: v0.2.0 · 2026-10-24
+
+A skill is a top-level folder with a `SKILL.md`; its name and description come from the front matter, with formcompiler's rules (folded and literal blocks joined, quotes trimmed, the folder name when there is no name). Files skip `__pycache__`, `node_modules`, `.git`, `.DS_Store`, `Thumbs.db`, `*.pyc` and links, and are sorted; each is marked `skill` (the top `SKILL.md`), `sub-skill` (`SUB-SKILL.md` or a nested `SKILL.md`), `reference` (other Markdown) or `file`, for the v0.3.0 viewer. Checked: formvis 1.97.1's asset built by formcompiler's `agents.py` and the formvis checkout index to the same skills, names, descriptions, files and sizes (4 skills, 42 files); all 17 checkouts in dev mode give 35 skills.
+
+### Checked end to end
+- kind: decision
+- logged: v0.2.0 · 2026-10-24
+
+With a key pair from formcompiler's `catalog.py keygen`, a catalogue signed with its `sign`, and real assets from `agents.py build` served on loopback: no trusted key, a wrong key and an unsigned file are refused with the reason (and a kept copy shown when there is one); unsigned is admitted with `FORMSKILLS_ALLOW_UNSIGNED`; formvis downloads once, is reused on the next run, downloads again with `fetch`, and a newer version replaces the older folder; a wrong digest is refused naming both digests; an asset with `../escape.txt` is refused and nothing is written outside; a release without an asset and an app without a release say so; with the server stopped every app shows its kept version; `FORMSKILLS_OFFLINE` with FormPortal's kept copy uses it. The real catalogue address fails TLS in this sandbox (its proxy's certificate authority) and falls back with the reason.
 
 ## v0.1.0 · the list {#v0-1-0}
 
@@ -26,4 +62,4 @@ The list is compiled in with `include_str!`, so the command line and the window 
 - kind: rationale
 - logged: v0.1.0 · 2026-10-24
 
-`apps` (with `source` and `count`), `app <id>` and `version`; an unknown app or command exits 1 with the reason. Checked: `formskills-cli version` prints 0.1.0, `app formvis` prints FormVis with `.claude/skills`, `app nope` exits 1 naming `apps`.
+`apps` (with `source` and `count`), `app <id>` and `version`; an unknown app or command exits 1 with the reason. From v0.2.0 also `skills [id]`, `fetch [id]`, `catalog` and `where`. Checked: `formskills-cli version` prints 0.1.0, `app formvis` prints FormVis with `.claude/skills`, `app nope` exits 1 naming `apps`.
