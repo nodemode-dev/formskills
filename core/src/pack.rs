@@ -6,6 +6,7 @@ use zip::write::SimpleFileOptions;
 use zip::{CompressionMethod, DateTime, ZipWriter};
 
 use crate::library::{AppSkills, Source};
+use crate::skills::Skill;
 use crate::places::downloads_dir;
 
 #[derive(Debug, Clone, Serialize)]
@@ -46,12 +47,16 @@ pub fn archive(app: &AppSkills, app_name: &str, skill: Option<&str>, into: Optio
         Some(w) => w.to_string(),
         None => label(app, app_name),
     };
+    zip_skills(root, &chosen, &stem, into)
+}
+
+pub fn zip_skills(root: &Path, chosen: &[&Skill], stem: &str, into: Option<&Path>) -> Result<Saved, String> {
     let mut buffer = std::io::Cursor::new(Vec::new());
     let mut zip = ZipWriter::new(&mut buffer);
     let stamp = DateTime::from_date_and_time(1980, 1, 1, 0, 0, 0).map_err(|e| e.to_string())?;
     let options = SimpleFileOptions::default().compression_method(CompressionMethod::Deflated).last_modified_time(stamp).unix_permissions(0o644);
     let mut files = 0;
-    for s in &chosen {
+    for s in chosen {
         for f in &s.files {
             let name = format!("{}/{}", s.folder, f.path);
             let data = std::fs::read(root.join(&s.folder).join(&f.path)).map_err(|e| format!("{name}: {e}"))?;
@@ -64,7 +69,7 @@ pub fn archive(app: &AppSkills, app_name: &str, skill: Option<&str>, into: Optio
     let bytes = buffer.into_inner();
     let dir = into.map(Path::to_path_buf).unwrap_or_else(downloads_dir);
     std::fs::create_dir_all(&dir).map_err(|e| format!("{}: {e}", dir.display()))?;
-    let target = free_name(&dir, &stem);
+    let target = free_name(&dir, stem);
     let part = dir.join(format!(".{stem}.zip.part-{}", std::process::id()));
     if let Err(e) = std::fs::write(&part, &bytes).and_then(|()| std::fs::rename(&part, &target)) {
         let _ = std::fs::remove_file(&part);

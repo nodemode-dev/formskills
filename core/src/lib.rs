@@ -1,5 +1,6 @@
 pub mod apps;
 pub mod catalog;
+pub mod edits;
 pub mod fetch;
 pub mod library;
 pub mod pack;

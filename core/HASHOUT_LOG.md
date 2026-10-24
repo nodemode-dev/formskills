@@ -2,8 +2,19 @@
 
 Living log for `formskills-core`, `formskills-cli` and `setup/apps.py`. Source files stay comment-free; what they would have said lives here.
 
-Current build version: v0.3.1
-Last updated: 2026-10-24 · no partial download; reading one file and packing downloads; released skills fetched, checked and kept, and the dev mode; the generated list of apps that ship skills
+Current build version: v0.4.0
+Last updated: 2026-10-24 · personal edited copies; no partial download; reading one file and packing downloads; released skills fetched, checked and kept, and the dev mode; the generated list of apps that ship skills
+
+## v0.4.0 · personal edited copies {#v0-4-0}
+
+### edits.rs · a copy beside the cache, never the original
+- refers-to: core/src/edits.rs :: start, read, write, acknowledge, discard, download, list, describe, Record, Edit · core/src/pack.rs :: zip_skills
+- kind: decision
+- logged: v0.4.0 · 2026-10-24
+
+A copy lives in `edits/<app>/<skill folder>/` under formskills' data folder, with `edits/<app>/<folder>.edit.json` beside it (outside the folder, so the index and zips never include it). `start` copies every file of the original skill into a hidden `.part` folder and renames it into place, and records the base (`release X` or `checkout`) and a SHA-256 of each original file; starting again returns the existing copy. Nothing ever writes to the release cache or to a checkout: the original stays as released, and pruning old releases cannot touch a copy. `write` replaces one existing file of the copy (plain path parts only, resolved inside the copy, at most 2 MB of text), written beside and renamed, and stamps `updated`; new files are not created in v0.4.0. `describe` reports `edited` (copy files that differ from the recorded originals) and `original_changed` (original files whose digest differs from the record, or added or removed): the "original updated" flag. `acknowledge` (Mark as seen) records the original's current digests and base and leaves the copy's text alone. `discard` deletes the copy and its record. `download` zips the copy as `<folder>-edited.zip` through `pack::zip_skills`, which `archive` now also uses.
+
+Checked with the CLI against a scratch copy of formcut's skills used as a checkout: start (11 files, nothing edited), start again (same copy), write (SKILL.md edited; the original's last line unchanged), an upstream change to the original (flagged as SKILL.md), seen (flag clear, copy text kept), `../x`, a new file name, `../formvis` as a skill, `/etc/passwd` and `../../formvis/x` refused, download (11 files, the edit inside), a new process with the checkout gone (copy listed, original "not available" with the reason), discard (copy and record gone).
 
 ## v0.3.1 · no partial download {#v0-3-1}
 
@@ -87,4 +98,4 @@ The list is compiled in with `include_str!`, so the command line and the window 
 - kind: rationale
 - logged: v0.1.0 · 2026-10-24
 
-`apps` (with `source` and `count`), `app <id>` and `version`; an unknown app or command exits 1 with the reason. From v0.2.0 also `skills [id]`, `fetch [id]`, `catalog` and `where`; from v0.3.0 `read <id> <path>` and `download <id> [skill] [--to DIR]`. Checked: `formskills-cli version` prints 0.1.0, `app formvis` prints FormVis with `.claude/skills`, `app nope` exits 1 naming `apps`.
+`apps` (with `source` and `count`), `app <id>` and `version`; an unknown app or command exits 1 with the reason. From v0.2.0 also `skills [id]`, `fetch [id]`, `catalog` and `where`; from v0.3.0 `read <id> <path>` and `download <id> [skill] [--to DIR]`; from v0.4.0 `edits` and `edit start|read|write|seen|download|discard`. Checked: `formskills-cli version` prints 0.1.0, `app formvis` prints FormVis with `.claude/skills`, `app nope` exits 1 naming `apps`.

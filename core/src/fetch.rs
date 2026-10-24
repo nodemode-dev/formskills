@@ -28,7 +28,7 @@ pub struct Kept {
     pub record: Record,
 }
 
-fn plain(text: &str) -> bool {
+pub fn plain(text: &str) -> bool {
     !text.is_empty() && text.len() <= 64 && text.chars().all(|c| c.is_ascii_alphanumeric() || matches!(c, '.' | '-' | '+' | '_')) && !text.starts_with('.')
 }
 

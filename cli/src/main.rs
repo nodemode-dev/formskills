@@ -1,6 +1,6 @@
 use std::process::ExitCode;
 
-use formskills_core::{catalog, library, pack, places, Apps, CORE_VERSION};
+use formskills_core::{catalog, edits, library, pack, places, Apps, CORE_VERSION};
 use serde_json::json;
 
 const HELP: &str = "formskills-cli: formskills without the window
@@ -11,6 +11,13 @@ const HELP: &str = "formskills-cli: formskills without the window
   fetch [id]      download every app's latest released skills again, check each digest, and keep them (JSON)
   read <id> <path>   one file of an app's skills, by its path in the set (skill folder first), as text
   download <id> [skill] [--to DIR]   an app's skills, or one skill, as a zip in Downloads (or DIR)
+  edits           your edited copies: what you changed, and whether the original changed since (JSON)
+  edit start <id> <skill>            make your own copy of a skill (the original is never changed)
+  edit read <id> <skill> <path>      one file of your copy, as text
+  edit write <id> <skill> <path> <file|->   replace one file of your copy with a file's text (or stdin)
+  edit seen <id> <skill>             note the original's current version as the one your copy follows
+  edit download <id> <skill> [--to DIR]   your copy as <skill>-edited.zip
+  edit discard <id> <skill>          delete your copy
   catalog         whether the signed family catalogue can be used now, and why not
   where           the folder formskills keeps released skills in
   version         formskills' version
@@ -68,6 +75,65 @@ fn main() -> ExitCode {
             let count: usize = found.apps.iter().map(|a| a.skills.len()).sum();
             print(&json!({ "catalogue": found.catalogue, "dev": found.dev, "dev_roots": found.dev_roots, "skills": count, "apps": found.apps }));
             ExitCode::SUCCESS
+        }
+        "edits" => {
+            let found = library::load(&apps, None, false);
+            print(&json!({ "folder": edits::edits_dir().display().to_string(), "edits": edits::list(Some(&found.apps)) }));
+            ExitCode::SUCCESS
+        }
+        "edit" => {
+            let action = args.get(1).map(String::as_str).unwrap_or("");
+            let Some(app) = args.get(2).and_then(|name| apps.get(name)).cloned() else {
+                eprintln!("formskills: edit {action} needs an app that ships skills and a skill; see `formskills-cli help`");
+                return ExitCode::FAILURE;
+            };
+            let Some(folder) = args.get(3).cloned() else {
+                eprintln!("formskills: edit {action} needs the skill's folder name, for example formvis-harness");
+                return ExitCode::FAILURE;
+            };
+            let original = library::load(&apps, Some(&app.id), false).apps.into_iter().next();
+            let result: Result<serde_json::Value, String> = match action {
+                "start" => original.as_ref().ok_or_else(|| format!("{} was not read", app.name)).and_then(|o| edits::start(o, &folder)).map(|e| json!(e)),
+                "read" => match args.get(4) {
+                    Some(path) => edits::read(&app.id, &folder, path).map(|f| {
+                        if let Some(text) = &f.text {
+                            print!("{text}");
+                        }
+                        serde_json::Value::Null
+                    }),
+                    None => Err("edit read needs a path in the skill, for example SKILL.md".to_string()),
+                },
+                "write" => match (args.get(4), args.get(5)) {
+                    (Some(path), Some(from)) => {
+                        let text = if from == "-" {
+                            let mut text = String::new();
+                            std::io::Read::read_to_string(&mut std::io::stdin(), &mut text).map(|_| text).map_err(|e| e.to_string())
+                        } else {
+                            std::fs::read_to_string(from).map_err(|e| format!("{from}: {e}"))
+                        };
+                        text.and_then(|t| edits::write(&app.id, &folder, path, &t, original.as_ref())).map(|e| json!(e))
+                    }
+                    _ => Err("edit write needs a path in the skill and a file to take the text from (- for stdin)".to_string()),
+                },
+                "seen" => original.as_ref().ok_or_else(|| format!("{} was not read", app.name)).and_then(|o| edits::acknowledge(&app.id, &folder, o)).map(|e| json!(e)),
+                "download" => {
+                    let to = args.iter().position(|a| a == "--to").and_then(|i| args.get(i + 1)).map(std::path::Path::new);
+                    edits::download(&app.id, &folder, to).map(|s| json!(s))
+                }
+                "discard" => edits::discard(&app.id, &folder).map(|()| json!({ "discarded": format!("{}/{folder}", app.id) })),
+                other => Err(format!("unknown edit action {other:?}; use start, read, write, seen, download or discard")),
+            };
+            match result {
+                Ok(serde_json::Value::Null) => ExitCode::SUCCESS,
+                Ok(value) => {
+                    print(&value);
+                    ExitCode::SUCCESS
+                }
+                Err(e) => {
+                    eprintln!("formskills: {e}");
+                    ExitCode::FAILURE
+                }
+            }
         }
         "read" | "download" => {
             let Some(app) = args.get(1).and_then(|name| apps.get(name)).cloned() else {
