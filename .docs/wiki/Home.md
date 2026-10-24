@@ -2,7 +2,7 @@
 
 formskills is where the Form family's skills are found: every Form app's released skills, listed by app, to read, download and keep your own edited copies of.
 
-**Current version:** v0.4.0 · **Stack:** Rust (`formskills-core`, `formskills-cli`) · Tauri 2 shell · vanilla TypeScript and Vite window · **Team:** one owner (nodemode-ai)
+**Current version:** v0.4.1 · **Stack:** Rust (`formskills-core`, `formskills-cli`) · Tauri 2 shell · vanilla TypeScript and Vite window · **Team:** one owner (nodemode-ai)
 
 | Page | What it covers |
 | --- | --- |
@@ -23,4 +23,4 @@ It does not install skills into an agent tool, push edits back to an app, or sho
 
 ## What comes next
 
-The planned versions are built. Per the family plan (Phase 5): formskills in formcompiler's registry, released like every Form app, and its id and name aligned across FormPortal, FormTray and FormRanker.
+The planned versions are built, and formskills is in formcompiler's registry (v0.4.1) under the same id and name as in FormPortal, FormTray and FormRanker. What remains is the owner's: the first push and `compile_v0.4.1` branch, and the family's catalogue key pair.

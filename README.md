@@ -5,7 +5,7 @@
 <p align="center"><b>Every Form app's released skills in one place: read them, download them, keep your own edited copies.</b></p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/version-v0.4.0-f97316" alt="version v0.4.0" />
+  <img src="https://img.shields.io/badge/version-v0.4.1-f97316" alt="version v0.4.1" />
   <img src="https://img.shields.io/badge/skills-released%20only-8b5cf6" alt="released skills only" />
   <img src="https://img.shields.io/badge/Tauri-2-24C8DB" alt="Tauri 2" />
   <img src="https://img.shields.io/badge/Rust-stable-B7410E" alt="Rust stable" />
@@ -15,7 +15,7 @@
 
 formskills is where the skills of the Form family of desktop apps (image, video, audio, layout, vector, notes, slides and the rest, by nodemode.ai) are found. Each app ships its agent skills with every release; formskills lists them by app, shows each one as formatted text with its sub-skills and references, lets you download a skill or an app's whole set, and keeps your own edited copies beside the originals. It shows exactly what shipped: no unreleased work, and nothing is ever changed in an app.
 
-**Stack:** Rust (`formskills-core`, `formskills-cli`) · Tauri 2 shell · vanilla TypeScript + Vite window with zero runtime dependencies · **Scale:** 17 Form apps that ship skills, from formcompiler's registry
+**Stack:** Rust (`formskills-core`, `formskills-cli`) · Tauri 2 shell · vanilla TypeScript + Vite window with zero runtime dependencies · **Scale:** 18 Form apps that ship skills, from formcompiler's registry
 
 ## Highlights
 
@@ -65,9 +65,11 @@ On Windows run `formskills_oc_install.bat`, then `formskills.bat`.
 | 5630 | Vite dev server (localhost only) |
 | 5631 | Vite preview (localhost only) |
 
-**Releases.** formskills builds nothing in this repository. After the version bump lands on main, push a branch `compile_vX.Y.Z` cut from that commit; CI runs on it, and formcompiler (`nodemode-ai/formcompiler`) builds the bundles and drafts the release `formskills-vX.Y.Z` once formskills is in its registry.
+**Releases.** formskills builds nothing in this repository. After the version bump lands on main, push a branch `compile_vX.Y.Z` cut from that commit; CI runs on it, and formcompiler (`nodemode-ai/formcompiler`) builds the bundles with `./build_app` (`build_app.bat` on Windows) and drafts the release `formskills-vX.Y.Z` (`apps/formskills.json` in its registry). `./build_app` also builds the app on your own machine.
 
 ## Status
+
+v0.4.1: formskills is in formcompiler's registry (`formskills`, `ai.nodemode.formskills`) with `build_app` and `build_app.bat` for its bundles (the Linux .deb built here), under the same id and name in FormPortal, FormTray and FormRanker; formMCP's skill joins the list (18 apps).
 
 v0.4.0: your own edited copies. A copy per skill in formskills' own folder, an editor with live preview and the read-only original beside it, saved as you type, flagged with the changed files when the original moves on, marked as seen, downloaded or discarded; the original is never written. Checked with the real engine behind the window (copy, edit, upstream change, restart, seen, download, discard; CLS 0 under 4x CPU throttling, dark, light and 640 by 480) and in the real app, quit and started again.
 
@@ -79,7 +81,7 @@ v0.2.0: fetch. The signed catalogue read with FormPortal's trust model; each app
 
 v0.1.0: the scaffold. The list of the 17 Form apps that ship skills, generated from formcompiler's registry; the command line; the window with All and per-app chips, a card per app and a detail pane, painted complete in its first frame.
 
-Next (family plan, Phase 5): formskills and formMCP in formcompiler's registry, released like every Form app, with their ids and names aligned in FormPortal, FormTray and FormRanker.
+Next: the owner's first push and `compile_v0.4.1` branch, and the family's catalogue key pair, so released skills are read from the signed catalogue.
 
 ## License
 

@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.4.1 · 2026-10-24
+
+- formskills is a registered Form app: formcompiler builds and releases it, and FormPortal, FormTray and FormRanker know it as `formskills`, `ai.nodemode.formskills`.
+- `./build_app` (macOS and Linux) and `build_app.bat` (Windows) build the desktop app and its installers.
+- formMCP's skill is in the list of apps that ship skills.
+
 ## v0.4.0 · 2026-10-24
 
 - Make your own copy of any skill and edit it: a text editor with a live preview, and the original read-only beside it. Your copy is saved as you type and kept after you close formskills; the original is never changed.

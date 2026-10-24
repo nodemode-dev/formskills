@@ -83,6 +83,10 @@ The list is generated from formcompiler's registry (`apps/<app>.json`: its `cata
 
 The file records the formcompiler version and commit it came from; the window's footer shows it.
 
+## Building the app
+
+`./build_app` builds the desktop app and its installers on macOS and Linux (`--no-install`, `--install`, `--open`, `--clean`, `--bundles deb,rpm,appimage`; the log is `build_app.log`); `build_app.bat` on Windows. formcompiler runs the same scripts for releases.
+
 ## Ports
 
 | Port | Service |
