@@ -1,4 +1,5 @@
 import list from "../../core/data/apps.json";
+import { renderMarkdown, splitFrontMatter } from "./markdown";
 
 type App = (typeof list.apps)[number];
 
@@ -113,17 +114,173 @@ function showSkills(id: string): void {
   skillList.dataset.count = String(found?.skills.length ?? -1);
   const items = (found?.skills ?? []).map((s) => {
     const li = el("li", "skill");
-    const head = el("div", "skill-head");
+    const hit = el("button", "skill-hit");
+    hit.type = "button";
+    hit.title = `Read ${s.name}`;
+    const head = el("span", "skill-head");
     const name = el("span", "skill-name", s.name);
     name.translate = false;
     const subs = s.files.filter((f) => f.kind === "sub-skill").length;
     const refs = s.files.filter((f) => f.kind === "reference").length;
     head.append(name, el("span", "skill-files", [plural(s.files.length, "file"), subs ? plural(subs, "sub-skill") : "", refs ? plural(refs, "reference") : ""].filter(Boolean).join(" · ")));
-    li.append(head, el("p", "skill-desc", s.description || "No description in its SKILL.md."));
+    hit.append(head, el("span", "skill-desc", s.description || "No description in its SKILL.md."));
+    hit.addEventListener("click", () => openSkill(id, s.folder));
+    li.append(hit);
     return li;
   });
   skillList.replaceChildren(...items);
 }
+
+const reader = document.getElementById("reader") as HTMLElement;
+const readerName = document.getElementById("reader-name") as HTMLElement;
+const readerFrom = document.getElementById("reader-from") as HTMLElement;
+const filesNav = document.getElementById("files") as HTMLElement;
+const doc = document.getElementById("doc") as HTMLElement;
+const downloadApp = document.getElementById("download-app") as HTMLButtonElement;
+const downloadSkill = document.getElementById("download-skill") as HTMLButtonElement;
+const detailPane = document.getElementById("detail") as HTMLElement;
+const GROUPS: [string, string][] = [["skill", "Skill"], ["sub-skill", "Sub-skills"], ["reference", "References"], ["file", "Other files"]];
+let reading: { app: string; folder: string; path: string } | null = null;
+let readSeq = 0;
+
+function currentSkill(): Skill | undefined {
+  return reading ? library.get(reading.app)?.skills.find((s) => s.folder === reading?.folder) : undefined;
+}
+
+function fileLabel(f: SkillFile): string {
+  if (f.kind === "sub-skill") {
+    const parts = f.path.split("/");
+    return parts.length > 1 ? parts[parts.length - 2] : f.path;
+  }
+  const parts = f.path.split("/");
+  return parts.length > 2 ? parts.slice(-2).join("/") : f.path;
+}
+
+function showFiles(skill: Skill): void {
+  const nodes: HTMLElement[] = [];
+  for (const [kind, title] of GROUPS) {
+    const files = skill.files.filter((f) => f.kind === kind);
+    if (!files.length) continue;
+    nodes.push(el("p", "files-title", title));
+    for (const f of files) {
+      const b = el("button", "file", fileLabel(f));
+      b.type = "button";
+      b.title = f.path;
+      b.dataset.path = f.path;
+      b.translate = false;
+      b.addEventListener("click", () => void openFile(f.path));
+      nodes.push(b);
+    }
+  }
+  filesNav.replaceChildren(...nodes);
+}
+
+function resolve(from: string, href: string): string | null {
+  if (/^[a-z][a-z0-9+.-]*:/i.test(href) || href.startsWith("#")) return null;
+  const parts = from.split("/").slice(0, -1);
+  for (const piece of href.split("#")[0].split("/")) {
+    if (!piece || piece === ".") continue;
+    if (piece === "..") {
+      if (!parts.length) return null;
+      parts.pop();
+    } else parts.push(piece);
+  }
+  return parts.join("/");
+}
+
+function wireLinks(skill: Skill, from: string): void {
+  for (const link of doc.querySelectorAll<HTMLElement>(".fs-md-link")) {
+    const target = resolve(from, link.dataset.href ?? "");
+    if (target && skill.files.some((f) => f.path === target)) {
+      link.classList.add("is-file");
+      link.tabIndex = 0;
+      link.setAttribute("role", "link");
+      link.addEventListener("click", () => void openFile(target));
+      link.addEventListener("keydown", (e) => {
+        if (e.key === "Enter") void openFile(target);
+      });
+    }
+  }
+}
+
+async function openFile(path: string): Promise<void> {
+  const skill = currentSkill();
+  if (!reading || !skill || !invoke) return;
+  reading.path = path;
+  for (const b of filesNav.querySelectorAll<HTMLButtonElement>(".file")) b.setAttribute("aria-current", String(b.dataset.path === path));
+  const seq = ++readSeq;
+  const { app, folder } = reading;
+  doc.replaceChildren(el("p", "doc-note", `Reading ${path}`));
+  try {
+    const file = (await invoke("read_file", { app, path: `${folder}/${path}` })) as { path: string; bytes: number; text: string | null; note: string | null };
+    if (seq !== readSeq) return;
+    const nodes: HTMLElement[] = [el("p", "doc-path", path)];
+    if (file.text === null) {
+      nodes.push(el("p", "doc-note", file.note ?? "Not shown here."));
+    } else if (/\.md$/i.test(path)) {
+      const { meta, body } = splitFrontMatter(file.text);
+      if (meta.length) {
+        const dl = el("dl", "doc-meta");
+        for (const [k, v] of meta) dl.append(el("dt", "", k), el("dd", "", v));
+        nodes.push(dl);
+      }
+      const md = el("div", "fs-md");
+      md.append(...renderMarkdown(body));
+      nodes.push(md);
+    } else {
+      const pre = el("pre", "doc-text");
+      pre.textContent = file.text;
+      nodes.push(pre);
+    }
+    doc.replaceChildren(...nodes);
+    doc.scrollTop = 0;
+    wireLinks(skill, path);
+  } catch (e) {
+    if (seq === readSeq) doc.replaceChildren(el("p", "doc-note", `Could not read ${path}: ${String(e)}`));
+  }
+}
+
+function openSkill(app: string, folder: string): void {
+  reading = { app, folder, path: "SKILL.md" };
+  const skill = currentSkill();
+  const found = library.get(app);
+  if (!skill || !found) return;
+  setText(readerName, skill.name);
+  setText(readerFrom, `${list.apps.find((a) => a.id === app)?.name ?? app} · ${shortText(found)}`);
+  showFiles(skill);
+  if (!detail.hidden) detail.hidden = true;
+  if (reader.hidden) reader.hidden = false;
+  detailPane.classList.add("is-reading");
+  void openFile("SKILL.md");
+}
+
+function closeReader(): void {
+  reading = null;
+  readSeq += 1;
+  if (!reader.hidden) reader.hidden = true;
+  detailPane.classList.remove("is-reading");
+}
+
+async function save(app: string, skill: string | null, button: HTMLButtonElement): Promise<void> {
+  if (!invoke) return;
+  button.disabled = true;
+  try {
+    const saved = (await invoke("download", { app, skill })) as { path: string; name: string; skills: number; files: number };
+    setText(status, `Saved ${saved.name} (${plural(saved.skills, "skill")}, ${plural(saved.files, "file")}) to ${saved.path}`);
+    status.title = saved.path;
+  } catch (e) {
+    setText(status, `Could not download: ${String(e)}`);
+  } finally {
+    button.disabled = false;
+  }
+}
+
+downloadApp.addEventListener("click", () => void save(chosen, null, downloadApp));
+downloadSkill.addEventListener("click", () => reading && void save(reading.app, reading.folder, downloadSkill));
+(document.getElementById("back") as HTMLButtonElement).addEventListener("click", () => {
+  closeReader();
+  if (chosen) choose(chosen);
+});
 
 function showLibrary(lib: Library): void {
   library.clear();
@@ -135,6 +292,17 @@ function showLibrary(lib: Library): void {
     where?.classList.toggle("is-missing", !found || found.source.kind === "missing");
   }
   if (chosen) showSkills(chosen);
+  if (chosen) downloadApp.disabled = !(library.get(chosen)?.skills.length ?? 0);
+  if (reading) {
+    const skill = currentSkill();
+    if (!skill) {
+      closeReader();
+      if (chosen) choose(chosen);
+    } else {
+      showFiles(skill);
+      void openFile(skill.files.some((f) => f.path === reading?.path) ? reading.path : "SKILL.md");
+    }
+  }
   const total = lib.apps.reduce((n, a) => n + a.skills.length, 0);
   const withSkills = lib.apps.filter((a) => a.skills.length > 0).length;
   const mode = lib.dev ? `Dev mode: checkouts in ${lib.dev_roots.join(", ") || "no folder"} first, releases otherwise` : "Released skills only";
@@ -162,11 +330,14 @@ function choose(id: string): void {
     const hit = node.firstElementChild as HTMLButtonElement;
     hit.setAttribute("aria-pressed", String(a.id === id));
   }
+  if (reading && reading.app !== id) closeReader();
   if (!app) {
     if (empty.hidden) empty.hidden = false;
     if (!detail.hidden) detail.hidden = true;
     return;
   }
+  downloadApp.disabled = !invoke || !(library.get(id)?.skills.length ?? 0);
+  if (reading) return;
   setText(field("name"), app.name);
   setText(field("kind"), app.kind);
   setText(field("summary"), app.summary);
@@ -193,6 +364,11 @@ function apply(next: string): void {
 }
 
 for (const c of chips) c.addEventListener("click", () => apply(c.dataset.filter ?? "all"));
+chipsBox.addEventListener("wheel", (e) => {
+  if (Math.abs(e.deltaY) <= Math.abs(e.deltaX) || chipsBox.scrollWidth <= chipsBox.clientWidth) return;
+  e.preventDefault();
+  chipsBox.scrollLeft += e.deltaY;
+}, { passive: false });
 for (const { app, node } of cards) node.firstElementChild?.addEventListener("click", () => choose(app.id));
 apply("all");
 

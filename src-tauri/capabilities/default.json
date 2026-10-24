@@ -1,7 +1,7 @@
 {
   "$schema": "../gen/schemas/desktop-schema.json",
   "identifier": "default",
-  "description": "The formskills window: the list of Form apps that ship skills, and their released skills through the library and refresh commands.",
+  "description": "The formskills window: the list of Form apps that ship skills, and their released skills through the library, refresh, read_file and download commands.",
   "windows": ["main"],
   "permissions": ["core:default"]
 }

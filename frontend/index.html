@@ -52,7 +52,25 @@
               <dt>Skills here</dt>
               <dd data-f="here"></dd>
             </dl>
+            <div class="app-actions">
+              <button class="btn" id="download-app" type="button" disabled>Download all</button>
+              <span class="hint">Every skill of this app as one zip, the way its release ships them</span>
+            </div>
             <ul class="skill-list" id="skill-list" aria-label="Skills"></ul>
+          </article>
+          <article class="reader" id="reader" hidden>
+            <header class="reader-head">
+              <button class="btn btn-quiet" id="back" type="button">All skills</button>
+              <div class="reader-title">
+                <h2 class="reader-name" id="reader-name" translate="no"></h2>
+                <p class="reader-from" id="reader-from"></p>
+              </div>
+              <button class="btn" id="download-skill" type="button">Download skill</button>
+            </header>
+            <div class="reader-body">
+              <nav class="files" id="files" aria-label="Files in this skill"></nav>
+              <div class="doc" id="doc" tabindex="0"></div>
+            </div>
           </article>
         </section>
       </main>

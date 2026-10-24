@@ -2,8 +2,31 @@
 
 Living log for formskills' window. Source files stay comment-free; what they would have said lives here.
 
-Current build version: v0.2.0
-Last updated: 2026-10-24 · where each app's skills come from; chips, cards and the detail pane
+Current build version: v0.3.0
+Last updated: 2026-10-24 · the reader and downloads; where each app's skills come from; chips, cards and the detail pane
+
+## v0.3.0 · the reader and downloads {#v0-3-0}
+
+### index.html, main.ts · skill cards, a reader, and the app list never moves
+- refers-to: index.html :: .app-actions, #download-app, #reader, #files, #doc · src/main.ts :: showSkills, openSkill, openFile, showFiles, wireLinks, resolve, closeReader, save
+- kind: decision
+- logged: v0.3.0 · 2026-10-24
+
+The left column stays one card per app, built in the first frame, so skills arriving late never move it. The detail pane shows the chosen app's skills as cards; a card opens the reader in the same pane: a head row (All skills, the skill's name and source, Download skill) and below it the skill's files grouped as Skill, Sub-skills (named by their folder), References (last two path parts) and Other files, beside the open file. SKILL.md opens first. Markdown files show their front matter as a small table and the body rendered; other text in a monospaced block; anything else a note. Requests are numbered so a slow answer for a file no longer chosen is dropped. A Markdown link whose target, resolved against the open file, is a file of this skill becomes a link (click or Enter) to it; links that leave the skill, web addresses and anchors stay inert text with the address as their title. Download all and Download skill write the zip and say where in the status line. Below 760 px wide the app list steps aside while a skill is open. Refresh while reading keeps the open file when it still exists.
+
+### markdown.ts · the family's renderer, adapted
+- refers-to: src/markdown.ts :: renderMarkdown, splitFrontMatter, inline
+- kind: rationale
+- logged: v0.3.0 · 2026-10-24
+
+From formsculpt and formlit (identical copies, GPL-3.0-only, same owner), per the family plan's preference: block Markdown to DOM nodes, never parsing HTML, so a skill cannot inject markup or script (`<b>` in a skill shows as text). Kept: paragraphs, headings, lists, tables, fenced code, rules and inline code, bold, italics and links. Changed: the `fs-md` class names, links carry `data-href`, block quotes added, front matter split out, the streaming class dropped, and a guard so a line no rule takes is still consumed.
+
+### app.css · the chip row leaves room for its own scrollbar
+- refers-to: src/styles/app.css :: .chips, .tools, .count, .reader, .files, .doc, .fs-md
+- kind: fix
+- logged: v0.3.0 · 2026-10-24
+
+The real window under Xvfb showed WebKitGTK's overlay scrollbar drawn over the lower half of the chips on hover, so a click on a chip hit the scrollbar (Chromium did not show it). The chip row is now 48 px with the chips at the top and 16 px below them for the scrollbar, and the mouse wheel scrolls it sideways. Measured after the change in Chromium at 4x CPU and a slow network with a stub bridge that returns real files from the checkouts after 800 ms, dark, light and 640 by 480: open an app, Download all, open formvis-harness (21 files, 4 groups, 7 headings, 3 tables), a sub-skill, Download skill, switch app, back: CLS 0, no page error, no sideways scroll; the v0.2.0 arrival and browser-preview runs: CLS 0. Links checked with a scratch skill: two links to its own guide followed (one with `./` and an anchor), one climbing out of the skill and one web address inert, Enter follows a focused link.
 
 ## v0.2.0 · where each app's skills come from {#v0-2-0}
 

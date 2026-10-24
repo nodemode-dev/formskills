@@ -2,8 +2,17 @@
 
 Living log for formskills' desktop shell. Source files stay comment-free; what they would have said lives here.
 
-Current build version: v0.2.0
-Last updated: 2026-10-24 · library and refresh; the shell
+Current build version: v0.3.0
+Last updated: 2026-10-24 · read_file and download; library and refresh; the shell
+
+## v0.3.0 · read_file and download {#v0-3-0}
+
+### lib.rs · the window asks by app id and path, never by folder
+- refers-to: src/lib.rs :: Shown, read, entry, read_file, download, run
+- kind: decision
+- logged: v0.3.0 · 2026-10-24
+
+The last library read is kept in managed state (`Shown`), with each app's skills folder, which is never sent to the page. `read_file` takes an app id and a path in the set and reads it through `library::read_text` in that folder; `download` packs one skill or the app's set through `pack::archive` into the Downloads folder and returns the saved path. Both run off the main thread. So the page cannot name a folder on disk, only a file the library already listed. Checked in the real window under Xvfb, driven with xdotool: the FormCut chip, Download all (the zip appeared in the downloads folder), and opening a skill.
 
 ## v0.2.0 · library and refresh {#v0-2-0}
 
