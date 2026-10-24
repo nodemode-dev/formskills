@@ -1,6 +1,6 @@
 use std::process::ExitCode;
 
-use formskills_core::{catalog, library, places, Apps, CORE_VERSION};
+use formskills_core::{catalog, library, pack, places, Apps, CORE_VERSION};
 use serde_json::json;
 
 const HELP: &str = "formskills-cli: formskills without the window
@@ -9,6 +9,8 @@ const HELP: &str = "formskills-cli: formskills without the window
   app <id>        one app (JSON)
   skills [id]     each app's skills and where they came from: its latest release, a kept copy, or a checkout in dev mode (JSON)
   fetch [id]      download every app's latest released skills again, check each digest, and keep them (JSON)
+  read <id> <path>   one file of an app's skills, by its path in the set (skill folder first), as text
+  download <id> [skill] [--to DIR]   an app's skills, or one skill, as a zip in Downloads (or DIR)
   catalog         whether the signed family catalogue can be used now, and why not
   where           the folder formskills keeps released skills in
   version         formskills' version
@@ -66,6 +68,41 @@ fn main() -> ExitCode {
             let count: usize = found.apps.iter().map(|a| a.skills.len()).sum();
             print(&json!({ "catalogue": found.catalogue, "dev": found.dev, "dev_roots": found.dev_roots, "skills": count, "apps": found.apps }));
             ExitCode::SUCCESS
+        }
+        "read" | "download" => {
+            let Some(app) = args.get(1).and_then(|name| apps.get(name)).cloned() else {
+                eprintln!("formskills: {command} needs an app that ships skills; `formskills-cli apps` lists them");
+                return ExitCode::FAILURE;
+            };
+            let found = library::load(&apps, Some(&app.id), false);
+            let Some(entry) = found.apps.into_iter().next() else {
+                eprintln!("formskills: {} was not read", app.name);
+                return ExitCode::FAILURE;
+            };
+            let result = if command == "read" {
+                match (args.get(2), entry.root.as_deref()) {
+                    (Some(path), Some(root)) => library::read_text(root, path).map(|f| {
+                        match f.text {
+                            Some(text) => print!("{text}"),
+                            None => eprintln!("formskills: {}: {}", f.path, f.note.unwrap_or_default()),
+                        }
+                    }),
+                    (None, _) => Err("read needs a path, for example formvis-harness/SKILL.md".to_string()),
+                    (_, None) => Err(format!("{} has no skills here", app.name)),
+                }
+            } else {
+                let rest: Vec<&str> = args[2..].iter().map(String::as_str).collect();
+                let to = rest.iter().position(|a| *a == "--to").and_then(|i| rest.get(i + 1)).map(std::path::Path::new);
+                let skill = rest.first().filter(|a| **a != "--to").copied();
+                pack::archive(&entry, &app.app, skill, to).map(|saved| print(&json!(saved)))
+            };
+            match result {
+                Ok(()) => ExitCode::SUCCESS,
+                Err(e) => {
+                    eprintln!("formskills: {e}");
+                    ExitCode::FAILURE
+                }
+            }
         }
         "app" => match args.get(1).and_then(|name| apps.get(name)) {
             Some(app) => {

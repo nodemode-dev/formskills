@@ -40,6 +40,18 @@ pub fn portal_root() -> PathBuf {
     }
 }
 
+pub fn downloads_dir() -> PathBuf {
+    if let Some(dir) = std::env::var_os("FORMSKILLS_DOWNLOADS") {
+        return PathBuf::from(dir);
+    }
+    let downloads = home().join("Downloads");
+    if downloads.is_dir() {
+        downloads
+    } else {
+        home()
+    }
+}
+
 pub fn dev_mode() -> bool {
     flag("FORMSKILLS_DEV")
 }

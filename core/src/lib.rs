@@ -2,6 +2,7 @@ pub mod apps;
 pub mod catalog;
 pub mod fetch;
 pub mod library;
+pub mod pack;
 pub mod places;
 pub mod skills;
 

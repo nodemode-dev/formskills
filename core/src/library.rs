@@ -1,4 +1,4 @@
-use std::path::PathBuf;
+use std::path::{Component, Path, PathBuf};
 
 use serde::Serialize;
 
@@ -32,6 +32,37 @@ pub struct Library {
     pub dev: bool,
     pub dev_roots: Vec<String>,
     pub apps: Vec<AppSkills>,
+}
+
+const TEXT_LIMIT: u64 = 2 * 1024 * 1024;
+
+#[derive(Debug, Clone, Serialize)]
+pub struct FileText {
+    pub path: String,
+    pub bytes: u64,
+    pub text: Option<String>,
+    pub note: Option<String>,
+}
+
+pub fn read_text(root: &Path, rel: &str) -> Result<FileText, String> {
+    let wanted = Path::new(rel);
+    if rel.is_empty() || !wanted.components().all(|c| matches!(c, Component::Normal(_))) {
+        return Err(format!("{rel:?} is not a path inside the skills folder"));
+    }
+    let base = root.canonicalize().map_err(|e| format!("{}: {e}", root.display()))?;
+    let full = base.join(wanted).canonicalize().map_err(|_| format!("{rel} is not in these skills"))?;
+    if !full.starts_with(&base) || !full.is_file() {
+        return Err(format!("{rel} is not a file in these skills"));
+    }
+    let bytes = full.metadata().map(|m| m.len()).unwrap_or(0);
+    if bytes > TEXT_LIMIT {
+        return Ok(FileText { path: rel.to_string(), bytes, text: None, note: Some(format!("{bytes} bytes, too large to show here; download the skill to open it")) });
+    }
+    let raw = std::fs::read(&full).map_err(|e| format!("{rel}: {e}"))?;
+    match String::from_utf8(raw) {
+        Ok(text) if !text.contains('\0') => Ok(FileText { path: rel.to_string(), bytes, text: Some(text), note: None }),
+        _ => Ok(FileText { path: rel.to_string(), bytes, text: None, note: Some(format!("{bytes} bytes, not text; download the skill to open it")) }),
+    }
 }
 
 pub fn checkout(app: &App) -> Option<PathBuf> {

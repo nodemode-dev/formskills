@@ -7,7 +7,7 @@ Licensed under the GNU General Public License v3.0 (SPDX `GPL-3.0-only`). See `L
 
 ## Dependencies
 
-formskills' own code and art (the icon in `assets/`, `frontend/public/` and `src-tauri/icons/`) are the owner's. The list of apps in `core/data/apps.json` is generated from formcompiler's registry (`nodemode-ai/formcompiler`, GPL-3.0-only, the same owner). The window's design tokens and layer scale come from FormTray by way of formMCP (`nodemode-ai/formtray`, `nodemode-ai/formMCP`, GPL-3.0-only, the same owner). The skills formskills shows belong to the Form apps that ship them, under each app's own licence; formskills shows them as released and never changes them.
+formskills' own code and art (the icon in `assets/`, `frontend/public/` and `src-tauri/icons/`) are the owner's. The list of apps in `core/data/apps.json` is generated from formcompiler's registry (`nodemode-ai/formcompiler`, GPL-3.0-only, the same owner). The window's Markdown renderer (`frontend/src/markdown.ts`) is adapted from the one in formsculpt and formlit (`nodemode-ai/formsculpt`, `nodemode-ai/formlit`, GPL-3.0-only, the same owner). The window's design tokens and layer scale come from FormTray by way of formMCP (`nodemode-ai/formtray`, `nodemode-ai/formMCP`, GPL-3.0-only, the same owner). The skills formskills shows belong to the Form apps that ship them, under each app's own licence; formskills shows them as released and never changes them.
 
 Its dependencies are MIT, Apache-2.0 or dual MIT and Apache-2.0, with some BSD-3-Clause, ISC, Zlib, Unicode-3.0 and CDLA-Permissive-2.0 crates, as their manifests declare (checked with `cargo metadata` against `Cargo.lock`, 446 packages at v0.2.0). The main ones:
 
@@ -17,7 +17,7 @@ Its dependencies are MIT, Apache-2.0 or dual MIT and Apache-2.0, with some BSD-3
 | ureq 2 (rustls, ring, webpki-roots) | reading the family catalogue and downloading skills assets over https (`core`); ring is Apache-2.0 and ISC, webpki-roots (the root certificates as data) CDLA-Permissive-2.0 |
 | ed25519-dalek 2 (curve25519-dalek, subtle), base64 | checking the catalogue's signature (`core`); the dalek crates and subtle are BSD-3-Clause |
 | sha2 | checking each skills asset against the catalogue's digest (`core`) |
-| zip 2 (flate2, miniz_oxide, crc32fast, zopfli) | unpacking skills assets (`core`); zip is MIT, miniz_oxide MIT, Zlib or Apache-2.0, zopfli Apache-2.0 |
+| zip 2 (flate2, miniz_oxide, crc32fast, zopfli) | unpacking skills assets and writing downloads (`core`); zip is MIT, miniz_oxide MIT, Zlib or Apache-2.0, zopfli Apache-2.0 |
 | tauri 2, tauri-build | the desktop shell |
 | Vite, TypeScript, @tauri-apps/cli, @types/node (build only) | building the window and the app; not shipped |
 

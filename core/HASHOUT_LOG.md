@@ -2,8 +2,24 @@
 
 Living log for `formskills-core`, `formskills-cli` and `setup/apps.py`. Source files stay comment-free; what they would have said lives here.
 
-Current build version: v0.2.0
-Last updated: 2026-10-24 · released skills fetched, checked and kept, and the dev mode; the generated list of apps that ship skills
+Current build version: v0.3.0
+Last updated: 2026-10-24 · reading one file and packing downloads; released skills fetched, checked and kept, and the dev mode; the generated list of apps that ship skills
+
+## v0.3.0 · read and download {#v0-3-0}
+
+### library.rs · read_text stays inside the skills folder
+- refers-to: core/src/library.rs :: read_text, FileText
+- kind: decision
+- logged: v0.3.0 · 2026-10-24
+
+A file is asked for by its path in the set (`<skill folder>/<path>`). The path must be made only of plain parts (no `..`, no root, no drive), and after resolving links it must still be a file under the skills folder, so a link inside a checkout cannot point the window at the rest of the disk. Files over 2 MB, or that are not UTF-8 or hold a zero byte, come back with a note instead of text. Checked: `..`, a `../` hidden in the middle, an absolute path and a link to `/etc/passwd` placed in a scratch skill are all refused; SKILL.md reads as text.
+
+### pack.rs · downloads shaped like the release asset
+- refers-to: core/src/pack.rs :: archive, free_name, label · core/src/places.rs :: downloads_dir
+- kind: decision
+- logged: v0.3.0 · 2026-10-24
+
+A download is a zip of whole skill folders (`<folder>/<path>`), entries in index order, every date set to 1980-01-01 and every mode to 0644, as formcompiler's `agents.py` writes its asset; one skill is `<folder>.zip`, an app's set `<app>-skills-v<version>.zip` (`-checkout` in dev mode). It goes to `FORMSKILLS_DOWNLOADS`, else the Downloads folder, else home, and never replaces a file: the next free name is `<name> (2).zip`. Checked: the formvis set from its checkout holds the same 42 files, byte for byte, as formcompiler's `formvis-skills-v1.97.1.zip`, and `testzip` finds no error.
 
 ## v0.2.0 · fetch {#v0-2-0}
 
@@ -62,4 +78,4 @@ The list is compiled in with `include_str!`, so the command line and the window 
 - kind: rationale
 - logged: v0.1.0 · 2026-10-24
 
-`apps` (with `source` and `count`), `app <id>` and `version`; an unknown app or command exits 1 with the reason. From v0.2.0 also `skills [id]`, `fetch [id]`, `catalog` and `where`. Checked: `formskills-cli version` prints 0.1.0, `app formvis` prints FormVis with `.claude/skills`, `app nope` exits 1 naming `apps`.
+`apps` (with `source` and `count`), `app <id>` and `version`; an unknown app or command exits 1 with the reason. From v0.2.0 also `skills [id]`, `fetch [id]`, `catalog` and `where`; from v0.3.0 `read <id> <path>` and `download <id> [skill] [--to DIR]`. Checked: `formskills-cli version` prints 0.1.0, `app formvis` prints FormVis with `.claude/skills`, `app nope` exits 1 naming `apps`.
