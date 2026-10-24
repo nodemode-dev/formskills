@@ -5,7 +5,7 @@
 <p align="center"><b>Every Form app's released skills in one place: read them, download them, keep your own edited copies.</b></p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/version-v0.3.0-f97316" alt="version v0.3.0" />
+  <img src="https://img.shields.io/badge/version-v0.3.1-f97316" alt="version v0.3.1" />
   <img src="https://img.shields.io/badge/skills-released%20only-8b5cf6" alt="released skills only" />
   <img src="https://img.shields.io/badge/Tauri-2-24C8DB" alt="Tauri 2" />
   <img src="https://img.shields.io/badge/Rust-stable-B7410E" alt="Rust stable" />
@@ -66,6 +66,8 @@ On Windows run `formskills_oc_install.bat`, then `formskills.bat`.
 **Releases.** formskills builds nothing in this repository. After the version bump lands on main, push a branch `compile_vX.Y.Z` cut from that commit; CI runs on it, and formcompiler (`nodemode-ai/formcompiler`) builds the bundles and drafts the release `formskills-vX.Y.Z` once formskills is in its registry.
 
 ## Status
+
+v0.3.1: a failed download leaves no partial file (written beside and renamed when complete; checked on a full disk).
 
 v0.3.0: the viewer. Skill cards, a reader with the skill's files grouped as skill, sub-skills, references and other files, Markdown rendered without ever parsing HTML, links between a skill's own files followed, and downloads of a skill or an app's set shaped like the release asset. Checked: reading refuses paths and links that leave the skills folder; the formvis set downloads byte for byte like formcompiler's asset; the window at 4x CPU and network throttling through opening, reading, downloading and switching (CLS 0), and in the real app.
 

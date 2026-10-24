@@ -1,5 +1,9 @@
 # Changelog
 
+## v0.3.1 · 2026-10-24
+
+- A download that fails part way (a full disk, for example) no longer leaves a broken zip in your Downloads folder.
+
 ## v0.3.0 · 2026-10-24
 
 - Open a skill to read it: its SKILL.md as formatted text, with its sub-skills, references and other files listed beside it, and links between them followed.
