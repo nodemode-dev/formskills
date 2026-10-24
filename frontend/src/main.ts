@@ -108,10 +108,12 @@ function field(name: string): Element | null {
 function showSkills(id: string): void {
   const found = library.get(id);
   setText(field("here"), found ? longText(found) : invoke ? HERE : "Open the formskills app to read the released skills.");
-  const shown = skillList.dataset.app === id && skillList.dataset.count === String(found?.skills.length ?? -1);
+  const marks = (found?.skills ?? []).map((s) => editMark(id, s.folder)).join("|");
+  const shown = skillList.dataset.app === id && skillList.dataset.count === String(found?.skills.length ?? -1) && skillList.dataset.marks === marks;
   if (shown) return;
   skillList.dataset.app = id;
   skillList.dataset.count = String(found?.skills.length ?? -1);
+  skillList.dataset.marks = marks;
   const items = (found?.skills ?? []).map((s) => {
     const li = el("li", "skill");
     const hit = el("button", "skill-hit");
@@ -123,6 +125,11 @@ function showSkills(id: string): void {
     const subs = s.files.filter((f) => f.kind === "sub-skill").length;
     const refs = s.files.filter((f) => f.kind === "reference").length;
     head.append(name, el("span", "skill-files", [plural(s.files.length, "file"), subs ? plural(subs, "sub-skill") : "", refs ? plural(refs, "reference") : ""].filter(Boolean).join(" · ")));
+    const mark = editMark(id, s.folder);
+    if (mark) {
+      const badge = el("span", `skill-mark${mark === "updated" ? " is-updated" : ""}`, mark === "updated" ? "Your copy · original updated" : "Your copy");
+      head.append(badge);
+    }
     hit.append(head, el("span", "skill-desc", s.description || "No description in its SKILL.md."));
     hit.addEventListener("click", () => openSkill(id, s.folder));
     li.append(hit);
@@ -142,6 +149,312 @@ const detailPane = document.getElementById("detail") as HTMLElement;
 const GROUPS: [string, string][] = [["skill", "Skill"], ["sub-skill", "Sub-skills"], ["reference", "References"], ["file", "Other files"]];
 let reading: { app: string; folder: string; path: string } | null = null;
 let readSeq = 0;
+
+type Edit = { app: string; folder: string; name: string; base: string; created: number; updated: number; files: SkillFile[]; edited: string[]; original: string; original_changed: string[] };
+type FileText = { path: string; bytes: number; text: string | null; note: string | null };
+const editsMap = new Map<string, Edit>();
+const editKey = (app: string, folder: string): string => `${app}/${folder}`;
+const readerBody = reader.querySelector(".reader-body") as HTMLElement;
+const editBar = document.getElementById("edit-bar") as HTMLElement;
+const saveState = document.getElementById("save-state") as HTMLElement;
+const flag = document.getElementById("flag") as HTMLElement;
+const flagText = document.getElementById("flag-text") as HTMLElement;
+const seenButton = document.getElementById("seen") as HTMLButtonElement;
+const downloadCopy = document.getElementById("download-copy") as HTMLButtonElement;
+const discardButton = document.getElementById("discard") as HTMLButtonElement;
+const editToggle = document.getElementById("edit-toggle") as HTMLButtonElement;
+const editorWrap = document.getElementById("editor-wrap") as HTMLElement;
+const editor = document.getElementById("editor") as HTMLTextAreaElement;
+const side = document.getElementById("side") as HTMLElement;
+const tabPreview = document.getElementById("tab-preview") as HTMLButtonElement;
+const tabOriginal = document.getElementById("tab-original") as HTMLButtonElement;
+const previewView = document.getElementById("preview") as HTMLElement;
+const originalView = document.getElementById("original") as HTMLElement;
+let editing = false;
+let editPath = "";
+let dirty = false;
+let saving: Promise<void> | null = null;
+let saveTimer = 0;
+let previewTimer = 0;
+let editSeq = 0;
+let discardArmed = 0;
+
+function editMark(app: string, folder: string): "" | "copy" | "updated" {
+  const e = editsMap.get(editKey(app, folder));
+  if (!e) return "";
+  return e.original_changed.length ? "updated" : "copy";
+}
+
+function show(node: HTMLElement, on: boolean): void {
+  if (node.hidden === on) node.hidden = !on;
+}
+
+function renderInto(target: HTMLElement, path: string, file: FileText | null, note = ""): void {
+  const nodes: HTMLElement[] = [];
+  if (!file || file.text === null) {
+    nodes.push(el("p", "doc-note", note || file?.note || "Not shown here."));
+  } else if (/\.md$/i.test(path)) {
+    const { meta, body } = splitFrontMatter(file.text);
+    if (meta.length) {
+      const dl = el("dl", "doc-meta");
+      for (const [k, v] of meta) dl.append(el("dt", "", k), el("dd", "", v));
+      nodes.push(dl);
+    }
+    const md = el("div", "fs-md");
+    md.append(...renderMarkdown(body));
+    nodes.push(md);
+  } else {
+    const pre = el("pre", "doc-text");
+    pre.textContent = file.text;
+    nodes.push(pre);
+  }
+  target.replaceChildren(...nodes);
+}
+
+function clockNow(): string {
+  return clock(Date.now());
+}
+
+function clock(t: number): string {
+  const d = new Date(t);
+  return [d.getHours(), d.getMinutes(), d.getSeconds()].map((n) => String(n).padStart(2, "0")).join(":");
+}
+
+function updateControls(): void {
+  if (!reading) return;
+  const copy = editsMap.get(editKey(reading.app, reading.folder));
+  const updated = (copy?.original_changed.length ?? 0) > 0;
+  setText(editToggle, editing ? "Show original" : copy ? (updated ? "Your copy (original updated)" : "Edit your copy") : "Edit a copy");
+  editToggle.disabled = !invoke;
+  show(editBar, editing);
+  readerBody.classList.toggle("is-editing", editing);
+  detailPane.classList.toggle("is-editing", editing);
+  show(doc, !editing);
+  show(editorWrap, editing);
+  show(side, editing);
+  show(flag, editing && updated);
+  if (copy && updated) {
+    const list = copy.original_changed.slice(0, 3).join(", ") + (copy.original_changed.length > 3 ? ` and ${copy.original_changed.length - 3} more` : "");
+    setText(flagText, `The original (${copy.original}) changed since your copy: ${list}`);
+    flagText.title = copy.original_changed.join("\n");
+  }
+}
+
+function markEdited(): void {
+  if (!reading) return;
+  const copy = editsMap.get(editKey(reading.app, reading.folder));
+  for (const b of filesNav.querySelectorAll<HTMLButtonElement>(".file")) {
+    b.classList.toggle("is-edited", editing && !!copy?.edited.includes(b.dataset.path ?? ""));
+    b.classList.toggle("is-upstream", editing && !!copy?.original_changed.includes(b.dataset.path ?? ""));
+  }
+}
+
+function setSave(text: string, fault = false): void {
+  setText(saveState, text);
+  saveState.classList.toggle("is-fault", fault);
+}
+
+async function saveNow(): Promise<void> {
+  window.clearTimeout(saveTimer);
+  if (saving) await saving;
+  if (!dirty || !reading || !invoke) return;
+  const { app, folder } = reading;
+  const path = editPath;
+  const text = editor.value;
+  dirty = false;
+  setSave("Saving");
+  saving = (async () => {
+    try {
+      const copy = (await invoke("edit_write", { app, skill: folder, path, text })) as Edit;
+      editsMap.set(editKey(app, folder), copy);
+      if (!dirty) setSave(`Saved ${clockNow()}`);
+      markEdited();
+      updateControls();
+    } catch (e) {
+      dirty = true;
+      setSave(`Could not save: ${String(e)}`, true);
+    } finally {
+      saving = null;
+    }
+  })();
+  await saving;
+}
+
+function renderPreview(): void {
+  renderInto(previewView, editPath, { path: editPath, bytes: editor.value.length, text: editor.value, note: null });
+}
+
+async function loadOriginal(path: string): Promise<void> {
+  const skill = currentSkill();
+  if (!reading || !invoke) return;
+  if (!skill?.files.some((f) => f.path === path)) {
+    renderInto(originalView, path, null, "This file is not in the original.");
+    return;
+  }
+  const seq = editSeq;
+  try {
+    const file = (await invoke("read_file", { app: reading.app, path: `${reading.folder}/${path}` })) as FileText;
+    if (seq === editSeq) renderInto(originalView, path, file);
+  } catch (e) {
+    if (seq === editSeq) renderInto(originalView, path, null, `Could not read the original: ${String(e)}`);
+  }
+}
+
+async function openEditFile(path: string): Promise<void> {
+  if (!reading || !invoke) return;
+  await saveNow();
+  editPath = path;
+  reading.path = path;
+  const seq = ++editSeq;
+  for (const b of filesNav.querySelectorAll<HTMLButtonElement>(".file")) b.setAttribute("aria-current", String(b.dataset.path === path));
+  editor.disabled = true;
+  try {
+    const file = (await invoke("edit_read", { app: reading.app, skill: reading.folder, path })) as FileText;
+    if (seq !== editSeq) return;
+    editor.value = file.text ?? "";
+    editor.disabled = file.text === null;
+    editor.placeholder = file.text === null ? (file.note ?? "Not text") : "";
+    dirty = false;
+    setSave(file.text === null ? "This file is not text; it is kept as it is" : "Saved");
+    renderPreview();
+    void loadOriginal(path);
+  } catch (e) {
+    if (seq === editSeq) setSave(`Could not open your copy: ${String(e)}`, true);
+  }
+}
+
+async function enterEdit(): Promise<void> {
+  if (!reading || !invoke) return;
+  const { app, folder } = reading;
+  let copy = editsMap.get(editKey(app, folder));
+  if (!copy) {
+    editToggle.disabled = true;
+    try {
+      copy = (await invoke("edit_start", { app, skill: folder })) as Edit;
+      editsMap.set(editKey(app, folder), copy);
+      setText(status, `Made your copy of ${copy.name}. The original stays as released.`);
+      if (chosen) showSkills(chosen);
+    } catch (e) {
+      editToggle.disabled = false;
+      setText(status, `Could not make a copy: ${String(e)}`);
+      return;
+    }
+  }
+  editing = true;
+  showFiles({ folder, name: copy.name, description: "", files: copy.files });
+  updateControls();
+  markEdited();
+  const start = copy.files.some((f) => f.path === reading?.path) ? reading.path : "SKILL.md";
+  await openEditFile(start);
+  editor.focus();
+}
+
+async function leaveEdit(save = true): Promise<void> {
+  if (save) await saveNow();
+  editing = false;
+  editSeq += 1;
+  const skill = currentSkill();
+  updateControls();
+  if (skill && reading) {
+    showFiles(skill);
+    void openFile(skill.files.some((f) => f.path === reading?.path) ? reading.path : "SKILL.md");
+  }
+}
+
+async function loadEdits(): Promise<void> {
+  if (!invoke) return;
+  try {
+    const list = (await invoke("edits")) as Edit[];
+    editsMap.clear();
+    for (const e of list) editsMap.set(editKey(e.app, e.folder), e);
+    if (chosen) showSkills(chosen);
+    updateControls();
+    markEdited();
+  } catch {
+    return;
+  }
+}
+
+function selectTab(original: boolean): void {
+  tabPreview.setAttribute("aria-selected", String(!original));
+  tabOriginal.setAttribute("aria-selected", String(original));
+  show(previewView, !original);
+  show(originalView, original);
+}
+
+editor.addEventListener("input", () => {
+  dirty = true;
+  setSave("Unsaved changes");
+  window.clearTimeout(previewTimer);
+  previewTimer = window.setTimeout(renderPreview, 150);
+  window.clearTimeout(saveTimer);
+  saveTimer = window.setTimeout(() => void saveNow(), 800);
+});
+editor.addEventListener("keydown", (e) => {
+  if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "s") {
+    e.preventDefault();
+    void saveNow();
+  }
+});
+tabPreview.addEventListener("click", () => selectTab(false));
+tabOriginal.addEventListener("click", () => selectTab(true));
+editToggle.addEventListener("click", () => void (editing ? leaveEdit() : enterEdit()));
+seenButton.addEventListener("click", async () => {
+  if (!reading || !invoke) return;
+  seenButton.disabled = true;
+  try {
+    const copy = (await invoke("edit_seen", { app: reading.app, skill: reading.folder })) as Edit;
+    editsMap.set(editKey(copy.app, copy.folder), copy);
+    setText(status, `Your copy of ${copy.name} now follows the original from ${copy.base}. Your text was not changed.`);
+    updateControls();
+    markEdited();
+    if (chosen) showSkills(chosen);
+  } catch (e) {
+    setText(status, `Could not mark as seen: ${String(e)}`);
+  } finally {
+    seenButton.disabled = false;
+  }
+});
+downloadCopy.addEventListener("click", async () => {
+  if (!reading || !invoke) return;
+  await saveNow();
+  downloadCopy.disabled = true;
+  try {
+    const saved = (await invoke("edit_download", { app: reading.app, skill: reading.folder })) as { path: string; name: string; files: number };
+    setText(status, `Saved ${saved.name} (your copy, ${plural(saved.files, "file")}) to ${saved.path}`);
+    status.title = saved.path;
+  } catch (e) {
+    setText(status, `Could not download your copy: ${String(e)}`);
+  } finally {
+    downloadCopy.disabled = false;
+  }
+});
+discardButton.addEventListener("click", async () => {
+  if (!reading || !invoke) return;
+  if (Date.now() > discardArmed) {
+    discardArmed = Date.now() + 4000;
+    setText(discardButton, "Click again to discard");
+    window.setTimeout(() => {
+      if (Date.now() >= discardArmed) setText(discardButton, "Discard copy");
+    }, 4100);
+    return;
+  }
+  discardArmed = 0;
+  setText(discardButton, "Discard copy");
+  const { app, folder } = reading;
+  window.clearTimeout(saveTimer);
+  dirty = false;
+  try {
+    await invoke("edit_discard", { app, skill: folder });
+    editsMap.delete(editKey(app, folder));
+    setText(status, "Your copy was deleted. The original is as released.");
+    await leaveEdit(false);
+    if (chosen) showSkills(chosen);
+  } catch (e) {
+    setText(status, `Could not discard: ${String(e)}`);
+  }
+});
+window.addEventListener("beforeunload", () => void saveNow());
 
 function currentSkill(): Skill | undefined {
   return reading ? library.get(reading.app)?.skills.find((s) => s.folder === reading?.folder) : undefined;
@@ -168,7 +481,7 @@ function showFiles(skill: Skill): void {
       b.title = f.path;
       b.dataset.path = f.path;
       b.translate = false;
-      b.addEventListener("click", () => void openFile(f.path));
+      b.addEventListener("click", () => void (editing ? openEditFile(f.path) : openFile(f.path)));
       nodes.push(b);
     }
   }
@@ -241,6 +554,8 @@ async function openFile(path: string): Promise<void> {
 }
 
 function openSkill(app: string, folder: string): void {
+  editing = false;
+  editSeq += 1;
   reading = { app, folder, path: "SKILL.md" };
   const skill = currentSkill();
   const found = library.get(app);
@@ -251,14 +566,18 @@ function openSkill(app: string, folder: string): void {
   if (!detail.hidden) detail.hidden = true;
   if (reader.hidden) reader.hidden = false;
   detailPane.classList.add("is-reading");
+  updateControls();
   void openFile("SKILL.md");
 }
 
 function closeReader(): void {
+  if (editing) void saveNow();
+  editing = false;
+  editSeq += 1;
   reading = null;
   readSeq += 1;
   if (!reader.hidden) reader.hidden = true;
-  detailPane.classList.remove("is-reading");
+  detailPane.classList.remove("is-reading", "is-editing");
 }
 
 async function save(app: string, skill: string | null, button: HTMLButtonElement): Promise<void> {
@@ -298,11 +617,12 @@ function showLibrary(lib: Library): void {
     if (!skill) {
       closeReader();
       if (chosen) choose(chosen);
-    } else {
+    } else if (!editing) {
       showFiles(skill);
       void openFile(skill.files.some((f) => f.path === reading?.path) ? reading.path : "SKILL.md");
     }
   }
+  void loadEdits();
   const total = lib.apps.reduce((n, a) => n + a.skills.length, 0);
   const withSkills = lib.apps.filter((a) => a.skills.length > 0).length;
   const mode = lib.dev ? `Dev mode: checkouts in ${lib.dev_roots.join(", ") || "no folder"} first, releases otherwise` : "Released skills only";

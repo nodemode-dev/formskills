@@ -2,8 +2,19 @@
 
 Living log for formskills' window. Source files stay comment-free; what they would have said lives here.
 
-Current build version: v0.3.0
-Last updated: 2026-10-24 · the reader and downloads; where each app's skills come from; chips, cards and the detail pane
+Current build version: v0.4.0
+Last updated: 2026-10-24 · editing your own copy; the reader and downloads; where each app's skills come from; chips, cards and the detail pane
+
+## v0.4.0 · editing your own copy {#v0-4-0}
+
+### index.html, main.ts · edit mode inside the reader
+- refers-to: index.html :: #edit-toggle, #edit-bar, #save-state, #flag, #seen, #download-copy, #discard, #editor-wrap, #editor, #side, #tab-preview, #tab-original, #preview, #original · src/main.ts :: editMark, updateControls, markEdited, saveNow, renderPreview, loadOriginal, openEditFile, enterEdit, leaveEdit, loadEdits, selectTab, renderInto
+- kind: decision
+- logged: v0.4.0 · 2026-10-24
+
+The reader's head has one edit button whose label says the state: "Edit a copy" (none yet: makes one), "Edit your copy", "Your copy (original updated)", or "Show original" while editing. Edit mode adds a 40 px bar (save state; the flag naming the changed original files with Mark as seen; Download your copy; Discard copy) and turns the body into the copy's files (a violet dot on files you changed, an orange one on files the original changed), a plain-text editor, and a side column with Preview and Original tabs; the original is read-only there and comes from the same release or checkout as the reader. Typing re-renders the preview after 150 ms and saves 800 ms after the last key (Ctrl or Cmd+S at once); changing file, showing the original, leaving the skill, downloading and closing the window save first. A failed save keeps the text and says why. Discard needs a second click within 4 s and says so on the button; there is no browser dialog. Skill cards show "Your copy" or "Your copy · original updated". While editing, the editor takes the whole width (the app list steps aside) and the original's Download skill is hidden; below 760 px the editor and side stack and the bar wraps. `renderInto` is the one renderer for the reader, the preview and the original.
+
+Measured in Chromium at 4x CPU with a bridge that runs the real `formskills-cli` against a scratch checkout of formcut (each call delayed 400 ms, the library 900 ms), dark, light and 640 by 480: open formcut-mcp, Edit a copy, type a section (saved; preview shows it; the Original tab and the file on disk do not), change the original on disk, reload (the copy keeps the text; the flag names SKILL.md), Mark as seen (flag gone), Download your copy (zip saved), Discard twice (copy gone on disk, back to the original): CLS 0, no page error. The v0.2.0 and v0.3.0 runs again: CLS 0.
 
 ## v0.3.0 · the reader and downloads {#v0-3-0}
 

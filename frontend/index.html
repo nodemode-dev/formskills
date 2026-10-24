@@ -65,11 +65,34 @@
                 <h2 class="reader-name" id="reader-name" translate="no"></h2>
                 <p class="reader-from" id="reader-from"></p>
               </div>
-              <button class="btn" id="download-skill" type="button">Download skill</button>
+              <div class="reader-actions">
+                <button class="btn" id="edit-toggle" type="button">Edit a copy</button>
+                <button class="btn" id="download-skill" type="button">Download skill</button>
+              </div>
             </header>
+            <div class="edit-bar" id="edit-bar" hidden>
+              <span class="save-state" id="save-state" aria-live="polite"></span>
+              <span class="flag" id="flag" hidden>
+                <span class="flag-text" id="flag-text"></span>
+                <button class="btn btn-small" id="seen" type="button">Mark as seen</button>
+              </span>
+              <button class="btn btn-small" id="download-copy" type="button">Download your copy</button>
+              <button class="btn btn-small btn-danger" id="discard" type="button">Discard copy</button>
+            </div>
             <div class="reader-body">
               <nav class="files" id="files" aria-label="Files in this skill"></nav>
               <div class="doc" id="doc" tabindex="0"></div>
+              <div class="editor-wrap" id="editor-wrap" hidden>
+                <textarea class="editor" id="editor" spellcheck="false" aria-label="Your copy of this file"></textarea>
+              </div>
+              <div class="side" id="side" hidden>
+                <div class="tabs" role="tablist" aria-label="Beside the editor">
+                  <button class="tab" id="tab-preview" type="button" role="tab" aria-selected="true">Preview</button>
+                  <button class="tab" id="tab-original" type="button" role="tab" aria-selected="false">Original</button>
+                </div>
+                <div class="side-view" id="preview" role="tabpanel" aria-labelledby="tab-preview"></div>
+                <div class="side-view" id="original" role="tabpanel" aria-labelledby="tab-original" hidden></div>
+              </div>
             </div>
           </article>
         </section>

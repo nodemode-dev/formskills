@@ -2,8 +2,17 @@
 
 Living log for formskills' desktop shell. Source files stay comment-free; what they would have said lives here.
 
-Current build version: v0.3.0
-Last updated: 2026-10-24 · read_file and download; library and refresh; the shell
+Current build version: v0.4.0
+Last updated: 2026-10-24 · the edit commands; read_file and download; library and refresh; the shell
+
+## v0.4.0 · the edit commands {#v0-4-0}
+
+### lib.rs · edits, edit_start, edit_read, edit_write, edit_seen, edit_discard, edit_download
+- refers-to: src/lib.rs :: original, library_apps, edits, edit_start, edit_read, edit_write, edit_seen, edit_discard, edit_download
+- kind: decision
+- logged: v0.4.0 · 2026-10-24
+
+Each passes an app id, a skill folder and, for files, a path in the skill to `edits.rs`, off the main thread; the original (for the flag) comes from the managed library, so the page never names a folder. `edit_start` and `edit_seen` need the original read; the others work without it. Checked in the real window under Xvfb driven with xdotool: FormCut, a skill, Edit a copy, typing (saved to the copy on disk; the original file unchanged); the app quit, the original changed on disk, the app started again: the skill card reads "Your copy · original updated".
 
 ## v0.3.0 · read_file and download {#v0-3-0}
 
