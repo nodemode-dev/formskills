@@ -1,7 +1,7 @@
 {
   "name": "formskills",
   "private": true,
-  "version": "0.4.0",
+  "version": "0.4.1",
   "description": "formskills' window: the Form apps' released skills",
   "license": "GPL-3.0-only",
   "type": "module",
