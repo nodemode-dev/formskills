@@ -1,0 +1,7 @@
+{
+  "$schema": "../gen/schemas/desktop-schema.json",
+  "identifier": "default",
+  "description": "The formskills window: read the list of Form apps that ship skills.",
+  "windows": ["main"],
+  "permissions": ["core:default"]
+}

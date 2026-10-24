@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en" class="booting">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="color-scheme" content="dark light" />
+    <title>formskills</title>
+    <link rel="icon" href="/formskills.png" />
+    <link rel="stylesheet" href="/src/styles/tokens.css" />
+    <link rel="stylesheet" href="/src/styles/layers.css" />
+    <link rel="stylesheet" href="/src/styles/app.css" />
+    <script type="module" src="/src/main.ts"></script>
+  </head>
+  <body>
+    <div class="shell">
+      <header class="bar">
+        <img class="mark" src="/formskills.png" width="32" height="32" alt="" />
+        <div class="title">
+          <h1 translate="no">formskills</h1>
+          <p class="sub">The Form apps' released skills: read them, download them, keep your own edits</p>
+        </div>
+        <span class="version" id="version" translate="no"></span>
+      </header>
+      <div class="tools">
+        <div class="chips" id="chips" role="group" aria-label="Show skills from"></div>
+        <p class="count" id="count" aria-live="polite"></p>
+      </div>
+      <main class="split">
+        <ul class="cards" id="cards" aria-label="Apps that ship skills"></ul>
+        <section class="detail" id="detail" aria-live="polite">
+          <div class="detail-empty" id="detail-empty">
+            <p class="detail-lead">Choose an app to see where its skills come from.</p>
+            <p class="detail-note">Each Form app ships its skills with every release. formskills shows exactly what shipped, never unreleased work, and never changes an app's own copy.</p>
+          </div>
+          <article class="detail-app" id="detail-app" hidden>
+            <header class="detail-head">
+              <h2 class="detail-name" data-f="name" translate="no"></h2>
+              <span class="detail-kind" data-f="kind"></span>
+            </header>
+            <p class="detail-summary" data-f="summary"></p>
+            <dl class="facts">
+              <dt>Skills folder</dt>
+              <dd data-f="skills" translate="no"></dd>
+              <dt>Repository</dt>
+              <dd data-f="repository" translate="no"></dd>
+              <dt>Release state</dt>
+              <dd data-f="state"></dd>
+              <dt>Skills here</dt>
+              <dd data-f="here"></dd>
+            </dl>
+          </article>
+        </section>
+      </main>
+      <footer class="foot">
+        <span translate="no">by nodemode.ai</span>
+        <span class="source" id="source"></span>
+      </footer>
+    </div>
+  </body>
+</html>

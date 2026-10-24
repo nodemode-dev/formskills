@@ -1,0 +1,18 @@
+[package]
+name = "formskills"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+authors.workspace = true
+description = "formskills: the Form apps' released skills, to read, download and keep your own edited copies"
+
+[lib]
+name = "formskills_shell"
+crate-type = ["staticlib", "cdylib", "rlib"]
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
+[dependencies]
+formskills-core = { path = "../core" }
+tauri = { version = "2", features = [] }
