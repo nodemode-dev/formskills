@@ -1,0 +1,15 @@
+[package]
+name = "formskills-cli"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+authors.workspace = true
+description = "formskills on the command line: the Form apps that ship skills."
+
+[[bin]]
+name = "formskills-cli"
+path = "src/main.rs"
+
+[dependencies]
+formskills-core = { path = "../core" }
+serde_json = "1"

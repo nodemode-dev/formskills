@@ -1,0 +1,198 @@
+{
+  "format": "formskills-apps",
+  "format_version": 1,
+  "source": {
+    "repository": "nodemode-ai/formcompiler",
+    "version": "0.4.0",
+    "commit": "30943accdd5e7f63c9062fdd596b841cc18eaedd"
+  },
+  "apps": [
+    {
+      "id": "formmd",
+      "app": "form.md",
+      "name": "Form.md",
+      "kind": "notes",
+      "summary": "Notes, docs and databases built on plain Markdown files.",
+      "repository": "https://github.com/nodemode-ai/form.md",
+      "skills": ".claude/skills",
+      "state": "live",
+      "released": true
+    },
+    {
+      "id": "format",
+      "app": "format",
+      "name": "Format",
+      "kind": "chat",
+      "summary": "A chat and agent workspace for the Claude API, with a terminal, artifacts and documents.",
+      "repository": "https://github.com/nodemode-ai/format",
+      "skills": ".claude/skills",
+      "state": "prelaunch",
+      "released": true
+    },
+    {
+      "id": "formcut",
+      "app": "formcut",
+      "name": "FormCut",
+      "kind": "video",
+      "summary": "Video editing on your own machine: cut, grade, caption and export.",
+      "repository": "https://github.com/nodemode-ai/formcut",
+      "skills": ".claude/skills",
+      "state": "live",
+      "released": true
+    },
+    {
+      "id": "formdesign",
+      "app": "formdesign",
+      "name": "FormDesign",
+      "kind": "layout",
+      "summary": "Page layout and PDF work in one app: lay out, publish, read, sign and edit.",
+      "repository": "https://github.com/nodemode-ai/formdesign",
+      "skills": ".claude/skills",
+      "state": "live",
+      "released": true
+    },
+    {
+      "id": "formencoder",
+      "app": "formencoder",
+      "name": "FormEncoder",
+      "kind": "encoder",
+      "summary": "Convert, compress and export media in batches, with presets.",
+      "repository": "https://github.com/nodemode-ai/formencoder",
+      "skills": ".claude/skills",
+      "state": "public",
+      "released": true
+    },
+    {
+      "id": "formlit",
+      "app": "formlit",
+      "name": "FormLit",
+      "kind": "photo",
+      "summary": "Photo library and raw development on your own machine.",
+      "repository": "https://github.com/nodemode-ai/formlit",
+      "skills": ".claude/skills",
+      "state": "live",
+      "released": true
+    },
+    {
+      "id": "formpath",
+      "app": "formpath",
+      "name": "FormPath",
+      "kind": "vector",
+      "summary": "Vector illustration: paths, shapes, type and artboards.",
+      "repository": "https://github.com/nodemode-ai/formpath",
+      "skills": ".claude/skills",
+      "state": "live",
+      "released": true
+    },
+    {
+      "id": "formpdf",
+      "app": "formpdf",
+      "name": "FormPDF",
+      "kind": "pdf",
+      "summary": "A PDF editor that runs on your computer: view, comment, fill, sign and edit.",
+      "repository": "https://github.com/nodemode-ai/formpdf",
+      "skills": ".claude/skills",
+      "state": "prelaunch",
+      "released": true
+    },
+    {
+      "id": "formai",
+      "app": "formportal",
+      "name": "FormPortal",
+      "kind": "portal",
+      "summary": "One place to install, open and update every Form app.",
+      "repository": "https://github.com/nodemode-ai/formportal",
+      "skills": ".claude/skills",
+      "state": "public",
+      "released": true
+    },
+    {
+      "id": "formref",
+      "app": "formref",
+      "name": "FormRef",
+      "kind": "reference",
+      "summary": "Reference boards for images, ideas and creative work.",
+      "repository": "https://github.com/nodemode-ai/formref",
+      "skills": ".claude/skills",
+      "state": "prelaunch",
+      "released": false
+    },
+    {
+      "id": "formsculpt",
+      "app": "formsculpt",
+      "name": "FormSculpt",
+      "kind": "sculpt",
+      "summary": "3D sculpting and modeling, with a Rust engine and a command set agents can drive.",
+      "repository": "https://github.com/nodemode-ai/formsculpt",
+      "skills": ".claude/skills",
+      "state": "prelaunch",
+      "released": true
+    },
+    {
+      "id": "formslide",
+      "app": "formdeck",
+      "name": "FormSlide",
+      "kind": "slides",
+      "summary": "Presentations: build slides, present and export.",
+      "repository": "https://github.com/nodemode-ai/formdeck",
+      "skills": ".claude/skills",
+      "state": "live",
+      "released": true
+    },
+    {
+      "id": "formsurface",
+      "app": "formsurface",
+      "name": "FormSurface",
+      "kind": "texture",
+      "summary": "Paint textures and materials straight onto 3D models.",
+      "repository": "https://github.com/nodemode-ai/formsurface",
+      "skills": ".claude/skills",
+      "state": "prelaunch",
+      "released": true
+    },
+    {
+      "id": "formvfx",
+      "app": "formvfx",
+      "name": "FormVFX",
+      "kind": "motion",
+      "summary": "Motion graphics and visual effects on a layered timeline.",
+      "repository": "https://github.com/nodemode-ai/formvfx",
+      "skills": ".claude/skills",
+      "state": "live",
+      "released": true
+    },
+    {
+      "id": "formvis",
+      "app": "formvis",
+      "name": "FormVis",
+      "kind": "image",
+      "summary": "Layered image editing: layers, masks, selections, painting and export.",
+      "repository": "https://github.com/nodemode-ai/formvis",
+      "skills": ".claude/skills",
+      "state": "live",
+      "released": true
+    },
+    {
+      "id": "formwav",
+      "app": "formwav",
+      "name": "FormWav",
+      "kind": "audio",
+      "summary": "Audio editing: record, edit, repair, mix and export.",
+      "repository": "https://github.com/nodemode-ai/formwav",
+      "skills": ".claude/skills",
+      "state": "live",
+      "released": true
+    },
+    {
+      "id": "formweb",
+      "app": "formweb",
+      "name": "FormWeb",
+      "kind": "web",
+      "summary": "Design and publish web pages visually.",
+      "repository": "https://github.com/nodemode-ai/formweb",
+      "skills": ".claude/skills",
+      "state": "prelaunch",
+      "released": true
+    }
+  ]
+}
