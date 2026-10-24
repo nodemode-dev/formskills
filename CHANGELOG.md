@@ -1,5 +1,12 @@
 # Changelog
 
+## v0.4.0 · 2026-10-24
+
+- Make your own copy of any skill and edit it: a text editor with a live preview, and the original read-only beside it. Your copy is saved as you type and kept after you close formskills; the original is never changed.
+- When a newer release changes the original, the skill and your copy say so and list the changed files; Mark as seen records the new original without touching your text.
+- Download your copy as a zip, or discard it (after a second click).
+- `./formskills cli edits` and `./formskills cli edit ...` do the same on the command line.
+
 ## v0.3.1 · 2026-10-24
 
 - A download that fails part way (a full disk, for example) no longer leaves a broken zip in your Downloads folder.

@@ -34,6 +34,22 @@ A download is shaped like the release asset (`<skill folder>/<files>`, fixed dat
 
 Each app's source is `release` (its latest released skills asset, digest checked), `kept` (an earlier release kept on this computer, with why the latest could not be read), `dev` (a checkout, dev mode only) or `missing` (with the reason). The window shows the same on each card and in the detail pane; Refresh downloads again.
 
+## Your own copies
+
+In the window, open a skill and press Edit a copy. Your copy is saved as you type (or at once with Ctrl or Cmd+S); Preview shows it formatted, Original shows the released file beside it. When a newer release changes the original, the skill card and the button say "original updated", the edit bar names the changed files, and Mark as seen records the new original without touching your text. Download your copy saves `<skill>-edited.zip`; Discard copy deletes it after a second click.
+
+```bash
+./formskills cli edits                                       # your copies and their state
+./formskills cli edit start formvis formvis-harness          # make a copy
+./formskills cli edit read formvis formvis-harness SKILL.md  # one file of your copy
+./formskills cli edit write formvis formvis-harness SKILL.md my.md   # replace it with my.md (- for stdin)
+./formskills cli edit seen formvis formvis-harness           # follow the original's current version
+./formskills cli edit download formvis formvis-harness --to .
+./formskills cli edit discard formvis formvis-harness
+```
+
+Copies live in `edits/` in formskills' data folder (beside `released/`), one folder per skill with a small record next to it. Only files the skill already has can be edited.
+
 ## Dev mode
 
 ```bash

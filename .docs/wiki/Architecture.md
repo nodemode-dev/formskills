@@ -3,7 +3,7 @@
 ```
 formskills/
 ├── core/            formskills-core: the list (core/data/apps.json, compiled in), catalogue, fetch, index, library
-├── cli/             formskills-cli: apps, app, skills, fetch, read, download, catalog, where, version
+├── cli/             formskills-cli: apps, app, skills, fetch, read, download, edits, edit, catalog, where, version
 ├── src-tauri/       the shell: the window
 ├── frontend/        the window: tokens, layers, chips, cards, the detail pane
 ├── setup/apps.py    core/data/apps.json from formcompiler's registry
@@ -28,6 +28,10 @@ formcompiler attaches `<app>-skills-vX.Y.Z.zip` to every release, built from the
 - `library.rs` gives every app one source (`release`, `kept`, `dev` or `missing`) and its skills. Dev mode, off by default, reads checkouts instead.
 
 The shell's `library` and `refresh` commands return that, off the main thread.
+
+## Your copies (v0.4.0)
+
+`edits.rs` keeps each copy in `edits/<app>/<skill>/` with `<skill>.edit.json` beside it: the base it was copied from and a SHA-256 of each original file. From those it reports which files you changed and which files the original changed since (the "original updated" flag); Mark as seen records the original's current digests. Writes replace one existing file of the copy, beside and renamed. Nothing writes to `released/` or to a checkout. The shell's `edit_*` commands pass app ids, skill folders and paths only.
 
 ## Reading and downloading (v0.3.0)
 

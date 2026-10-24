@@ -5,7 +5,7 @@
 <p align="center"><b>Every Form app's released skills in one place: read them, download them, keep your own edited copies.</b></p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/version-v0.3.1-f97316" alt="version v0.3.1" />
+  <img src="https://img.shields.io/badge/version-v0.4.0-f97316" alt="version v0.4.0" />
   <img src="https://img.shields.io/badge/skills-released%20only-8b5cf6" alt="released skills only" />
   <img src="https://img.shields.io/badge/Tauri-2-24C8DB" alt="Tauri 2" />
   <img src="https://img.shields.io/badge/Rust-stable-B7410E" alt="Rust stable" />
@@ -21,7 +21,7 @@ formskills is where the skills of the Form family of desktop apps (image, video,
 
 - **Released skills only.** What formskills shows is what each app's latest release carries: the skills asset named in the signed family catalogue, its digest checked, kept on this computer and reused until a new release changes it. No `main`, no watch step, no copy kept in this repository. A dev mode (`./formskills dev`) reads local checkouts instead, for building the apps.
 - **One place for skills.** formMCP gives agents the Form apps' tools; formskills is where their skills live. The two do not overlap.
-- **Your edits stay yours.** An edited copy is kept beside the original, which stays read-only and is flagged when a newer release changes it (v0.4.0).
+- **Your edits stay yours.** Make your own copy of any skill and edit it with a live preview and the original read-only beside it. The copy is saved as you type and kept in formskills' own folder; the original is never changed, and when a newer release changes it your copy is flagged with the files that changed. Download your copy as a zip whenever you like.
 - **Never hand-kept.** The list of apps is generated from formcompiler's registry (`./formskills apps --compiler PATH`) and records the version and commit it came from.
 - **Read them properly.** Each app's skills as cards; open one to read its SKILL.md as formatted text, with its sub-skills, references and other files beside it and links between them followed. Skills are shown as text and never run.
 - **Download what shipped.** One skill, or an app's whole set, as a zip shaped exactly like the release asset, saved to Downloads.
@@ -39,6 +39,8 @@ Requirements: Rust (stable), Node 20.19+, and on Linux WebKitGTK 4.1 for the win
 ./formskills cli fetch      # download every app's latest released skills again
 ./formskills cli read formvis formvis-harness/SKILL.md
 ./formskills cli download formvis formvis-harness   # a zip in Downloads
+./formskills cli edit start formvis formvis-harness # your own copy; then edit it in the window
+./formskills cli edits                              # your copies, and whether their originals changed
 ./formskills dev            # the window, reading Form app checkouts beside this one
 ```
 
@@ -50,8 +52,8 @@ On Windows run `formskills_oc_install.bat`, then `formskills.bat`.
 
 | Path | Role |
 | --- | --- |
-| `core/` | The engine: the list of apps that ship skills (`core/data/apps.json`, generated), the signed catalogue, fetching and keeping released skills, the skills index |
-| `cli/` | `formskills-cli apps`, `app`, `skills`, `fetch`, `read`, `download`, `catalog`, `where`, `version` |
+| `core/` | The engine: the list of apps that ship skills (`core/data/apps.json`, generated), the signed catalogue, fetching and keeping released skills, the skills index, downloads, your edited copies |
+| `cli/` | `formskills-cli apps`, `app`, `skills`, `fetch`, `read`, `download`, `edits`, `edit ...`, `catalog`, `where`, `version` |
 | `src-tauri/` | The shell: the window |
 | `frontend/` | The window: tokens, layers, chips, cards and the detail pane |
 | `setup/apps.py` | Generates `core/data/apps.json` from formcompiler's registry |
@@ -67,6 +69,8 @@ On Windows run `formskills_oc_install.bat`, then `formskills.bat`.
 
 ## Status
 
+v0.4.0: your own edited copies. A copy per skill in formskills' own folder, an editor with live preview and the read-only original beside it, saved as you type, flagged with the changed files when the original moves on, marked as seen, downloaded or discarded; the original is never written. Checked with the real engine behind the window (copy, edit, upstream change, restart, seen, download, discard; CLS 0 under 4x CPU throttling, dark, light and 640 by 480) and in the real app, quit and started again.
+
 v0.3.1: a failed download leaves no partial file (written beside and renamed when complete; checked on a full disk).
 
 v0.3.0: the viewer. Skill cards, a reader with the skill's files grouped as skill, sub-skills, references and other files, Markdown rendered without ever parsing HTML, links between a skill's own files followed, and downloads of a skill or an app's set shaped like the release asset. Checked: reading refuses paths and links that leave the skills folder; the formvis set downloads byte for byte like formcompiler's asset; the window at 4x CPU and network throttling through opening, reading, downloading and switching (CLS 0), and in the real app.
@@ -75,7 +79,7 @@ v0.2.0: fetch. The signed catalogue read with FormPortal's trust model; each app
 
 v0.1.0: the scaffold. The list of the 17 Form apps that ship skills, generated from formcompiler's registry; the command line; the window with All and per-app chips, a card per app and a detail pane, painted complete in its first frame.
 
-Next (family plan, Phase 4): v0.4.0 keeps your own edited copies beside the originals.
+Next (family plan, Phase 5): formskills and formMCP in formcompiler's registry, released like every Form app, with their ids and names aligned in FormPortal, FormTray and FormRanker.
 
 ## License
 
