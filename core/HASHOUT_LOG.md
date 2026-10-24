@@ -2,8 +2,17 @@
 
 Living log for `formskills-core`, `formskills-cli` and `setup/apps.py`. Source files stay comment-free; what they would have said lives here.
 
-Current build version: v0.4.0
-Last updated: 2026-10-24 · personal edited copies; no partial download; reading one file and packing downloads; released skills fetched, checked and kept, and the dev mode; the generated list of apps that ship skills
+Current build version: v0.4.1
+Last updated: 2026-10-24 · registered in formcompiler; personal edited copies; no partial download; reading one file and packing downloads; released skills fetched, checked and kept, and the dev mode; the generated list of apps that ship skills
+
+## v0.4.1 · registered in formcompiler {#v0-4-1}
+
+### core/data/apps.json, build_app · the list from formcompiler 0.4.1, and the build formcompiler runs
+- refers-to: core/data/apps.json · build_app · build_app.bat
+- kind: decision
+- logged: v0.4.1 · 2026-10-24
+
+formcompiler 0.4.1 (7c92f91) registers formMCP, whose `.claude/skills` holds `formmcp-harness`, and formskills, which ships no skills; the regenerated list has 18 apps with formMCP among them. `build_app` and `build_app.bat` follow formtray's (check the tools, run `formskills_oc_install`, run the Tauri CLI from the repository root, log to `build_app.log`); formcompiler's `apps/formskills.json` calls `./build_app --no-install` and `call build_app.bat`. Checked: `./build_app --no-install --bundles deb` on Linux made `formskills_0.4.0_amd64.deb` (binary, LICENSE, NOTICE.md, desktop file, icons), and the release binary, run without a dev server, opened the window with every card and said why it read no skills (no catalogue here).
 
 ## v0.4.0 · personal edited copies {#v0-4-0}
 

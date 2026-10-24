@@ -3,8 +3,8 @@
   "format_version": 1,
   "source": {
     "repository": "nodemode-ai/formcompiler",
-    "version": "0.4.0",
-    "commit": "30943accdd5e7f63c9062fdd596b841cc18eaedd"
+    "version": "0.4.1",
+    "commit": "7c92f91e2a3fb7a0ddb4cdddfc81ead9771240db"
   },
   "apps": [
     {
@@ -71,6 +71,17 @@
       "repository": "https://github.com/nodemode-ai/formlit",
       "skills": ".claude/skills",
       "state": "live",
+      "released": true
+    },
+    {
+      "id": "formmcp",
+      "app": "formMCP",
+      "name": "formMCP",
+      "kind": "connect",
+      "summary": "One MCP connection from Claude Code, Codex and Cursor to every Form app.",
+      "repository": "https://github.com/nodemode-ai/formMCP",
+      "skills": ".claude/skills",
+      "state": "prelaunch",
       "released": true
     },
     {
