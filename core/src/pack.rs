@@ -65,7 +65,11 @@ pub fn archive(app: &AppSkills, app_name: &str, skill: Option<&str>, into: Optio
     let dir = into.map(Path::to_path_buf).unwrap_or_else(downloads_dir);
     std::fs::create_dir_all(&dir).map_err(|e| format!("{}: {e}", dir.display()))?;
     let target = free_name(&dir, &stem);
-    std::fs::write(&target, &bytes).map_err(|e| format!("{}: {e}", target.display()))?;
+    let part = dir.join(format!(".{stem}.zip.part-{}", std::process::id()));
+    if let Err(e) = std::fs::write(&part, &bytes).and_then(|()| std::fs::rename(&part, &target)) {
+        let _ = std::fs::remove_file(&part);
+        return Err(format!("{}: {e}", target.display()));
+    }
     Ok(Saved {
         name: target.file_name().map(|n| n.to_string_lossy().to_string()).unwrap_or_default(),
         path: target.display().to_string(),

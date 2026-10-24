@@ -2,8 +2,17 @@
 
 Living log for `formskills-core`, `formskills-cli` and `setup/apps.py`. Source files stay comment-free; what they would have said lives here.
 
-Current build version: v0.3.0
-Last updated: 2026-10-24 · reading one file and packing downloads; released skills fetched, checked and kept, and the dev mode; the generated list of apps that ship skills
+Current build version: v0.3.1
+Last updated: 2026-10-24 · no partial download; reading one file and packing downloads; released skills fetched, checked and kept, and the dev mode; the generated list of apps that ship skills
+
+## v0.3.1 · no partial download {#v0-3-1}
+
+### pack.rs · write beside, then rename
+- refers-to: core/src/pack.rs :: archive
+- kind: fix
+- logged: v0.3.1 · 2026-10-24
+
+v0.3.0 wrote the zip straight to its final name, so a write that failed (the disk filled during the release check) left a broken `formcut-skills-checkout.zip` in the downloads folder, and the next download became `(2)`. The zip is now written to a hidden `.<name>.zip.part-<pid>` in the same folder and renamed into place only when complete; on any failure the part is removed and the error names the target. Checked on a 20 KB tmpfs: the download fails with "No space left on device" and the folder stays empty; a normal download gets the plain name.
 
 ## v0.3.0 · read and download {#v0-3-0}
 
