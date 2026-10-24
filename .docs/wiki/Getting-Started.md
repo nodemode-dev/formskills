@@ -17,6 +17,39 @@
 
 On Windows: `formskills_oc_install.bat`, then `formskills.bat`, `formskills.bat cli apps`.
 
+## Released skills
+
+```bash
+./formskills cli catalog          # can the signed family catalogue be used now, and if not, why
+./formskills cli skills           # every app's skills and where they came from
+./formskills cli skills formvis   # one app
+./formskills cli fetch            # download every app's latest release again
+./formskills cli where            # the folder released skills are kept in
+```
+
+Each app's source is `release` (its latest released skills asset, digest checked), `kept` (an earlier release kept on this computer, with why the latest could not be read), `dev` (a checkout, dev mode only) or `missing` (with the reason). The window shows the same on each card and in the detail pane; Refresh downloads again.
+
+## Dev mode
+
+```bash
+./formskills dev                  # the window, reading checkouts in the folder that holds this one
+./formskills dev cli skills       # the same on the command line
+```
+
+A checkout counts when `<folder>/<app repository name>/<skills folder>` exists (for example `../formvis/.claude/skills`); apps without one still come from their release. Dev mode shows unreleased work, so it is off unless asked for.
+
+## Settings
+
+| Variable | What it does |
+| --- | --- |
+| `FORMSKILLS_HOME` | formskills' data folder (default: Application Support `ai.nodemode.formskills` on macOS, `%LOCALAPPDATA%\formskills` on Windows, `~/.local/share/formskills` elsewhere) |
+| `FORMSKILLS_CATALOG` | the catalogue's address: https, loopback http or a file (default: formcompiler's `catalog` release) |
+| `FORMAI_CATALOG_PUBKEY` | extra trusted catalogue keys, comma separated (shared with FormPortal and formMCP) |
+| `FORMSKILLS_OFFLINE` | `1`: read only FormPortal's kept copy of the catalogue |
+| `FORMPORTAL_ROOT` | where FormPortal keeps its data, for that copy |
+| `FORMSKILLS_ALLOW_UNSIGNED` | `1`: accept an unsigned catalogue (development only) |
+| `FORMSKILLS_DEV`, `FORMSKILLS_DEV_ROOTS` | dev mode, and the folders holding checkouts (`./formskills dev` sets both) |
+
 ## Refreshing the list
 
 The list is generated from formcompiler's registry (`apps/<app>.json`: its `catalog` block, and `agents.skills`, the folder an app keeps its skills in; apps without one are left out):
