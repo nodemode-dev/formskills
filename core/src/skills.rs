@@ -22,7 +22,15 @@ pub struct Skill {
     pub description: String,
     pub license: String,
     pub check: Summary,
+    pub scripts: usize,
     pub files: Vec<SkillFile>,
+}
+
+const SCRIPT_ENDINGS: [&str; 12] = [".py", ".sh", ".bash", ".zsh", ".js", ".mjs", ".ts", ".ps1", ".bat", ".cmd", ".rb", ".pl"];
+
+pub fn is_script(path: &str) -> bool {
+    let lower = path.to_ascii_lowercase();
+    SCRIPT_ENDINGS.iter().any(|e| lower.ends_with(e))
 }
 
 pub fn front_matter(text: &str) -> BTreeMap<String, String> {
@@ -112,6 +120,7 @@ pub fn index(root: &Path) -> Vec<Skill> {
             description: meta.get("description").cloned().unwrap_or_default(),
             license: meta.get("license").cloned().unwrap_or_default(),
             check: check::validate(&dir, &folder).summary(),
+            scripts: files.iter().filter(|f| is_script(&f.path)).count(),
             folder,
             files,
         });

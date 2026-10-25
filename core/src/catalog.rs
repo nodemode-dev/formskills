@@ -23,10 +23,17 @@ pub struct Asset {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize)]
+pub struct Older {
+    pub version: String,
+    pub skills: Option<Asset>,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
 pub struct Released {
     pub channel: String,
     pub version: String,
     pub skills: Option<Asset>,
+    pub history: Vec<Older>,
 }
 
 #[derive(Debug, Clone, Default)]
@@ -52,6 +59,15 @@ struct Product {
 
 #[derive(Deserialize)]
 struct Release {
+    version: String,
+    #[serde(default)]
+    agents: Option<ReleaseAgents>,
+    #[serde(default)]
+    history: Vec<Earlier>,
+}
+
+#[derive(Deserialize)]
+struct Earlier {
     version: String,
     #[serde(default)]
     agents: Option<ReleaseAgents>,
@@ -140,7 +156,8 @@ fn released(products: Vec<Product>) -> HashMap<String, Released> {
         let pick = ["stable", "beta"].into_iter().find_map(|c| product.channels.remove(c).map(|r| (c, r)));
         if let Some((channel, release)) = pick {
             let skills = release.agents.and_then(|a| a.skills);
-            found.insert(product.id, Released { channel: channel.to_string(), version: release.version, skills });
+            let history = release.history.into_iter().map(|e| Older { version: e.version, skills: e.agents.and_then(|a| a.skills) }).collect();
+            found.insert(product.id, Released { channel: channel.to_string(), version: release.version, skills, history });
         }
     }
     found

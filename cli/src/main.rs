@@ -1,6 +1,6 @@
 use std::process::ExitCode;
 
-use formskills_core::{catalog, check, edits, library, pack, places, search, Apps, CORE_VERSION};
+use formskills_core::{catalog, check, edits, library, own, pack, pins, places, search, Apps, CORE_VERSION};
 use serde_json::json;
 
 const HELP: &str = "formskills-cli: formskills without the window
@@ -13,6 +13,10 @@ const HELP: &str = "formskills-cli: formskills without the window
   check <id> [skill] [--edit]   an app's skills, one skill, or your copy of it, against the SKILL.md format (JSON; exit 1 on an error)
   read <id> <path>   one file of an app's skills, by its path in the set (skill folder first), as text
   download <id> [skill] [--to DIR]   an app's skills, or one skill, as a zip in Downloads (or DIR)
+  pin <id> <version>|latest   keep an app on one of its earlier releases (the catalogue lists the last five), or follow the latest again
+  pins            the apps you pinned (JSON)
+  new <name> [description...]   start a skill of your own from the template (then edit it with `edit ... yours <name> ...`)
+  own             your own skills (JSON)
   edits           your edited copies: what you changed, and whether the original changed since (JSON)
   edit start <id> <skill>            make your own copy of a skill (the original is never changed)
   edit read <id> <skill> <path>      one file of your copy, as text
@@ -25,6 +29,7 @@ const HELP: &str = "formskills-cli: formskills without the window
   version         formskills' version
   help            this text
 
+Your own skills use the app name `yours` in `edit` and `check --edit`.
 Released skills only, unless FORMSKILLS_DEV=1: then an app's checkout in a FORMSKILLS_DEV_ROOTS folder is read instead.
 ";
 
@@ -53,6 +58,86 @@ fn main() -> ExitCode {
         print(&json!({ "used": found.used, "source": found.note, "releases": found.released.len(), "with_skills": with_skills }));
         return ExitCode::SUCCESS;
     }
+    if command == "new" {
+        let (Some(name), description) = (args.get(1), args[2.min(args.len())..].join(" ")) else {
+            eprintln!("formskills: new <name> [description], for example: new tidy-notes Tidies meeting notes into decisions and actions");
+            return ExitCode::FAILURE;
+        };
+        return match own::create(name, &description) {
+            Ok(made) => {
+                print(&json!({ "created": made, "folder": edits::copy_dir(own::OWN).join(name).display().to_string() }));
+                ExitCode::SUCCESS
+            }
+            Err(e) => {
+                eprintln!("formskills: {e}");
+                ExitCode::FAILURE
+            }
+        };
+    }
+    if command == "own" {
+        print(&json!({ "folder": edits::copy_dir(own::OWN).display().to_string(), "skills": own::list() }));
+        return ExitCode::SUCCESS;
+    }
+    if command == "pins" {
+        print(&json!({ "file": pins::path().display().to_string(), "pins": pins::load() }));
+        return ExitCode::SUCCESS;
+    }
+    if command == "edit" && args.get(2).map(String::as_str) == Some(own::OWN) {
+        let action = args.get(1).map(String::as_str).unwrap_or("");
+        let Some(folder) = args.get(3).cloned() else {
+            eprintln!("formskills: edit {action} yours <name>");
+            return ExitCode::FAILURE;
+        };
+        let result: Result<serde_json::Value, String> = match (action, args.get(4), args.get(5)) {
+            ("read", Some(path), _) => edits::read(own::OWN, &folder, path).map(|f| {
+                print!("{}", f.text.unwrap_or_default());
+                serde_json::Value::Null
+            }),
+            ("write", Some(path), Some(from)) => {
+                let text = if from == "-" {
+                    let mut text = String::new();
+                    std::io::Read::read_to_string(&mut std::io::stdin(), &mut text).map(|_| text).map_err(|e| e.to_string())
+                } else {
+                    std::fs::read_to_string(from).map_err(|e| format!("{from}: {e}"))
+                };
+                text.and_then(|t| edits::write(own::OWN, &folder, path, &t, None)).map(|e| json!(e))
+            }
+            ("download", _, _) => {
+                let to = args.iter().position(|a| a == "--to").and_then(|i| args.get(i + 1)).map(std::path::Path::new);
+                edits::download(own::OWN, &folder, to).map(|s| json!(s))
+            }
+            ("discard", _, _) => edits::discard(own::OWN, &folder).map(|()| json!({ "discarded": format!("yours/{folder}") })),
+            _ => Err("for your own skills: edit read|write|download|discard yours <name> ...".to_string()),
+        };
+        return match result {
+            Ok(serde_json::Value::Null) => ExitCode::SUCCESS,
+            Ok(value) => {
+                print(&value);
+                ExitCode::SUCCESS
+            }
+            Err(e) => {
+                eprintln!("formskills: {e}");
+                ExitCode::FAILURE
+            }
+        };
+    }
+    if command == "check" && args.get(1).map(String::as_str) == Some(own::OWN) {
+        let Some(folder) = args.get(2).filter(|a| *a != "--edit") else {
+            eprintln!("formskills: check yours <name>");
+            return ExitCode::FAILURE;
+        };
+        return match edits::validate(own::OWN, folder) {
+            Ok(report) => {
+                let failed = report.errors > 0;
+                print(&json!({ "app": own::OWN, "spec": check::SPEC, "errors": report.errors, "warnings": report.warnings, "skills": [report] }));
+                if failed { ExitCode::FAILURE } else { ExitCode::SUCCESS }
+            }
+            Err(e) => {
+                eprintln!("formskills: {e}");
+                ExitCode::FAILURE
+            }
+        };
+    }
     let apps = match Apps::bundled() {
         Ok(apps) => apps,
         Err(e) => {
@@ -60,6 +145,31 @@ fn main() -> ExitCode {
             return ExitCode::FAILURE;
         }
     };
+    if command == "pin" {
+        let (Some(app), Some(version)) = (args.get(1).and_then(|n| apps.get(n)), args.get(2)) else {
+            eprintln!("formskills: pin <id> <version>|latest");
+            return ExitCode::FAILURE;
+        };
+        let wanted = (version != "latest").then_some(version.as_str());
+        if let Some(v) = wanted {
+            let listed = library::load(&apps, Some(&app.id), false).apps.into_iter().next().map(|a| a.releases).unwrap_or_default();
+            if !listed.iter().any(|r| r == v) {
+                eprintln!("formskills: {} has no release {v} with skills in the catalogue; it lists {}", app.name, if listed.is_empty() { "none".to_string() } else { listed.join(", ") });
+                return ExitCode::FAILURE;
+            }
+        }
+        return match pins::set(&app.id, wanted) {
+            Ok(all) => {
+                let found = library::load(&apps, Some(&app.id), false).apps.into_iter().next();
+                print(&json!({ "pins": all, "now": found.map(|a| a.source) }));
+                ExitCode::SUCCESS
+            }
+            Err(e) => {
+                eprintln!("formskills: {e}");
+                ExitCode::FAILURE
+            }
+        };
+    }
     match command {
         "apps" => {
             print(&json!({ "source": apps.describe_source(), "count": apps.apps.len(), "apps": apps.apps }));

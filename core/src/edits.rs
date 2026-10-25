@@ -234,6 +234,24 @@ pub fn acknowledge(app: &str, folder: &str, original: &AppSkills) -> Result<Edit
     Ok(describe(&record, Some(original)))
 }
 
+pub fn copy_dir(app: &str) -> PathBuf {
+    copy_root(app)
+}
+
+pub fn adopt(app: &str, folder: &str, base: &str) -> Result<Edit, String> {
+    check(app, folder)?;
+    if read_record(app, folder).is_some() {
+        return Err(format!("{folder} exists already"));
+    }
+    if !copy_root(app).join(folder).join("SKILL.md").is_file() {
+        return Err(format!("{folder} has no SKILL.md"));
+    }
+    let time = now();
+    let record = Record { app: app.to_string(), folder: folder.to_string(), base: base.to_string(), digests: BTreeMap::new(), created: time, updated: time };
+    save_record(&record)?;
+    Ok(describe(&record, None))
+}
+
 pub fn validate(app: &str, folder: &str) -> Result<check::Report, String> {
     check(app, folder)?;
     read_record(app, folder).ok_or_else(|| format!("there is no copy of {folder}"))?;
@@ -255,5 +273,6 @@ pub fn download(app: &str, folder: &str, into: Option<&Path>) -> Result<Saved, S
     read_record(app, folder).ok_or_else(|| format!("there is no copy of {folder}"))?;
     let root = copy_root(app);
     let skill = skills::index(&root).into_iter().find(|s| s.folder == folder).ok_or_else(|| format!("the copy of {folder} has no SKILL.md"))?;
-    pack::zip_skills(&root, &[&skill], &format!("{folder}-edited"), into)
+    let name = if app == crate::own::OWN { folder.to_string() } else { format!("{folder}-edited") };
+    pack::zip_skills(&root, &[&skill], &name, into)
 }
