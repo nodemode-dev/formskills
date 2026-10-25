@@ -33,7 +33,7 @@ html.booting body {
 
 .bar {
   display: grid;
-  grid-template-columns: auto minmax(0, 1fr) auto auto auto;
+  grid-template-columns: auto minmax(0, 1fr) auto auto auto auto;
   align-items: center;
   gap: var(--sp-3);
   padding-bottom: var(--sp-4);
@@ -638,6 +638,126 @@ html.booting body {
 
 .own-empty {
   color: var(--ink-faint);
+}
+
+.install-group {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--sp-2) var(--sp-4);
+  margin: var(--sp-4) 0 0;
+  padding: var(--sp-3) 0 0;
+  border: 0;
+  border-top: 1px solid var(--edge);
+}
+
+.install-group legend {
+  float: left;
+  width: 100%;
+  margin-bottom: var(--sp-1);
+  padding: 0;
+  color: var(--ink-faint);
+  font-size: var(--fs-s);
+}
+
+.install-option {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-2);
+  min-height: 28px;
+  cursor: pointer;
+}
+
+.install-option input {
+  accent-color: var(--accent);
+}
+
+.install-path {
+  flex: 1 1 20em;
+  min-width: 0;
+}
+
+.install-path:disabled {
+  opacity: 0.5;
+}
+
+#install-where {
+  min-height: 2.9em;
+  overflow-wrap: anywhere;
+}
+
+.install-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  margin-top: var(--sp-3);
+}
+
+.install-result,
+.installed-list {
+  display: grid;
+  gap: var(--sp-2);
+  margin: var(--sp-3) 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.install-row {
+  overflow-wrap: anywhere;
+  font-size: var(--fs-s);
+}
+
+.install-row.is-fault {
+  color: var(--fault);
+}
+
+.installed-info.is-note {
+  color: var(--accent);
+}
+
+.installed-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr) auto auto;
+  align-items: center;
+  gap: var(--sp-3);
+  padding: var(--sp-2) 0;
+  border-top: 1px solid var(--edge);
+}
+
+.installed-head {
+  display: grid;
+  min-width: 0;
+}
+
+@media (max-width: 760px) {
+  .installed-row {
+    grid-template-columns: minmax(0, 1fr) auto auto;
+  }
+
+  .installed-row .installed-info {
+    grid-row: 2;
+    grid-column: 1 / -1;
+  }
+}
+
+.installed-head .skill-name,
+.installed-where {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.installed-where {
+  color: var(--ink-faint);
+  font-size: var(--fs-s);
+}
+
+.installed-info {
+  overflow: hidden;
+  color: var(--ink-faint);
+  font-size: var(--fs-s);
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
 
 @media (max-width: 760px) {

@@ -5,7 +5,7 @@ use formskills_core::check::{self, Report};
 use formskills_core::edits::{self, Edit};
 use formskills_core::search::{self, Hit};
 use formskills_core::skills::Skill;
-use formskills_core::{own, pins};
+use formskills_core::{install, own, pins};
 use formskills_core::library::{self, AppSkills, FileText, Library};
 use formskills_core::pack::{self, Saved};
 use formskills_core::Apps;
@@ -124,6 +124,29 @@ async fn pin(app: String, version: Option<String>, shown: tauri::State<'_, Shown
 }
 
 #[tauri::command]
+async fn install_skills(app: String, skill: Option<String>, copy: bool, agents: Vec<String>, project: Option<String>, force: bool, shown: tauri::State<'_, Shown>) -> Result<Vec<install::Outcome>, String> {
+    let apps = library_apps(shown.inner()).unwrap_or_default();
+    tauri::async_runtime::spawn_blocking(move || install::install_many(&apps, &app, skill.as_deref(), copy, &agents, project.as_deref(), force)).await.map_err(|e| e.to_string())?
+}
+
+#[tauri::command]
+fn installed(shown: tauri::State<'_, Shown>) -> Vec<install::State> {
+    let apps = library_apps(shown.inner());
+    install::list(apps.as_deref())
+}
+
+#[tauri::command]
+async fn install_update(agent: String, project: Option<String>, skill: String, shown: tauri::State<'_, Shown>) -> Result<install::State, String> {
+    let apps = library_apps(shown.inner()).unwrap_or_default();
+    tauri::async_runtime::spawn_blocking(move || install::update(&apps, &install::Target::new(&agent, project.as_deref())?, &skill)).await.map_err(|e| e.to_string())?
+}
+
+#[tauri::command]
+async fn install_remove(agent: String, project: Option<String>, skill: String, force: bool) -> Result<(), String> {
+    tauri::async_runtime::spawn_blocking(move || install::uninstall(&install::Target::new(&agent, project.as_deref())?, &skill, force)).await.map_err(|e| e.to_string())?
+}
+
+#[tauri::command]
 fn own_list() -> Vec<Skill> {
     own::list()
 }
@@ -169,7 +192,7 @@ pub fn run() -> ExitCode {
         eprintln!("formskills: {e}");
         return ExitCode::FAILURE;
     }
-    match tauri::Builder::default().manage(Shown::default()).invoke_handler(tauri::generate_handler![library, refresh, read_file, download, edits, edit_start, edit_read, edit_write, edit_seen, edit_discard, edit_download, search, check_skill, edit_check, refresh_app, pin, own_list, own_new]).run(tauri::generate_context!()) {
+    match tauri::Builder::default().manage(Shown::default()).invoke_handler(tauri::generate_handler![library, refresh, read_file, download, edits, edit_start, edit_read, edit_write, edit_seen, edit_discard, edit_download, search, check_skill, edit_check, refresh_app, pin, own_list, own_new, install_skills, installed, install_update, install_remove]).run(tauri::generate_context!()) {
         Ok(()) => ExitCode::SUCCESS,
         Err(e) => {
             eprintln!("formskills: the window could not start: {e}");

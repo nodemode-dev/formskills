@@ -19,6 +19,7 @@
           <h1 translate="no">formskills</h1>
           <p class="sub">The Form apps' released skills: read them, download them, keep your own edits</p>
         </div>
+        <button class="btn btn-quiet" id="installed-open" type="button" aria-pressed="false">Installed</button>
         <button class="btn btn-quiet" id="trust-open" type="button" aria-pressed="false">Trust</button>
         <button class="btn btn-quiet" id="guide-open" type="button" aria-pressed="false">Skill format</button>
         <span class="version" id="version" translate="no"></span>
@@ -72,6 +73,7 @@
             </dl>
             <div class="app-actions">
               <button class="btn" id="download-app" type="button" disabled>Download all</button>
+              <button class="btn" id="install-app" type="button" disabled>Install all</button>
               <span class="hint">Every skill of this app as one zip, the way its release ships them</span>
             </div>
             <ul class="skill-list" id="skill-list" aria-label="Skills"></ul>
@@ -85,6 +87,7 @@
               </div>
               <div class="reader-actions">
                 <button class="btn" id="check-skill" type="button" aria-pressed="false">Check</button>
+                <button class="btn" id="install-skill" type="button">Install</button>
                 <button class="btn" id="edit-toggle" type="button">Edit a copy</button>
                 <button class="btn" id="download-skill" type="button">Download skill</button>
               </div>
@@ -146,6 +149,39 @@
             </header>
             <p class="pane-note" id="results-note" aria-live="polite"></p>
             <ul class="skill-list" id="hits" aria-label="Skills found"></ul>
+          </article>
+          <article class="guide install" id="install" hidden>
+            <header class="pane-head">
+              <h2 class="pane-title" id="install-title">Install</h2>
+              <button class="btn btn-quiet" id="install-back" type="button">Back</button>
+            </header>
+            <p class="pane-note" id="install-what"></p>
+            <fieldset class="install-group">
+              <legend>Into</legend>
+              <label class="install-option"><input type="checkbox" name="agent" value="claude" checked /> <span>Claude Code</span></label>
+              <label class="install-option"><input type="checkbox" name="agent" value="codex" /> <span>Codex</span></label>
+              <label class="install-option"><input type="checkbox" name="agent" value="cursor" /> <span>Cursor</span></label>
+            </fieldset>
+            <fieldset class="install-group">
+              <legend>For</legend>
+              <label class="install-option"><input type="radio" name="scope" value="user" checked /> <span>Just me, in every project</span></label>
+              <label class="install-option"><input type="radio" name="scope" value="project" /> <span>One project folder</span></label>
+              <input class="install-path" id="install-path" type="text" placeholder="/path/to/the/project" spellcheck="false" aria-label="The project folder" disabled />
+            </fieldset>
+            <p class="pane-note" id="install-where"></p>
+            <div class="install-actions">
+              <button class="btn" id="install-go" type="button">Install</button>
+              <span class="hint" id="install-hint">Cursor also reads Claude Code's and Codex's folders, so it already sees skills installed for them.</span>
+            </div>
+            <ul class="install-result" id="install-result" aria-live="polite"></ul>
+          </article>
+          <article class="guide" id="installed" hidden>
+            <header class="pane-head">
+              <h2 class="pane-title">Installed by formskills</h2>
+              <button class="btn btn-quiet" id="installed-close" type="button">Close</button>
+            </header>
+            <p class="pane-note" id="installed-note">Skills formskills put into an agent's folder. It never touches a folder it did not write, and keeps any change you made there unless you choose to lose it.</p>
+            <ul class="installed-list" id="installed-list"></ul>
           </article>
           <article class="guide" id="trust" hidden>
             <header class="pane-head">

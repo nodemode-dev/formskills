@@ -177,6 +177,7 @@ const filesNav = document.getElementById("files") as HTMLElement;
 const doc = document.getElementById("doc") as HTMLElement;
 const downloadApp = document.getElementById("download-app") as HTMLButtonElement;
 const downloadSkill = document.getElementById("download-skill") as HTMLButtonElement;
+const installAppButton = (): HTMLButtonElement => document.getElementById("install-app") as HTMLButtonElement;
 const detailPane = document.getElementById("detail") as HTMLElement;
 const GROUPS: [string, string][] = [["skill", "Skill"], ["sub-skill", "Sub-skills"], ["reference", "References"], ["file", "Other files"]];
 let reading: { app: string; folder: string; path: string } | null = null;
@@ -726,6 +727,7 @@ function showLibrary(lib: Library): void {
   }
   if (chosen) showSkills(chosen);
   if (chosen) downloadApp.disabled = !(library.get(chosen)?.skills.length ?? 0);
+  if (chosen) installAppButton().disabled = downloadApp.disabled;
   if (reading) {
     const skill = currentSkill();
     if (!skill) {
@@ -782,6 +784,7 @@ function choose(id: string): void {
     return;
   }
   downloadApp.disabled = !invoke || !(library.get(id)?.skills.length ?? 0);
+  installAppButton().disabled = downloadApp.disabled;
   showRelease(id);
   if (reading) return;
   setText(field("name"), app.name);
@@ -979,7 +982,8 @@ const guide = document.getElementById("guide") as HTMLElement;
 const guideOpen = document.getElementById("guide-open") as HTMLButtonElement;
 const trust = document.getElementById("trust") as HTMLElement;
 const trustOpen = document.getElementById("trust-open") as HTMLButtonElement;
-let overlay: "" | "results" | "guide" | "trust" = "";
+type Overlay = "" | "results" | "guide" | "trust" | "install" | "installed";
+let overlay: Overlay = "";
 let hits: Hit[] | null = null;
 let searchNote = "";
 let searchSeq = 0;
@@ -991,14 +995,17 @@ function inFilter(appId: string): boolean {
   return appId === filter;
 }
 
-function setOverlay(next: "" | "results" | "guide" | "trust"): void {
+function setOverlay(next: Overlay): void {
   if (next && reading) closeReader();
   overlay = next;
   show(results, next === "results");
   show(guide, next === "guide");
   show(trust, next === "trust");
+  show(installPane, next === "install");
+  show(installedPane, next === "installed");
   guideOpen.setAttribute("aria-pressed", String(next === "guide"));
   trustOpen.setAttribute("aria-pressed", String(next === "trust"));
+  installedOpen.setAttribute("aria-pressed", String(next === "installed"));
   if (next) {
     show(empty, false);
     show(detail, false);
@@ -1106,6 +1113,191 @@ searchBox.addEventListener("keydown", (e) => {
 guideOpen.addEventListener("click", () => setOverlay(overlay === "guide" ? (hits ? "results" : "") : "guide"));
 (document.getElementById("guide-close") as HTMLButtonElement).addEventListener("click", () => setOverlay(hits && searchBox.value.trim().length >= 2 ? "results" : ""));
 trustOpen.addEventListener("click", () => setOverlay(overlay === "trust" ? (hits ? "results" : "") : "trust"));
+
+type Outcome = { folder: string; where: string; path: string | null; error: string | null };
+type Origin = { kind: string; app: string; version: string };
+type Installed = { target: { agent: string; project: string | null }; folder: string; origin: Origin; installed: number; path: string; where: string; state: "ok" | "modified" | "missing"; changed: string[]; update: string | null };
+type InstallSpec = { app: string; skill: string | null; copy: boolean; label: string };
+type ReturnTo = { kind: "skill" | "own" | "app"; app: string; folder: string; editing: boolean };
+const installPane = document.getElementById("install") as HTMLElement;
+const installedPane = document.getElementById("installed") as HTMLElement;
+const installedOpen = document.getElementById("installed-open") as HTMLButtonElement;
+const installTitle = document.getElementById("install-title") as HTMLElement;
+const installWhat = document.getElementById("install-what") as HTMLElement;
+const installWhere = document.getElementById("install-where") as HTMLElement;
+const installPath = document.getElementById("install-path") as HTMLInputElement;
+const installGo = document.getElementById("install-go") as HTMLButtonElement;
+const installResult = document.getElementById("install-result") as HTMLUListElement;
+const installedList = document.getElementById("installed-list") as HTMLUListElement;
+const installSkill = document.getElementById("install-skill") as HTMLButtonElement;
+const installApp = document.getElementById("install-app") as HTMLButtonElement;
+const AGENT_DIRS: Record<string, [string, string]> = { claude: ["Claude Code", ".claude/skills"], codex: ["Codex", ".agents/skills"], cursor: ["Cursor", ".cursor/skills"] };
+let installSpec: InstallSpec | null = null;
+let returnTo: ReturnTo | null = null;
+
+function chosenAgents(): string[] {
+  return [...installPane.querySelectorAll<HTMLInputElement>('input[name="agent"]:checked')].map((i) => i.value);
+}
+
+function projectScope(): boolean {
+  return installPane.querySelector<HTMLInputElement>('input[name="scope"][value="project"]')?.checked ?? false;
+}
+
+function showInstallWhere(): void {
+  const project = projectScope();
+  installPath.disabled = !project;
+  const base = project ? (installPath.value.trim() || "<project>") : "~";
+  const folder = installSpec?.skill ?? "<each skill>";
+  const lines = chosenAgents().map((a) => `${AGENT_DIRS[a][0]}: ${base}/${AGENT_DIRS[a][1]}/${folder}`);
+  setText(installWhere, lines.length ? `Goes to ${lines.join(" · ")}` : "Choose at least one agent.");
+  installGo.disabled = !invoke || !lines.length || (project && !installPath.value.trim());
+}
+
+function openInstall(spec: InstallSpec, back: ReturnTo): void {
+  installSpec = spec;
+  returnTo = back;
+  setOverlay("install");
+  setText(installTitle, `Install ${spec.label}`);
+  setText(installWhat, spec.copy ? "Your edited copy, as it is saved now, under the skill's own folder name." : spec.app === OWN ? "Your own skill, as it is saved now." : spec.skill ? "The released skill as formskills shows it, signature and digest checked." : "Every skill of this app's release, each in its own folder.");
+  installResult.replaceChildren();
+  showInstallWhere();
+}
+
+async function runInstall(force: boolean): Promise<void> {
+  if (!invoke || !installSpec) return;
+  installGo.disabled = true;
+  const project = projectScope() ? installPath.value.trim() : null;
+  installResult.replaceChildren(el("li", "install-row", "Installing"));
+  try {
+    const rows = (await invoke("install_skills", { app: installSpec.app, skill: installSpec.skill, copy: installSpec.copy, agents: chosenAgents(), project, force })) as Outcome[];
+    const items = rows.map((r) => {
+      const li = el("li", `install-row${r.error ? " is-fault" : ""}`, r.error ? `${r.folder} for ${r.where}: ${r.error}` : `Installed ${r.folder}: ${r.where}`);
+      if (r.path) li.title = r.path;
+      return li;
+    });
+    if (!force && rows.some((r) => r.error?.includes("with force"))) {
+      const again = el("button", "btn btn-small btn-danger", "Install anyway, replacing your changes there");
+      again.type = "button";
+      again.addEventListener("click", () => void runInstall(true));
+      const li = el("li", "install-row");
+      li.append(again);
+      items.push(li);
+    }
+    installResult.replaceChildren(...items);
+    const ok = rows.filter((r) => !r.error).length;
+    setText(status, `${ok ? `${ok} of ${rows.length} installed` : "Nothing was installed"}${rows.length > ok ? `; ${rows.length - ok} left as they were` : ""}. Agents read new skills the next time they start.`);
+  } catch (e) {
+    installResult.replaceChildren(el("li", "install-row is-fault", `Could not install: ${String(e)}`));
+  } finally {
+    showInstallWhere();
+  }
+}
+
+function originText(o: Origin): string {
+  if (o.kind === "release") return `${list.apps.find((a) => a.id === o.app)?.name ?? o.app} release ${o.version}`;
+  if (o.kind === "copy") return `your copy (from ${o.version})`;
+  if (o.kind === "own") return "your own skill";
+  return `${o.app} checkout`;
+}
+
+async function showInstalled(): Promise<void> {
+  if (!invoke) {
+    installedList.replaceChildren(el("li", "own-empty", "Open the formskills app to see what it installed."));
+    return;
+  }
+  try {
+    const rows = (await invoke("installed")) as Installed[];
+    const items = rows.map((r) => {
+      const li = el("li", "installed-row");
+      const head = el("span", "installed-head");
+      const name = el("span", "skill-name", r.folder);
+      name.translate = false;
+      const where = el("span", "installed-where", `${r.where} · ${originText(r.origin)}`);
+      where.title = r.path;
+      head.append(name, where);
+      const state = r.state === "missing" ? "No longer in the folder" : r.state === "modified" ? `Changed there: ${r.changed.join(", ")}` : r.update ? `Newer release ${r.update}` : "As installed";
+      const info = el("span", "installed-info", state);
+      info.title = state;
+      info.classList.toggle("is-note", r.state !== "ok" || !!r.update);
+      const update = el("button", "btn btn-small", r.state === "missing" ? "Install again" : "Update");
+      update.type = "button";
+      update.disabled = r.state === "modified" || (r.origin.kind === "release" && !r.update && r.state === "ok");
+      update.title = r.state === "modified" ? "Changed there; remove it, or install again from the skill with Install anyway" : "";
+      update.addEventListener("click", async () => {
+        update.disabled = true;
+        try {
+          await invoke("install_update", { agent: r.target.agent, project: r.target.project, skill: r.folder });
+          setText(status, `Updated ${r.folder} for ${r.where}.`);
+        } catch (e) {
+          setText(status, `Could not update ${r.folder}: ${String(e)}`);
+        }
+        void showInstalled();
+      });
+      const remove = el("button", "btn btn-small btn-danger", r.state === "modified" ? "Remove, losing changes" : "Remove");
+      remove.type = "button";
+      let armed = 0;
+      remove.addEventListener("click", async () => {
+        if (Date.now() > armed) {
+          armed = Date.now() + 4000;
+          setText(status, `Click again to remove ${r.folder} from ${r.where}${r.state === "modified" ? ", with the changes made there" : ""}.`);
+          return;
+        }
+        remove.disabled = true;
+        try {
+          await invoke("install_remove", { agent: r.target.agent, project: r.target.project, skill: r.folder, force: r.state === "modified" });
+          setText(status, `Removed ${r.folder} from ${r.where}.`);
+        } catch (e) {
+          setText(status, `Could not remove ${r.folder}: ${String(e)}`);
+        }
+        void showInstalled();
+      });
+      li.append(head, info, update, remove);
+      return li;
+    });
+    if (!items.length) items.push(el("li", "own-empty", "Nothing yet. Open a skill and press Install, or Install all on an app."));
+    installedList.replaceChildren(...items);
+  } catch (e) {
+    installedList.replaceChildren(el("li", "own-empty", `Could not read what was installed: ${String(e)}`));
+  }
+}
+
+for (const input of installPane.querySelectorAll<HTMLInputElement>("input")) input.addEventListener("input", showInstallWhere);
+for (const input of installPane.querySelectorAll<HTMLInputElement>('input[type="radio"], input[type="checkbox"]')) input.addEventListener("change", showInstallWhere);
+installGo.addEventListener("click", () => void runInstall(false));
+installSkill.addEventListener("click", async () => {
+  if (!reading) return;
+  const { app, folder } = reading;
+  const wasEditing = editing;
+  if (editing) await saveNow();
+  const copy = wasEditing && app !== OWN;
+  const name = currentSkill()?.name ?? folder;
+  openInstall({ app, skill: folder, copy, label: copy ? `your copy of ${name}` : name }, { kind: app === OWN ? "own" : "skill", app, folder, editing: wasEditing });
+});
+installApp.addEventListener("click", () => {
+  if (!chosen) return;
+  const name = list.apps.find((a) => a.id === chosen)?.name ?? chosen;
+  openInstall({ app: chosen, skill: null, copy: false, label: `every ${name} skill` }, { kind: "app", app: chosen, folder: "", editing: false });
+});
+(document.getElementById("install-back") as HTMLButtonElement).addEventListener("click", () => {
+  const back = returnTo;
+  returnTo = null;
+  setOverlay("");
+  if (!back) return;
+  if (back.kind === "own") void openOwn(back.folder);
+  else if (back.kind === "skill") {
+    choose(back.app);
+    openSkill(back.app, back.folder);
+    if (back.editing) void enterEdit();
+  } else choose(back.app);
+});
+installedOpen.addEventListener("click", () => {
+  if (overlay === "installed") setOverlay(hits ? "results" : "");
+  else {
+    setOverlay("installed");
+    void showInstalled();
+  }
+});
+(document.getElementById("installed-close") as HTMLButtonElement).addEventListener("click", () => setOverlay(hits && searchBox.value.trim().length >= 2 ? "results" : ""));
 (document.getElementById("trust-close") as HTMLButtonElement).addEventListener("click", () => setOverlay(hits && searchBox.value.trim().length >= 2 ? "results" : ""));
 
 function apply(next: string): void {
