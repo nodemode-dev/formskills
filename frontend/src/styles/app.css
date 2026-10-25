@@ -33,7 +33,7 @@ html.booting body {
 
 .bar {
   display: grid;
-  grid-template-columns: auto minmax(0, 1fr) auto auto;
+  grid-template-columns: auto minmax(0, 1fr) auto auto auto;
   align-items: center;
   gap: var(--sp-3);
   padding-bottom: var(--sp-4);
@@ -554,6 +554,101 @@ html.booting body {
 
 .skill-meta .is-fault {
   color: var(--fault);
+}
+
+.skill-meta .is-note {
+  color: var(--accent);
+}
+
+.release-row {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  min-height: 28px;
+}
+
+.release-row .hint {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.facts dd[data-f="here"] {
+  min-height: 4.35em;
+}
+
+.release-row select,
+.own-field input {
+  height: 28px;
+  padding: 0 var(--sp-2);
+  border: 1px solid var(--edge-strong);
+  border-radius: var(--radius-s);
+  background: var(--control);
+  color: var(--ink);
+  font: inherit;
+}
+
+.release-row select {
+  width: 11em;
+}
+
+.release-row select:focus-visible,
+.own-field input:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+}
+
+.card-own .card-hit {
+  border-style: dashed;
+}
+
+.own-form {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 2fr) auto;
+  align-items: end;
+  gap: var(--sp-3);
+  padding-top: var(--sp-4);
+  border-top: 1px solid var(--edge);
+}
+
+.own-field {
+  display: grid;
+  gap: var(--sp-1);
+  min-width: 0;
+  color: var(--ink-faint);
+  font-size: var(--fs-s);
+}
+
+.own-field input {
+  min-width: 0;
+  font-size: var(--fs-m);
+}
+
+.own-note {
+  display: block;
+  min-height: 1.45em;
+  margin: var(--sp-2) 0 0;
+}
+
+.own-note.is-fault {
+  color: var(--fault);
+}
+
+.own-empty {
+  color: var(--ink-faint);
+}
+
+@media (max-width: 760px) {
+  .own-form {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+
+  .own-field-wide {
+    grid-column: 1 / -1;
+    grid-row: 2;
+  }
 }
 
 .hit-snippet {

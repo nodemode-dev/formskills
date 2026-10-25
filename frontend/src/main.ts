@@ -9,18 +9,19 @@ const STATES: Record<string, string> = { live: "Live", public: "Public", prelaun
 const HERE = "Checking the app's latest release.";
 
 type Source =
-  | { kind: "release"; channel: string; version: string; downloaded: boolean }
+  | { kind: "release"; channel: string; version: string; downloaded: boolean; pinned: boolean; latest: string }
   | { kind: "kept"; channel: string; version: string; reason: string }
   | { kind: "dev"; path: string }
   | { kind: "missing"; reason: string };
 type SkillFile = { path: string; bytes: number; kind: string };
 type Summary = { errors: number; warnings: number };
-type Skill = { folder: string; name: string; description: string; license: string; check: Summary; files: SkillFile[] };
+type Skill = { folder: string; name: string; description: string; license: string; check: Summary; scripts: number; files: SkillFile[] };
 type Hit = { app: string; folder: string; name: string; description: string; score: number; matched: string[]; path: string; snippet: string };
 type Finding = { level: "error" | "warning"; path: string; rule: string; message: string };
 type Field = { name: string; required: boolean; set: boolean; chars: number };
 type Report = { folder: string; name: string; license: string; fields: Field[]; errors: number; warnings: number; findings: Finding[]; spec: string };
-type AppSkills = { id: string; source: Source; skills: Skill[] };
+type AppSkills = { id: string; source: Source; skills: Skill[]; releases: string[]; pin: string | null };
+const OWN = "yours";
 type Library = { catalogue: string; dev: boolean; dev_roots: string[]; apps: AppSkills[] };
 type Invoke = (cmd: string, args?: Record<string, unknown>) => Promise<unknown>;
 
@@ -33,7 +34,7 @@ function plural(n: number, word: string): string {
 
 function shortText(a: AppSkills): string {
   const s = a.source;
-  if (s.kind === "release") return `${plural(a.skills.length, "skill")} · release ${s.version}${s.channel === "beta" ? " beta" : ""}`;
+  if (s.kind === "release") return `${plural(a.skills.length, "skill")} · ${s.pinned ? "pinned " : "release "}${s.version}${s.channel === "beta" ? " beta" : ""}${s.pinned && s.latest !== s.version ? ` (${s.latest} out)` : ""}`;
   if (s.kind === "kept") return `${plural(a.skills.length, "skill")} · kept ${s.version}`;
   if (s.kind === "dev") return `${plural(a.skills.length, "skill")} · checkout`;
   return "No released skills yet";
@@ -41,7 +42,7 @@ function shortText(a: AppSkills): string {
 
 function longText(a: AppSkills): string {
   const s = a.source;
-  if (s.kind === "release") return `${plural(a.skills.length, "skill")} from release ${s.version} (${s.channel}), digest checked${s.downloaded ? ", downloaded now" : ""}.`;
+  if (s.kind === "release") return `${plural(a.skills.length, "skill")} from release ${s.version} (${s.channel}), signed and checked${s.downloaded ? ", downloaded now" : ""}${s.pinned ? ", pinned" : ""}.`;
   if (s.kind === "kept") return `${plural(a.skills.length, "skill")} from release ${s.version}, kept from an earlier check. The latest could not be read: ${s.reason}`;
   if (s.kind === "dev") return `${plural(a.skills.length, "skill")} from the checkout at ${s.path} (dev mode, not a release).`;
   return `None to show: ${s.reason}`;
@@ -55,6 +56,7 @@ function checkText(c: Summary): string {
 
 function licenceText(app: string, skill: Skill): string {
   if (skill.license) return `Licence ${skill.license}`;
+  if (app === OWN) return "Your licence: add license to its front matter";
   const own = list.apps.find((a) => a.id === app)?.licence;
   return own ? `Licence ${own} (the app's)` : "No licence named";
 }
@@ -134,7 +136,8 @@ function field(name: string): Element | null {
 function showSkills(id: string): void {
   const found = library.get(id);
   setText(field("here"), found ? longText(found) : invoke ? HERE : "Open the formskills app to read the released skills.");
-  const marks = (found?.skills ?? []).map((s) => `${s.folder}:${editMark(id, s.folder)}:${s.check.errors}.${s.check.warnings}:${s.license}`).join("|");
+  const version = found?.source.kind === "release" || found?.source.kind === "kept" ? found.source.version : "";
+  const marks = version + "|" + (found?.skills ?? []).map((s) => `${s.folder}:${editMark(id, s.folder)}:${s.check.errors}.${s.check.warnings}:${s.license}:${s.scripts}:${s.description.length}`).join("|");
   const shown = skillList.dataset.app === id && skillList.dataset.count === String(found?.skills.length ?? -1) && skillList.dataset.marks === marks;
   if (shown) return;
   skillList.dataset.app = id;
@@ -158,6 +161,7 @@ function showSkills(id: string): void {
     }
     const meta = el("span", "skill-meta");
     meta.append(el("span", "", licenceText(id, s)), el("span", s.check.errors ? "is-fault" : "", checkText(s.check)));
+    if (s.scripts) meta.append(el("span", "is-note", `Holds ${plural(s.scripts, "script")} an agent may run`));
     hit.append(head, el("span", "skill-desc", s.description || "No description in its SKILL.md."), meta);
     hit.addEventListener("click", () => openSkill(id, s.folder));
     li.append(hit);
@@ -224,7 +228,7 @@ function renderReport(r: Report | null, note = ""): void {
     findingsList.replaceChildren();
     return;
   }
-  const whose = editing ? "Your copy" : "This skill";
+  const whose = reading?.app === OWN ? "Your skill" : editing ? "Your copy" : "This skill";
   setText(findingsSum, r.errors ? `${whose}: ${plural(r.errors, "format error")}${r.warnings ? ` and ${plural(r.warnings, "note")}` : ""}` : `${whose} passes the format check${r.warnings ? `, with ${plural(r.warnings, "note")}` : ""}`);
   const fields = r.fields.filter((f) => f.required || f.set).map((f) => {
     if (!f.set) return `${f.name} missing`;
@@ -311,6 +315,8 @@ function updateControls(): void {
   const updated = (copy?.original_changed.length ?? 0) > 0;
   setText(editToggle, editing ? "Show original" : copy ? (updated ? "Your copy (original updated)" : "Edit your copy") : "Edit a copy");
   editToggle.disabled = !invoke;
+  show(editToggle, reading.app !== OWN);
+  setText(downloadCopy, reading.app === OWN ? "Download skill" : "Download your copy");
   checkButton.disabled = !invoke;
   checkButton.setAttribute("aria-pressed", String(checkOpen));
   show(checkButton, !editing);
@@ -431,7 +437,7 @@ async function enterEdit(): Promise<void> {
     }
   }
   editing = true;
-  showFiles({ folder, name: copy.name, description: "", license: "", check: { errors: 0, warnings: 0 }, files: copy.files });
+  showFiles({ folder, name: copy.name, description: "", license: "", check: { errors: 0, warnings: 0 }, scripts: 0, files: copy.files });
   updateControls();
   void runCheck();
   markEdited();
@@ -539,6 +545,14 @@ discardButton.addEventListener("click", async () => {
   try {
     await invoke("edit_discard", { app, skill: folder });
     editsMap.delete(editKey(app, folder));
+    if (app === OWN) {
+      editing = false;
+      closeReader();
+      setText(status, `Your skill ${folder} was deleted.`);
+      await loadOwn();
+      choose(OWN);
+      return;
+    }
     setText(status, "Your copy was deleted. The original is as released.");
     await leaveEdit(false);
     if (chosen) showSkills(chosen);
@@ -656,7 +670,7 @@ function openSkill(app: string, folder: string): void {
   const found = library.get(app);
   if (!skill || !found) return;
   setText(readerName, skill.name);
-  setText(readerFrom, `${list.apps.find((a) => a.id === app)?.name ?? app} · ${shortText(found)}`);
+  setText(readerFrom, app === OWN ? "Your own skill · kept in formskills' folder" : `${list.apps.find((a) => a.id === app)?.name ?? app} · ${shortText(found)}${skill.scripts ? ` · holds ${plural(skill.scripts, "script")}` : ""}`);
   showFiles(skill);
   if (!detail.hidden) detail.hidden = true;
   if (reader.hidden) reader.hidden = false;
@@ -702,6 +716,8 @@ downloadSkill.addEventListener("click", () => reading && void save(reading.app, 
 function showLibrary(lib: Library): void {
   library.clear();
   for (const a of lib.apps) library.set(a.id, a);
+  library.set(OWN, { id: OWN, source: { kind: "missing", reason: "your own skills" }, skills: ownSkills, releases: [], pin: null });
+  if (chosen && chosen !== OWN) showRelease(chosen);
   for (const { app, node } of cards) {
     const found = library.get(app.id);
     const where = node.querySelector("[data-where]");
@@ -749,13 +765,24 @@ function choose(id: string): void {
     const hit = node.firstElementChild as HTMLButtonElement;
     hit.setAttribute("aria-pressed", String(a.id === id));
   }
+  ownCard.setAttribute("aria-pressed", String(id === OWN));
   if (reading && reading.app !== id) closeReader();
+  if (id === OWN) {
+    if (reading) return;
+    show(empty, false);
+    show(detail, false);
+    show(detailOwn, true);
+    showOwn();
+    return;
+  }
+  show(detailOwn, false);
   if (!app) {
     if (empty.hidden) empty.hidden = false;
     if (!detail.hidden) detail.hidden = true;
     return;
   }
   downloadApp.disabled = !invoke || !(library.get(id)?.skills.length ?? 0);
+  showRelease(id);
   if (reading) return;
   setText(field("name"), app.name);
   setText(field("kind"), app.kind);
@@ -768,6 +795,181 @@ function choose(id: string): void {
   if (detail.hidden) detail.hidden = false;
 }
 
+const ownCard = document.getElementById("own-card") as HTMLButtonElement;
+const ownCount = document.getElementById("own-count") as HTMLElement;
+const detailOwn = document.getElementById("detail-own") as HTMLElement;
+const ownForm = document.getElementById("own-form") as HTMLFormElement;
+const ownName = document.getElementById("own-name") as HTMLInputElement;
+const ownDescription = document.getElementById("own-description") as HTMLInputElement;
+const ownCreate = document.getElementById("own-create") as HTMLButtonElement;
+const ownNote = document.getElementById("own-note") as HTMLElement;
+const ownList = document.getElementById("own-list") as HTMLUListElement;
+const releasePick = document.getElementById("release-pick") as HTMLSelectElement;
+const updateApp = document.getElementById("update-app") as HTMLButtonElement;
+const releaseNote = document.getElementById("release-note") as HTMLElement;
+const OWN_HINT = "Lowercase letters, digits and hyphens; the name becomes the skill's folder.";
+let ownSkills: Skill[] = [];
+
+function nameProblem(name: string): string {
+  if (!name) return OWN_HINT;
+  if (name.length > 64) return "At most 64 characters.";
+  if (!/^[a-z0-9-]+$/.test(name)) return "Only lowercase letters, digits and hyphens.";
+  if (name.startsWith("-") || name.endsWith("-") || name.includes("--")) return "No hyphen at either end, and never two in a row.";
+  if (name.includes("anthropic") || name.includes("claude")) return "Claude refuses names holding \"anthropic\" or \"claude\".";
+  if (ownSkills.some((s) => s.folder === name)) return `You already have ${name}.`;
+  return "";
+}
+
+function showOwn(): void {
+  const key = ownSkills.map((s) => `${s.folder}:${s.check.errors}.${s.check.warnings}:${s.description.length}`).join("|");
+  if (ownList.dataset.key === key) return;
+  ownList.dataset.key = key;
+  const items = ownSkills.map((s) => {
+    const li = el("li", "skill");
+    const hit = el("button", "skill-hit");
+    hit.type = "button";
+    hit.title = `Edit ${s.name}`;
+    const head = el("span", "skill-head");
+    const name = el("span", "skill-name", s.name);
+    name.translate = false;
+    head.append(name, el("span", "skill-files", plural(s.files.length, "file")));
+    const meta = el("span", "skill-meta");
+    meta.append(el("span", "", licenceText(OWN, s)), el("span", s.check.errors ? "is-fault" : "", checkText(s.check)));
+    hit.append(head, el("span", "skill-desc", s.description || "No description yet."), meta);
+    hit.addEventListener("click", () => void openOwn(s.folder));
+    li.append(hit);
+    return li;
+  });
+  if (!items.length) items.push(el("li", "own-empty", invoke ? "No skills of your own yet. Name one above to start from the template." : "Open the formskills app to write skills of your own."));
+  ownList.replaceChildren(...items);
+}
+
+async function loadOwn(): Promise<void> {
+  if (!invoke) return;
+  try {
+    ownSkills = (await invoke("own_list")) as Skill[];
+    library.set(OWN, { id: OWN, source: { kind: "missing", reason: "your own skills" }, skills: ownSkills, releases: [], pin: null });
+    setText(ownCount, ownSkills.length ? `${plural(ownSkills.length, "skill")} of yours` : "None yet");
+    if (chosen === OWN && !reading) showOwn();
+  } catch {
+    return;
+  }
+}
+
+function stageOwn(folder: string): void {
+  chosen = OWN;
+  checkOpen = false;
+  checkSeq += 1;
+  editSeq += 1;
+  renderReport(null, "Checking against the skill format");
+  reading = { app: OWN, folder, path: "SKILL.md" };
+  editing = true;
+  setText(readerName, folder);
+  setText(readerFrom, "Your own skill · kept in formskills' folder");
+  filesNav.replaceChildren();
+  editor.value = "";
+  editor.disabled = true;
+  previewView.replaceChildren();
+  originalView.replaceChildren(el("p", "doc-note", "Your own skill has no released original."));
+  setSave("Opening");
+  show(empty, false);
+  show(detail, false);
+  show(detailOwn, false);
+  show(reader, true);
+  detailPane.classList.add("is-reading");
+  updateControls();
+}
+
+async function openOwn(folder: string, staged = false): Promise<void> {
+  if (!invoke) return;
+  if (!staged) stageOwn(folder);
+  await loadOwn();
+  if (!editsMap.has(editKey(OWN, folder))) await loadEdits();
+  if (!reading || reading.app !== OWN || reading.folder !== folder) return;
+  await enterEdit();
+}
+
+ownName.addEventListener("input", () => {
+  const why = nameProblem(ownName.value.trim());
+  setText(ownNote, why || "Ready: New skill writes SKILL.md from the template and opens it for editing.");
+  ownNote.classList.toggle("is-fault", !!why && why !== OWN_HINT);
+  ownCreate.disabled = !invoke || !!why;
+});
+ownForm.addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const name = ownName.value.trim();
+  if (!invoke || nameProblem(name)) return;
+  ownCreate.disabled = true;
+  stageOwn(name);
+  try {
+    const made = (await invoke("own_new", { name, description: ownDescription.value })) as Edit;
+    editsMap.set(editKey(OWN, made.folder), made);
+    ownName.value = "";
+    ownDescription.value = "";
+    setText(ownNote, OWN_HINT);
+    setText(status, `Made ${made.folder} from the template. It is saved as you type.`);
+    await openOwn(made.folder, true);
+  } catch (err) {
+    editing = false;
+    closeReader();
+    choose(OWN);
+    setText(ownNote, `Could not make it: ${String(err)}`);
+    ownNote.classList.add("is-fault");
+    ownCreate.disabled = false;
+  }
+});
+
+function showRelease(id: string): void {
+  const found = library.get(id);
+  const releases = found?.releases ?? [];
+  const key = `${id}:${releases.join(",")}:${found?.pin ?? ""}`;
+  if (releasePick.dataset.key !== key) {
+    releasePick.dataset.key = key;
+    const options = [el("option", "", releases.length ? `Latest (${releases[0]})` : "Latest")];
+    options[0].value = "";
+    for (const v of releases.slice(1)) {
+      const o = el("option", "", `Keep ${v}`);
+      o.value = v;
+      options.push(o);
+    }
+    releasePick.replaceChildren(...options);
+    releasePick.value = found?.pin && releases.includes(found.pin) ? found.pin : "";
+  }
+  const source = found?.source.kind;
+  releasePick.disabled = !invoke || releases.length < 2;
+  updateApp.disabled = !invoke || !found || source === "dev";
+  setText(releaseNote, !found ? "" : source === "dev" ? "Dev mode reads the checkout, not releases." : releases.length < 2 ? (found.pin ? `Pinned to ${found.pin}` : releases.length ? "No earlier release with skills in the catalogue" : "") : found.pin ? `Pinned: ${releases[0]} is not taken` : "");
+}
+
+releasePick.addEventListener("change", async () => {
+  if (!invoke || !chosen) return;
+  const version = releasePick.value || null;
+  releasePick.disabled = true;
+  setText(status, version ? `Keeping ${version} of this app's skills.` : "Following this app's latest release again.");
+  try {
+    showLibrary((await invoke("pin", { app: chosen, version })) as Library);
+  } catch (e) {
+    setText(status, `Could not change the release: ${String(e)}`);
+    showRelease(chosen);
+  }
+});
+updateApp.addEventListener("click", async () => {
+  if (!invoke || !chosen) return;
+  updateApp.disabled = true;
+  setText(status, "Checking this app's release again and downloading its skills.");
+  try {
+    showLibrary((await invoke("refresh_app", { app: chosen })) as Library);
+  } catch (e) {
+    setText(status, `Could not update: ${String(e)}`);
+    showRelease(chosen);
+  }
+});
+ownCard.addEventListener("click", () => {
+  if (overlay) setOverlay("");
+  choose(OWN);
+  void loadOwn();
+});
+
 const searchBox = document.getElementById("search") as HTMLInputElement;
 const results = document.getElementById("results") as HTMLElement;
 const resultsTitle = document.getElementById("results-title") as HTMLElement;
@@ -775,7 +977,9 @@ const resultsNote = document.getElementById("results-note") as HTMLElement;
 const hitsList = document.getElementById("hits") as HTMLUListElement;
 const guide = document.getElementById("guide") as HTMLElement;
 const guideOpen = document.getElementById("guide-open") as HTMLButtonElement;
-let overlay: "" | "results" | "guide" = "";
+const trust = document.getElementById("trust") as HTMLElement;
+const trustOpen = document.getElementById("trust-open") as HTMLButtonElement;
+let overlay: "" | "results" | "guide" | "trust" = "";
 let hits: Hit[] | null = null;
 let searchNote = "";
 let searchSeq = 0;
@@ -787,15 +991,18 @@ function inFilter(appId: string): boolean {
   return appId === filter;
 }
 
-function setOverlay(next: "" | "results" | "guide"): void {
+function setOverlay(next: "" | "results" | "guide" | "trust"): void {
   if (next && reading) closeReader();
   overlay = next;
   show(results, next === "results");
   show(guide, next === "guide");
+  show(trust, next === "trust");
   guideOpen.setAttribute("aria-pressed", String(next === "guide"));
+  trustOpen.setAttribute("aria-pressed", String(next === "trust"));
   if (next) {
     show(empty, false);
     show(detail, false);
+    show(detailOwn, false);
     detailPane.scrollTop = 0;
   } else if (!reading) {
     choose(chosen);
@@ -898,6 +1105,8 @@ searchBox.addEventListener("keydown", (e) => {
 });
 guideOpen.addEventListener("click", () => setOverlay(overlay === "guide" ? (hits ? "results" : "") : "guide"));
 (document.getElementById("guide-close") as HTMLButtonElement).addEventListener("click", () => setOverlay(hits && searchBox.value.trim().length >= 2 ? "results" : ""));
+trustOpen.addEventListener("click", () => setOverlay(overlay === "trust" ? (hits ? "results" : "") : "trust"));
+(document.getElementById("trust-close") as HTMLButtonElement).addEventListener("click", () => setOverlay(hits && searchBox.value.trim().length >= 2 ? "results" : ""));
 
 function apply(next: string): void {
   filter = next;
@@ -914,7 +1123,7 @@ function apply(next: string): void {
   else if (filter !== "all" && !topic) {
     if (overlay) setOverlay("");
     choose(filter);
-  } else if (chosen && !list.apps.some((a) => a.id === chosen)) choose("");
+  } else if (chosen && chosen !== OWN && !list.apps.some((a) => a.id === chosen)) choose("");
 }
 
 for (const c of chips) c.addEventListener("click", () => apply(c.dataset.filter ?? "all"));
@@ -934,6 +1143,7 @@ apply("all");
 if (invoke) {
   refreshButton.addEventListener("click", () => void load("refresh"));
   void load("library");
+  void loadOwn();
 } else {
   setText(status, "Preview in a browser: open the formskills app to read the released skills.");
 }

@@ -4,6 +4,8 @@ use std::sync::{Arc, Mutex};
 use formskills_core::check::{self, Report};
 use formskills_core::edits::{self, Edit};
 use formskills_core::search::{self, Hit};
+use formskills_core::skills::Skill;
+use formskills_core::{own, pins};
 use formskills_core::library::{self, AppSkills, FileText, Library};
 use formskills_core::pack::{self, Saved};
 use formskills_core::Apps;
@@ -90,6 +92,47 @@ async fn edit_seen(app: String, skill: String, shown: tauri::State<'_, Shown>) -
     tauri::async_runtime::spawn_blocking(move || edits::acknowledge(&app, &skill, &found)).await.map_err(|e| e.to_string())?
 }
 
+fn read_one(app: String, refresh: bool, shown: Shown) -> Result<Library, String> {
+    let apps = Apps::bundled()?;
+    let one = library::load(&apps, Some(&app), refresh).apps.into_iter().next().ok_or_else(|| format!("{app} ships no skills"))?;
+    let mut slot = shown.0.lock().map_err(|_| "the library is busy".to_string())?;
+    let found = slot.as_mut().ok_or("the skills have not been read yet")?;
+    match found.apps.iter_mut().find(|a| a.id == one.id) {
+        Some(place) => *place = one,
+        None => found.apps.push(one),
+    }
+    Ok(found.clone())
+}
+
+#[tauri::command]
+async fn refresh_app(app: String, shown: tauri::State<'_, Shown>) -> Result<Library, String> {
+    let shown = shown.inner().clone();
+    tauri::async_runtime::spawn_blocking(move || read_one(app, true, shown)).await.map_err(|e| e.to_string())?
+}
+
+#[tauri::command]
+async fn pin(app: String, version: Option<String>, shown: tauri::State<'_, Shown>) -> Result<Library, String> {
+    let current = entry(shown.inner(), &app)?;
+    if let Some(v) = &version {
+        if !current.releases.iter().any(|r| r == v) {
+            return Err(format!("the catalogue lists no release {v} with skills for this app"));
+        }
+    }
+    pins::set(&app, version.as_deref())?;
+    let shown = shown.inner().clone();
+    tauri::async_runtime::spawn_blocking(move || read_one(app, false, shown)).await.map_err(|e| e.to_string())?
+}
+
+#[tauri::command]
+fn own_list() -> Vec<Skill> {
+    own::list()
+}
+
+#[tauri::command]
+fn own_new(name: String, description: String) -> Result<Edit, String> {
+    own::create(name.trim(), &description)
+}
+
 #[tauri::command]
 async fn search(query: String, shown: tauri::State<'_, Shown>) -> Result<Vec<Hit>, String> {
     let apps = library_apps(shown.inner()).ok_or("the skills have not been read yet")?;
@@ -126,7 +169,7 @@ pub fn run() -> ExitCode {
         eprintln!("formskills: {e}");
         return ExitCode::FAILURE;
     }
-    match tauri::Builder::default().manage(Shown::default()).invoke_handler(tauri::generate_handler![library, refresh, read_file, download, edits, edit_start, edit_read, edit_write, edit_seen, edit_discard, edit_download, search, check_skill, edit_check]).run(tauri::generate_context!()) {
+    match tauri::Builder::default().manage(Shown::default()).invoke_handler(tauri::generate_handler![library, refresh, read_file, download, edits, edit_start, edit_read, edit_write, edit_seen, edit_discard, edit_download, search, check_skill, edit_check, refresh_app, pin, own_list, own_new]).run(tauri::generate_context!()) {
         Ok(()) => ExitCode::SUCCESS,
         Err(e) => {
             eprintln!("formskills: the window could not start: {e}");

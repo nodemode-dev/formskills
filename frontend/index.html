@@ -19,6 +19,7 @@
           <h1 translate="no">formskills</h1>
           <p class="sub">The Form apps' released skills: read them, download them, keep your own edits</p>
         </div>
+        <button class="btn btn-quiet" id="trust-open" type="button" aria-pressed="false">Trust</button>
         <button class="btn btn-quiet" id="guide-open" type="button" aria-pressed="false">Skill format</button>
         <span class="version" id="version" translate="no"></span>
       </header>
@@ -32,11 +33,20 @@
         <p class="count" id="count" aria-live="polite"></p>
       </div>
       <main class="split">
-        <ul class="cards" id="cards" aria-label="Apps that ship skills"></ul>
+        <ul class="cards" id="cards" aria-label="Apps that ship skills">
+          <li class="card card-own" data-app="yours">
+            <button class="card-hit" id="own-card" type="button" aria-pressed="false">
+              <span class="card-head"><span class="card-name">Your skills</span><span class="card-kind">yours</span></span>
+              <span class="card-summary">Write your own skill from the template, checked as you type.</span>
+              <span class="card-foot"><span class="card-where" id="own-count">Kept in formskills' folder</span></span>
+            </button>
+          </li>
+        </ul>
         <section class="detail" id="detail" aria-live="polite">
           <div class="detail-empty" id="detail-empty">
             <p class="detail-lead">Choose an app to see where its skills come from.</p>
             <p class="detail-note">Each Form app ships its skills with every release. formskills shows exactly what shipped, never unreleased work, and never changes an app's own copy.</p>
+            <p class="detail-note">A skill is instructions an agent follows, and some carry scripts it may run. formskills only reads signed family releases and never runs a skill; read one before you give it to an agent. Trust, in the header, says more.</p>
           </div>
           <article class="detail-app" id="detail-app" hidden>
             <header class="detail-head">
@@ -53,6 +63,12 @@
               <dd data-f="state"></dd>
               <dt>Skills here</dt>
               <dd data-f="here"></dd>
+              <dt>Release</dt>
+              <dd class="release-row">
+                <select id="release-pick" aria-label="Which release's skills" disabled></select>
+                <button class="btn btn-small" id="update-app" type="button" disabled>Update this app</button>
+                <span class="hint" id="release-note"></span>
+              </dd>
             </dl>
             <div class="app-actions">
               <button class="btn" id="download-app" type="button" disabled>Download all</button>
@@ -103,6 +119,26 @@
               </div>
             </div>
           </article>
+          <article class="detail-own" id="detail-own" hidden>
+            <header class="detail-head">
+              <h2 class="detail-name">Your skills</h2>
+              <span class="detail-kind">yours</span>
+            </header>
+            <p class="detail-summary">Skills you write yourself, started from the format's template and checked as you type. They stay in formskills' own folder until you download them.</p>
+            <form class="own-form" id="own-form" autocomplete="off">
+              <label class="own-field">
+                <span>Name</span>
+                <input id="own-name" type="text" placeholder="tidy-meeting-notes" spellcheck="false" maxlength="64" required />
+              </label>
+              <label class="own-field own-field-wide">
+                <span>What it does and when to use it</span>
+                <input id="own-description" type="text" placeholder="Turns meeting notes into decisions and actions. Use after a meeting." maxlength="1024" />
+              </label>
+              <button class="btn" id="own-create" type="submit" disabled>New skill</button>
+            </form>
+            <p class="hint own-note" id="own-note">Lowercase letters, digits and hyphens; the name becomes the skill's folder.</p>
+            <ul class="skill-list" id="own-list" aria-label="Your skills"></ul>
+          </article>
           <article class="results" id="results" hidden>
             <header class="pane-head">
               <h2 class="pane-title" id="results-title">Search</h2>
@@ -110,6 +146,27 @@
             </header>
             <p class="pane-note" id="results-note" aria-live="polite"></p>
             <ul class="skill-list" id="hits" aria-label="Skills found"></ul>
+          </article>
+          <article class="guide" id="trust" hidden>
+            <header class="pane-head">
+              <h2 class="pane-title">Trust and how far to rely on skills</h2>
+              <button class="btn btn-quiet" id="trust-close" type="button">Close</button>
+            </header>
+            <div class="fs-md guide-body">
+              <h3 class="fs-md-h fs-md-h3">What a skill can do</h3>
+              <p>A skill is instructions an agent reads and follows. A skill may tell the agent to run commands, edit files, or run the scripts it carries; the agent does that with the permissions you gave it. A card says "holds N scripts" when a skill carries code an agent may run.</p>
+              <h3 class="fs-md-h fs-md-h3">What formskills checks</h3>
+              <ul>
+                <li>It reads only the Form family's own releases, listed in the family catalogue, which must carry a signature from a key built into formskills; an unsigned or wrongly signed catalogue is refused.</li>
+                <li>Each skills download must match the catalogue's SHA-256, and unpacking refuses links, paths that leave the folder, and oversized archives.</li>
+                <li>formskills shows skills as text and never runs them. The format check reads the files; it does not judge what they ask an agent to do.</li>
+              </ul>
+              <p>A signature says where a skill came from and that it was not changed on the way. It does not say the skill is right for your task or safe on your computer.</p>
+              <h3 class="fs-md-h fs-md-h3">Sources that are not releases</h3>
+              <p>Dev mode reads app checkouts on this computer: unreleased work, not signed and not checked. A kept copy is the last release formskills checked, shown when the catalogue cannot be read now. Your own skills and edited copies are yours; formskills keeps them but did not write their instructions.</p>
+              <h3 class="fs-md-h fs-md-h3">How far to rely on them</h3>
+              <p>Skills are provided as they are, under each app's licence, without warranty. They describe how the Form apps work at their release and can be wrong, out of date or incomplete. Read a skill before you give it to an agent, keep the agent's own approvals on, and check what it changes. Pin an app to an earlier release when a newer skill does not suit you.</p>
+            </div>
           </article>
           <article class="guide" id="guide" hidden>
             <header class="pane-head">
