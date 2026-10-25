@@ -122,3 +122,10 @@ A chip toggles `hidden` on existing cards (only when it changes) and rewrites th
 The chip row is 36 px high and scrolls sideways instead of wrapping, so 18 chips (more as apps are added) never change its height. The count has a minimum width and aligns right. The split is two grid columns (2 to 3), one column of two rows below 760 px; both the list and the pane scroll inside themselves. Tokens and the layer scale are formMCP's (FormTray's family tokens, orange and violet accents to match the icon).
 
 Measured in Chromium at 4x CPU and a slow network (150 ms latency, 200 kB/s), dark and light, and at 640 by 480: the first visible frame already has 17 cards and 18 chips, no visible frame was partial; choosing FormVis, the FormCut chip and All: CLS 0, no page error, no sideways scroll.
+
+### package.json · vite 8.3.5 clears the dev server's launch-editor advisories
+- refers-to: frontend/package.json :: devDependencies.vite · frontend/package-lock.json
+- kind: fix
+- logged: v0.7.1 · 2026-10-25
+
+Family rule from `FAMILY_DEV_PLAN.md` v0.4.x Phase 2b (formai_dev sidecar): every frontend installs with zero `npm audit` findings. Vite 8.3.2 carries a `launch-editor` with two command-injection advisories in the dev server (ledger FB-004); 8.3.5 clears them. Dev dependency only, nothing in the shipped bundle changed. Verified after `npm install`: `npm audit` reports 0 vulnerabilities, `npm run typecheck` passes, `vite build` succeeds (outDir outside the repo), and the dev server answers 200 on `http://localhost:5630/` with no Network address printed.
