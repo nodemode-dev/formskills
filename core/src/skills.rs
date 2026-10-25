@@ -3,6 +3,8 @@ use std::path::Path;
 
 use serde::Serialize;
 
+use crate::check::{self, Summary};
+
 const SKIP_DIRS: [&str; 3] = ["__pycache__", "node_modules", ".git"];
 const SKIP_FILES: [&str; 2] = [".DS_Store", "Thumbs.db"];
 
@@ -18,6 +20,8 @@ pub struct Skill {
     pub folder: String,
     pub name: String,
     pub description: String,
+    pub license: String,
+    pub check: Summary,
     pub files: Vec<SkillFile>,
 }
 
@@ -88,6 +92,10 @@ fn walk(dir: &Path, prefix: &str, files: &mut Vec<SkillFile>) {
     }
 }
 
+pub fn walk_files(dir: &Path, files: &mut Vec<SkillFile>) {
+    walk(dir, "", files);
+}
+
 pub fn index(root: &Path) -> Vec<Skill> {
     let Ok(read) = std::fs::read_dir(root) else { return Vec::new() };
     let mut folders: Vec<_> = read.flatten().filter(|e| e.file_type().map(|t| t.is_dir()).unwrap_or(false)).map(|e| e.file_name().to_string_lossy().to_string()).filter(|n| !n.starts_with('.')).collect();
@@ -102,6 +110,8 @@ pub fn index(root: &Path) -> Vec<Skill> {
         skills.push(Skill {
             name: meta.get("name").filter(|n| !n.is_empty()).cloned().unwrap_or_else(|| folder.clone()),
             description: meta.get("description").cloned().unwrap_or_default(),
+            license: meta.get("license").cloned().unwrap_or_default(),
+            check: check::validate(&dir, &folder).summary(),
             folder,
             files,
         });

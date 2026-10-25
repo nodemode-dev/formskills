@@ -4,6 +4,7 @@ use std::time::{SystemTime, UNIX_EPOCH};
 
 use serde::{Deserialize, Serialize};
 
+use crate::check;
 use crate::fetch::{hex_sha256, plain};
 use crate::library::{self, AppSkills, FileText, Source};
 use crate::pack::{self, Saved};
@@ -231,6 +232,12 @@ pub fn acknowledge(app: &str, folder: &str, original: &AppSkills) -> Result<Edit
     record.base = base_label(&original.source);
     save_record(&record)?;
     Ok(describe(&record, Some(original)))
+}
+
+pub fn validate(app: &str, folder: &str) -> Result<check::Report, String> {
+    check(app, folder)?;
+    read_record(app, folder).ok_or_else(|| format!("there is no copy of {folder}"))?;
+    Ok(check::validate(&copy_root(app).join(folder), folder))
 }
 
 pub fn discard(app: &str, folder: &str) -> Result<(), String> {

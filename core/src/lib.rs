@@ -1,10 +1,12 @@
 pub mod apps;
 pub mod catalog;
+pub mod check;
 pub mod edits;
 pub mod fetch;
 pub mod library;
 pub mod pack;
 pub mod places;
+pub mod search;
 pub mod skills;
 
 pub use apps::{App, Apps};

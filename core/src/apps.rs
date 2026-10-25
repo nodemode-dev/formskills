@@ -9,6 +9,8 @@ pub struct App {
     pub app: String,
     pub name: String,
     pub kind: String,
+    pub topic: String,
+    pub licence: String,
     pub summary: String,
     pub repository: String,
     pub skills: String,
@@ -28,6 +30,7 @@ pub struct Apps {
     pub format: String,
     pub format_version: u32,
     pub source: Source,
+    pub topics: Vec<String>,
     pub apps: Vec<App>,
 }
 

@@ -1,6 +1,6 @@
 use std::process::ExitCode;
 
-use formskills_core::{catalog, edits, library, pack, places, Apps, CORE_VERSION};
+use formskills_core::{catalog, check, edits, library, pack, places, search, Apps, CORE_VERSION};
 use serde_json::json;
 
 const HELP: &str = "formskills-cli: formskills without the window
@@ -9,6 +9,8 @@ const HELP: &str = "formskills-cli: formskills without the window
   app <id>        one app (JSON)
   skills [id]     each app's skills and where they came from: its latest release, a kept copy, or a checkout in dev mode (JSON)
   fetch [id]      download every app's latest released skills again, check each digest, and keep them (JSON)
+  search <words>  every app's skills holding all the words, in the name, description or text, best first (JSON)
+  check <id> [skill] [--edit]   an app's skills, one skill, or your copy of it, against the SKILL.md format (JSON; exit 1 on an error)
   read <id> <path>   one file of an app's skills, by its path in the set (skill folder first), as text
   download <id> [skill] [--to DIR]   an app's skills, or one skill, as a zip in Downloads (or DIR)
   edits           your edited copies: what you changed, and whether the original changed since (JSON)
@@ -75,6 +77,57 @@ fn main() -> ExitCode {
             let count: usize = found.apps.iter().map(|a| a.skills.len()).sum();
             print(&json!({ "catalogue": found.catalogue, "dev": found.dev, "dev_roots": found.dev_roots, "skills": count, "apps": found.apps }));
             ExitCode::SUCCESS
+        }
+        "search" => {
+            let query = args[1..].join(" ");
+            if search::words(&query).is_empty() {
+                eprintln!("formskills: search needs a word, for example `formskills-cli search mask`");
+                return ExitCode::FAILURE;
+            }
+            let found = library::load(&apps, None, false);
+            let hits = search::search(&found.apps, &query);
+            print(&json!({ "query": query, "count": hits.len(), "hits": hits }));
+            ExitCode::SUCCESS
+        }
+        "check" => {
+            let rest: Vec<&str> = args[1..].iter().map(String::as_str).filter(|a| *a != "--edit").collect();
+            let own = args.iter().any(|a| a == "--edit");
+            let Some(app) = rest.first().and_then(|name| apps.get(name)).cloned() else {
+                eprintln!("formskills: check needs an app that ships skills; `formskills-cli apps` lists them");
+                return ExitCode::FAILURE;
+            };
+            let skill = rest.get(1).copied();
+            let reports: Result<Vec<check::Report>, String> = if own {
+                match skill {
+                    Some(folder) => edits::validate(&app.id, folder).map(|r| vec![r]),
+                    None => Err("check --edit needs the skill whose copy to check".to_string()),
+                }
+            } else {
+                let entry = library::load(&apps, Some(&app.id), false).apps.into_iter().next();
+                match entry.as_ref().and_then(|e| e.root.as_deref().map(|root| (e, root))) {
+                    Some((e, root)) => {
+                        let chosen: Vec<_> = e.skills.iter().filter(|s| skill.is_none_or(|w| s.folder == w)).collect();
+                        if chosen.is_empty() {
+                            Err(format!("{} has no skill {:?}", app.name, skill.unwrap_or("")))
+                        } else {
+                            Ok(chosen.iter().map(|s| check::validate(&root.join(&s.folder), &s.folder)).collect())
+                        }
+                    }
+                    None => Err(format!("{} has no skills here", app.name)),
+                }
+            };
+            match reports {
+                Ok(reports) => {
+                    let errors: usize = reports.iter().map(|r| r.errors).sum();
+                    let warnings: usize = reports.iter().map(|r| r.warnings).sum();
+                    print(&json!({ "app": app.id, "spec": check::SPEC, "errors": errors, "warnings": warnings, "skills": reports }));
+                    if errors > 0 { ExitCode::FAILURE } else { ExitCode::SUCCESS }
+                }
+                Err(e) => {
+                    eprintln!("formskills: {e}");
+                    ExitCode::FAILURE
+                }
+            }
         }
         "edits" => {
             let found = library::load(&apps, None, false);

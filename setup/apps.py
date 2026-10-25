@@ -7,6 +7,19 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 OUT = ROOT / "core" / "data" / "apps.json"
 FORMAT = "formskills-apps"
+TOPICS = {
+    "Media": ["audio", "encoder", "image", "motion", "photo", "video"],
+    "Design": ["layout", "sculpt", "slides", "texture", "vector", "web"],
+    "Documents": ["chat", "document", "notes", "pdf", "reference", "spreadsheet"],
+    "Family": ["connect", "launcher", "library", "portal", "skill"],
+}
+
+
+def topic_of(kind):
+    for topic, kinds in TOPICS.items():
+        if kind in kinds:
+            return topic
+    sys.exit(f"apps: kind {kind!r} has no topic; add it to TOPICS in setup/apps.py")
 
 
 def git(repo, *args):
@@ -33,6 +46,8 @@ def build(compiler):
             "app": entry["app"],
             "name": catalog["name"],
             "kind": catalog["kind"],
+            "topic": topic_of(catalog["kind"]),
+            "licence": catalog.get("licence") or "",
             "summary": catalog["summary"],
             "repository": f"https://github.com/{entry['repository']}",
             "skills": skills,
@@ -42,8 +57,9 @@ def build(compiler):
     apps.sort(key=lambda a: a["name"].lower())
     return {
         "format": FORMAT,
-        "format_version": 1,
+        "format_version": 2,
         "source": {"repository": "nodemode-ai/formcompiler", "version": version, "commit": git(compiler, "rev-parse", "HEAD")},
+        "topics": list(TOPICS),
         "apps": apps,
     }
 
