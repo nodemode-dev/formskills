@@ -1,5 +1,14 @@
 # Changelog
 
+## v0.5.0 · 2026-10-25
+
+- Search every app's skills: type in the box above the chips, and the matching skills appear best first, each with the line that matched; open one at that file. The chips narrow the results.
+- Topic chips (Media, Design, Documents, Family) show the apps for one kind of work.
+- Each skill shows its licence (its own, or its app's) and whether it passes the SKILL.md format check.
+- Check, in the reader, lists every format error and note with the fields' lengths; while you edit your copy it runs after every save, so you see the moment a fix lands.
+- The Skill format page explains the folder, the front matter fields and what Check reports.
+- The command line gains `search` and `check` (`check` exits 1 on an error, for scripts).
+
 ## v0.4.1 · 2026-10-24
 
 - formskills is a registered Form app: formcompiler builds and releases it, and FormPortal, FormTray and FormRanker know it as `formskills`, `ai.nodemode.formskills`.

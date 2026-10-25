@@ -2,8 +2,17 @@
 
 Living log for formskills' desktop shell. Source files stay comment-free; what they would have said lives here.
 
-Current build version: v0.4.0
-Last updated: 2026-10-24 · the edit commands; read_file and download; library and refresh; the shell
+Current build version: v0.5.0
+Last updated: 2026-10-25 · search and the check commands; the edit commands; read_file and download; library and refresh; the shell
+
+## v0.5.0 · search and the check commands {#v0-5-0}
+
+### lib.rs · search, check_skill, edit_check
+- refers-to: src-tauri/src/lib.rs :: search, check_skill, edit_check
+- kind: decision
+- logged: v0.5.0 · 2026-10-25
+
+`search` runs over the library the shell already holds (the last `library` or `refresh`), so it never reads the catalogue or the network; before the first read it says so. `check_skill` takes an app id and a skill folder, refuses a folder the app's index does not list, and checks inside the app's skills folder. `edit_check` checks your copy through `edits::validate`, which applies the same plain-name check as every edit command. All three run off the main thread and send no path to the page.
 
 ## v0.4.0 · the edit commands {#v0-4-0}
 

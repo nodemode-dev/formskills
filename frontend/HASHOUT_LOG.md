@@ -2,8 +2,24 @@
 
 Living log for formskills' window. Source files stay comment-free; what they would have said lives here.
 
-Current build version: v0.4.0
-Last updated: 2026-10-24 · editing your own copy; the reader and downloads; where each app's skills come from; chips, cards and the detail pane
+Current build version: v0.5.0
+Last updated: 2026-10-25 · search, topics, the format page and Check; editing your own copy; the reader and downloads; where each app's skills come from; chips, cards and the detail pane
+
+## v0.5.0 · search, topics, the format page and Check {#v0-5-0}
+
+### index.html, main.ts · results and the format page live in the detail pane
+- refers-to: index.html :: #search, #results, #results-title, #results-note, #hits, #results-clear, #guide, #guide-open, #guide-close · src/main.ts :: setOverlay, renderHits, runSearch, clearSearch, inFilter, apply, overlay, hits
+- kind: decision
+- logged: v0.5.0 · 2026-10-25
+
+The app list is the one thing the first frame builds complete, so search never replaces it: results and the format page are two more articles in the detail pane, shown in place of the empty state, the app detail or the reader (`setOverlay`). Typing searches after 180 ms (Enter at once, Escape clears); two characters at least. The chips filter results in place (`inFilter`: All, a topic, or one app) and say how many more are under All. Opening a result chooses its app, scrolls its card into view in the list, and opens the reader at the file that matched; All skills goes back to the results while the query stands. The topic chips are built from the list's `topics` in the first frame, before a thin separator and the app chips, so the row's height never changes. The format page is static HTML in `index.html`, there from the first frame and hidden.
+
+### main.ts, app.css · Check and live findings
+- refers-to: index.html :: #check-skill, #findings, #findings-sum, #findings-fields, #findings-list · src/main.ts :: renderReport, runCheck, checkText, licenceText, updateControls, saveNow, enterEdit · src/styles/app.css :: .findings, .finding, .skill-meta
+- kind: fix
+- logged: v0.5.0 · 2026-10-25
+
+The findings panel is a fourth row of the reader, between its head and the edit bar. In edit mode it is always shown and runs `edit_check` after every save; reading, Check toggles it. The first throttled run measured CLS 0.012: the panel grew when the report arrived (400 ms after the edit started) and pushed the edit bar and editor down. The panel now has a fixed height (84 px, 52 px in windows under 600 px tall) and scrolls inside, so a report of any length moves nothing: CLS 0 after. The pass line is in ink, not the green `--live`, which the light theme does not redefine and would be faint on white. Skill cards gained a meta line (licence, then the check summary, in the fault colour when there is an error); the memo key that decides whether to rebuild the list now includes each skill's check and licence.
 
 ## v0.4.0 · editing your own copy {#v0-4-0}
 

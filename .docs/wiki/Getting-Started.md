@@ -25,6 +25,9 @@ On Windows: `formskills_oc_install.bat`, then `formskills.bat`, `formskills.bat 
 ./formskills cli skills formvis   # one app
 ./formskills cli fetch            # download every app's latest release again
 ./formskills cli where            # the folder released skills are kept in
+./formskills cli search colour grading                      # skills holding every word, best first
+./formskills cli check formpdf                              # its skills against the SKILL.md format
+./formskills cli check formvis formvis-harness --edit       # your copy of one skill
 ./formskills cli read formvis formvis-harness/SKILL.md      # one file, as text
 ./formskills cli download formvis                           # the app's set as a zip in Downloads
 ./formskills cli download formvis formvis-harness --to .    # one skill, into this folder

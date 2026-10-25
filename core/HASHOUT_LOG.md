@@ -2,8 +2,33 @@
 
 Living log for `formskills-core`, `formskills-cli` and `setup/apps.py`. Source files stay comment-free; what they would have said lives here.
 
-Current build version: v0.4.1
-Last updated: 2026-10-24 · registered in formcompiler; personal edited copies; no partial download; reading one file and packing downloads; released skills fetched, checked and kept, and the dev mode; the generated list of apps that ship skills
+Current build version: v0.5.0
+Last updated: 2026-10-25 · search, the format check, licences and topics; registered in formcompiler; personal edited copies; no partial download; reading one file and packing downloads; released skills fetched, checked and kept, and the dev mode; the generated list of apps that ship skills
+
+## v0.5.0 · search, the format check, licences and topics {#v0-5-0}
+
+### check.rs · the Agent Skills format plus Claude's rules
+- refers-to: core/src/check.rs :: validate, name_findings, link_targets, resolve, has_tag, block_closed, Report, Finding, Field, Summary, SPEC · core/src/skills.rs :: Skill.license, Skill.check, walk_files · core/src/edits.rs :: validate
+- kind: decision
+- logged: v0.5.0 · 2026-10-25
+
+The rules come from the Agent Skills specification (agentskills.io/specification, read 2026-10-25) and Claude's Agent Skills overview (platform.claude.com, the same day): name 1 to 64 characters of lowercase letters, digits and hyphens, no hyphen at either end or two in a row, equal to the folder; Claude adds no XML tags and no "anthropic" or "claude" (checked without regard to case); description 1 to 1024 characters with no XML tags; compatibility 1 to 500 when set; SKILL.md under 500 lines (a note, not an error). Links are notes only, because a broken link does not stop an agent from loading the skill; they are read outside fenced code and outside inline code spans (formdeck's skills show `![alt](a1)` as script syntax, which the first run reported as six broken links). Unknown front matter keys are not reported: Claude Code and other agents add their own. The index runs the check for every skill so each card can carry a summary; it reads only files already listed and costs little against the 36 skills.
+
+Found in the family: formpdf-harness's description is 1,362 characters, over the 1,024 limit (an error that Claude's upload checks would refuse). Every other skill passes with no notes.
+
+### search.rs · every word, at the start of a word
+- refers-to: core/src/search.rs :: search, words, starts, body, snippet, Hit
+- kind: decision
+- logged: v0.5.0 · 2026-10-25
+
+A skill matches when every word appears at the start of a word in its name or folder, description, or Markdown text (front matter left out). The first version matched inside words, so "lip sync" found "clipping" and "async"; matching at a word start keeps prefixes ("mask" finds "masks") and drops those. Scores: 8 for the name, 4 for the description, the number of places in the text up to 5, per word; ties by name then app; at most 60 results. Nothing is cached: a search over the 36 skills reads their Markdown again and takes about 80 ms in a whole CLI run, so a cache would be complexity for no gain yet.
+
+### setup/apps.py, apps.rs · topic and licence per app
+- refers-to: setup/apps.py :: TOPICS, topic_of · core/src/apps.rs :: App.topic, App.licence, Apps.topics · core/data/apps.json
+- kind: decision
+- logged: v0.5.0 · 2026-10-25
+
+The registry's `kind` is one per app (18 kinds for 18 apps), so it cannot group anything; `TOPICS` in the generator maps kinds to four topics (Media, Design, Documents, Family) and fails on a new kind, so a new app cannot slip in without one. `licence` is the registry's `catalog.licence`, shown when a skill names none. The list's format version is now 2.
 
 ## v0.4.1 · registered in formcompiler {#v0-4-1}
 
