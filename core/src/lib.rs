@@ -3,6 +3,7 @@ pub mod catalog;
 pub mod check;
 pub mod edits;
 pub mod fetch;
+pub mod install;
 pub mod library;
 pub mod own;
 pub mod pack;

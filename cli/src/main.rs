@@ -1,6 +1,6 @@
 use std::process::ExitCode;
 
-use formskills_core::{catalog, check, edits, library, own, pack, pins, places, search, Apps, CORE_VERSION};
+use formskills_core::{catalog, check, edits, install, library, own, pack, pins, places, search, Apps, CORE_VERSION};
 use serde_json::json;
 
 const HELP: &str = "formskills-cli: formskills without the window
@@ -17,6 +17,12 @@ const HELP: &str = "formskills-cli: formskills without the window
   pins            the apps you pinned (JSON)
   new <name> [description...]   start a skill of your own from the template (then edit it with `edit ... yours <name> ...`)
   own             your own skills (JSON)
+  install <id> [skill] --to claude[,codex,cursor] [--project DIR] [--copy] [--force]
+                  put an app's skills, one skill, your copy (--copy) or your own skill (id yours) into an agent's skills
+                  folder: for you (~/.claude/skills, ~/.agents/skills, ~/.cursor/skills) or one project (DIR/.claude/skills ...)
+  installed       what formskills installed, where, whether it was changed there, and newer releases (JSON)
+  update <skill> --for AGENT [--project DIR]   install that skill again from its source (a newer release, your latest copy)
+  uninstall <skill> --from AGENT [--project DIR] [--force]   remove a skill formskills installed; never one it did not
   edits           your edited copies: what you changed, and whether the original changed since (JSON)
   edit start <id> <skill>            make your own copy of a skill (the original is never changed)
   edit read <id> <skill> <path>      one file of your copy, as text
@@ -145,6 +151,86 @@ fn main() -> ExitCode {
             return ExitCode::FAILURE;
         }
     };
+    if matches!(command, "install" | "installed" | "update" | "uninstall") {
+        let value = |name: &str| args.iter().position(|a| a == name).and_then(|i| args.get(i + 1)).cloned();
+        let has = |name: &str| args.iter().any(|a| a == name);
+        let plain: Vec<&str> = {
+            let mut out = Vec::new();
+            let mut skip = false;
+            for a in &args[1..] {
+                if skip {
+                    skip = false;
+                    continue;
+                }
+                if matches!(a.as_str(), "--to" | "--for" | "--from" | "--project") {
+                    skip = true;
+                    continue;
+                }
+                if a.starts_with("--") {
+                    continue;
+                }
+                out.push(a.as_str());
+            }
+            out
+        };
+        let lib = library::load(&apps, None, false);
+        let project = value("--project");
+        let result: Result<serde_json::Value, String> = match command {
+            "installed" => Ok(json!({ "installed": install::list(Some(&lib.apps)) })),
+            "install" => (|| {
+                let id = plain.first().copied().ok_or("install needs an app id (or yours) and --to")?;
+                let id = if id == own::OWN { own::OWN.to_string() } else { apps.get(id).map(|a| a.id.clone()).ok_or_else(|| format!("no Form app ships skills under {id:?}"))? };
+                let agents = value("--to").ok_or("install needs --to claude, codex or cursor (comma separated)")?;
+                let folders: Vec<String> = match plain.get(1) {
+                    Some(f) => vec![f.to_string()],
+                    None if id == own::OWN => return Err("install yours needs the skill's name".to_string()),
+                    None => lib.apps.iter().find(|a| a.id == id).map(|a| a.skills.iter().map(|s| s.folder.clone()).collect()).unwrap_or_default(),
+                };
+                if folders.is_empty() {
+                    return Err("there are no skills to install".to_string());
+                }
+                let mut rows = Vec::new();
+                let mut failed = 0;
+                for agent in agents.split(',').map(str::trim).filter(|a| !a.is_empty()) {
+                    let target = install::Target::new(agent, project.as_deref())?;
+                    for folder in &folders {
+                        let done = install::source(&lib.apps, &id, folder, has("--copy")).and_then(|(from, origin)| install::install(&from, folder, origin, &target, has("--force")));
+                        match done {
+                            Ok(state) => rows.push(json!(state)),
+                            Err(e) => {
+                                failed += 1;
+                                rows.push(json!({ "folder": folder, "where": target.describe(), "error": e }));
+                            }
+                        }
+                    }
+                }
+                if failed == rows.len() {
+                    return Err(rows.iter().filter_map(|r| r.get("error").and_then(|e| e.as_str())).collect::<Vec<_>>().join("; "));
+                }
+                Ok(json!({ "installed": rows, "failed": failed }))
+            })(),
+            _ => (|| {
+                let folder = plain.first().copied().ok_or_else(|| format!("{command} needs the skill's folder name"))?;
+                let agent = value(if command == "update" { "--for" } else { "--from" }).ok_or_else(|| format!("{command} needs {} claude, codex or cursor", if command == "update" { "--for" } else { "--from" }))?;
+                let target = install::Target::new(&agent, project.as_deref())?;
+                if command == "update" {
+                    install::update(&lib.apps, &target, folder).map(|s| json!(s))
+                } else {
+                    install::uninstall(&target, folder, has("--force")).map(|()| json!({ "removed": folder, "where": target.describe() }))
+                }
+            })(),
+        };
+        return match result {
+            Ok(v) => {
+                print(&v);
+                ExitCode::SUCCESS
+            }
+            Err(e) => {
+                eprintln!("formskills: {e}");
+                ExitCode::FAILURE
+            }
+        };
+    }
     if command == "pin" {
         let (Some(app), Some(version)) = (args.get(1).and_then(|n| apps.get(n)), args.get(2)) else {
             eprintln!("formskills: pin <id> <version>|latest");
