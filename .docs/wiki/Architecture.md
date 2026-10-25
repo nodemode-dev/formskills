@@ -43,6 +43,10 @@ formcompiler's catalogue gives each app's stable release a `history` of up to fi
 
 Your own skills live in `edits/yours/<name>/`, made by `own.rs` from a template and registered with the same record as an edited copy (base "your own skill", no original), so editing, the format check, download (as `<name>.zip`) and discard are the copy code. Names are refused unless they meet the format.
 
+## Installing into agents (v0.7.0)
+
+`install.rs` knows three agents and their skill folders, from each agent's docs: Claude Code `.claude/skills`, Codex `.agents/skills`, Cursor `.cursor/skills`, under the home folder for the user or under a project folder (canonicalised; the home folder itself counts as the user). A source is a released skill (the kept, checked release), an edited copy, or your own skill. Each install copies the folder into a hidden temporary sibling, then renames it into place, and records the target, folder, origin and a SHA-256 of every file in `installed.json`. A folder of the same name with no record, or a symlink, is refused; a recorded folder whose files no longer match is "modified" and is only replaced or removed with force. `list` compares each record with the disk and with the library, and reports a newer release; `update` installs the current source again; `install_many` installs one skill or a whole app into several agents and returns one outcome per skill and agent, so one refusal leaves the rest done. The shell's `install_skills`, `installed`, `install_update` and `install_remove` pass ids, agent names and an optional project path only.
+
 ## Reading and downloading (v0.3.0)
 
 The shell keeps the last library, with each app's skills folder, and never sends a folder to the page. `read_file` takes an app id and a path in the set; `library::read_text` refuses anything that is not plain path parts or that resolves outside the folder, and returns text or a note. `download` packs one skill or the set with `pack.rs`, shaped like formcompiler's asset, into the Downloads folder without replacing a file. The page renders Markdown with `markdown.ts` (the family's renderer), which builds DOM nodes and never parses HTML.

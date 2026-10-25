@@ -59,6 +59,22 @@ In the window, open a skill and press Edit a copy. Your copy is saved as you typ
 
 Copies live in `edits/` in formskills' data folder (beside `released/`), one folder per skill with a small record next to it. Only files the skill already has can be edited.
 
+## Installing into an agent
+
+In the window, open a skill and press Install, or press Install all on an app. Tick Claude Code, Codex or Cursor, choose Just me (the folders in your home) or One project folder, and press Install; the page shows where each skill goes before you press it. When you are editing a copy, Install puts your copy in, under the skill's own name. Installed, in the header, lists everything formskills put in an agent's folder, and updates or removes it. Agents read new skills the next time they start.
+
+```bash
+./formskills cli install formvis --to claude,codex                      # every formvis skill, for you
+./formskills cli install formvis formvis-harness --to claude --project ~/work/site
+./formskills cli install formvis formvis-harness --to claude --copy     # your edited copy
+./formskills cli install yours tidy-meeting-notes --to cursor           # your own skill
+./formskills cli installed                                              # what was installed, and its state
+./formskills cli update formvis-harness --for claude
+./formskills cli uninstall formvis-harness --from claude                # add --force to lose changes made there
+```
+
+formskills writes only folders it made. It refuses a folder of the same name that it did not install, and keeps any change made inside an installed skill: installing again or removing it then needs `--force` (Install anyway, or Remove, losing changes, in the window). Cursor also reads `.claude/skills` and `.agents/skills`, so a skill installed for Claude Code or Codex already shows there.
+
 ## Dev mode
 
 ```bash

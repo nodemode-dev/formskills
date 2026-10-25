@@ -4,7 +4,8 @@ Rules for agents working in this repository. Read the in-tree HASHOUT logs (`cor
 
 ## What formskills is, and is not
 
-- A viewer of the Form apps' released skills, with download and personal edited copies. Nothing more: it does not install skills into Claude Code, Codex or Cursor, does not push edits to an app, and does not follow unreleased `main`.
+- A viewer of the Form apps' released skills, with download, personal edited copies, and installing into Claude Code, Codex and Cursor (the owner allowed installing for v0.7.0). It does not push edits to an app and does not follow unreleased `main`.
+- Installing (`core/src/install.rs`) only writes folders recorded in `installed.json`: never replace a folder it did not make or a symlink, never replace or delete a changed install without force, and always copy into a temporary sibling and rename. Agent folders come from each agent's docs (Claude Code `.claude/skills`, Codex `.agents/skills`, Cursor `.cursor/skills`); check the docs again before changing them.
 - The one place for skills in the family. formMCP handles the apps' MCP tools and carries nothing about skills; keep it that way from this side too.
 - Every list formskills carries is generated. `core/data/apps.json` comes from formcompiler's registry through `setup/apps.py` (`./formskills apps --compiler PATH`); `--check` fails while it drifts. Never copy an app's skills into this repository.
 - The engine owns all logic and works with no window: `formskills-core` holds the list, the catalogue, fetching and keeping, and the index; `cli` and `src-tauri` are thin.

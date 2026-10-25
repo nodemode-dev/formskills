@@ -2,8 +2,17 @@
 
 Living log for formskills' desktop shell. Source files stay comment-free; what they would have said lives here.
 
-Current build version: v0.6.0
-Last updated: 2026-10-25 · one app at a time, pins, your own skills; search and the check commands; the edit commands; read_file and download; library and refresh; the shell
+Current build version: v0.7.0
+Last updated: 2026-10-25 · the install commands; one app at a time, pins, your own skills; search and the check commands; the edit commands; read_file and download; library and refresh; the shell
+
+## v0.7.0 · the install commands {#v0-7-0}
+
+### lib.rs · install_skills, installed, install_update, install_remove
+- refers-to: src-tauri/src/lib.rs :: install_skills, installed, install_update, install_remove
+- kind: decision
+- logged: v0.7.0 · 2026-10-25
+
+The page sends an app id (or `yours`), a skill folder or none, the agent names, an optional project path and the copy and force flags; the shell passes the library it holds to `install::install_many` and returns the typed outcomes, so the batch logic and its JSON shape live in core (the shell has no serde_json). Update and remove build a `Target` from the agent and project, which checks both. Checked in the real window: Install all for formcut into Claude Code wrote both skills into the scratch home's `.claude/skills`, and Installed listed them.
 
 ## v0.6.0 · one app at a time, pins, your own skills {#v0-6-0}
 

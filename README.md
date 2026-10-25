@@ -29,6 +29,7 @@ formskills is where the skills of the Form family of desktop apps (image, video,
 - **Know what you are trusting.** The Trust page says what a skill can make an agent do, what formskills checks (signature, digest, safe unpacking) and what it does not, and how far to rely on skills; cards say when a skill holds scripts.
 - **Read them properly.** Each app's skills as cards; open one to read its SKILL.md as formatted text, with its sub-skills, references and other files beside it and links between them followed. Skills are shown as text and never run.
 - **Download what shipped.** One skill, or an app's whole set, as a zip shaped exactly like the release asset, saved to Downloads.
+- **Install into your agent.** Put a skill, an app's set, your copy or your own skill into Claude Code, Codex or Cursor, for you or for one project. formskills writes only folders it made, keeps any change made there unless you choose to lose it, and its Installed page updates or removes what it put in.
 - **A window that does not flicker.** Chips for All and each app, a card per app, a detail pane and reader; painted complete in its first frame, and nothing moves when the skills arrive.
 
 ## Quick start
@@ -50,6 +51,8 @@ Requirements: Rust (stable), Node 20.19+, and on Linux WebKitGTK 4.1 for the win
 ./formskills cli new tidy-notes Tidies meeting notes   # a skill of your own from the template
 ./formskills cli pin formvis 1.97.1                 # keep an earlier release (latest to follow again)
 ./formskills cli fetch formvis                      # check and download one app again
+./formskills cli install formvis --to claude,codex  # every formvis skill into Claude Code and Codex, for you
+./formskills cli installed                          # what formskills installed, and whether it changed
 ./formskills dev            # the window, reading Form app checkouts beside this one
 ```
 
@@ -61,8 +64,8 @@ On Windows run `formskills_oc_install.bat`, then `formskills.bat`.
 
 | Path | Role |
 | --- | --- |
-| `core/` | The engine: the list of apps that ship skills (`core/data/apps.json`, generated), the signed catalogue, fetching and keeping released skills, the skills index, search, the format check, downloads, your edited copies |
-| `cli/` | `formskills-cli apps`, `app`, `skills`, `fetch`, `search`, `check`, `read`, `download`, `pin`, `pins`, `new`, `own`, `edits`, `edit ...`, `catalog`, `where`, `version` |
+| `core/` | The engine: the list of apps that ship skills (`core/data/apps.json`, generated), the signed catalogue, fetching and keeping released skills, the skills index, search, the format check, downloads, your edited copies, installing into agents |
+| `cli/` | `formskills-cli apps`, `app`, `skills`, `fetch`, `search`, `check`, `read`, `download`, `pin`, `pins`, `new`, `own`, `edits`, `edit ...`, `install`, `installed`, `update`, `uninstall`, `catalog`, `where`, `version` |
 | `src-tauri/` | The shell: the window |
 | `frontend/` | The window: tokens, layers, chips, cards and the detail pane |
 | `setup/apps.py` | Generates `core/data/apps.json` from formcompiler's registry |
@@ -77,6 +80,8 @@ On Windows run `formskills_oc_install.bat`, then `formskills.bat`.
 **Releases.** formskills builds nothing in this repository. After the version bump lands on main, push a branch `compile_vX.Y.Z` cut from that commit; CI runs on it, and formcompiler (`nodemode-ai/formcompiler`) builds the bundles with `./build_app` (`build_app.bat` on Windows) and drafts the release `formskills-vX.Y.Z` (`apps/formskills.json` in its registry). `./build_app` also builds the app on your own machine.
 
 ## Status
+
+v0.7.0: installing into agents. Install a skill, an app's set, an edited copy or your own skill into Claude Code, Codex or Cursor, for you or one project, and update or remove it from the Installed page. Checked in a scratch home against a signed catalogue on loopback with two formvis releases: user and project installs for each agent, a foreign folder and a symlink refused, a changed install kept until forced, an install from an older pinned release updated to the newer one, copy and own-skill installs, removal; the window at 4x CPU and network throttling (CLS 0, dark 1040 by 720 and light 640 by 520) and the real app (an app's set installed into Claude Code and listed). That a running agent loads the installed folders is taken from each agent's docs, not tried here.
 
 v0.6.0: own skills and versions. Your own skills from a template; pinning an app to an earlier release from the catalogue's history; updating one app; the Trust page and script counts. Checked against a signed catalogue on loopback with two formvis releases (pin, a pin refused when the release has no skills or is not listed, a pin the catalogue later drops, unpin, one-app update), your own skill from making to deleting, the window at 4x CPU and network throttling (CLS 0, dark, light, 640 by 480) and the real app (a skill made, kept across a restart; a release pinned through the window).
 

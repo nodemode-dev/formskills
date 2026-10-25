@@ -1,5 +1,12 @@
 # Changelog
 
+## v0.7.0 · 2026-10-25
+
+- Install skills into an agent: Install on a skill, or Install all on an app, puts the skills into Claude Code (`.claude/skills`), Codex (`.agents/skills`) or Cursor (`.cursor/skills`), for you in every project or in one project folder. Your edited copy installs under the skill's own name, and your own skills install too.
+- formskills only ever writes folders it made: it refuses a folder of the same name it did not install, or a link, and keeps changes you made in an installed skill unless you choose Install anyway or Remove, losing changes.
+- The Installed page lists every install with where it is, which release or copy it came from, whether it was changed there, and any newer release, with Update and a two-click Remove.
+- The command line gains `install <id> [skill] --to claude,codex,cursor [--project DIR] [--copy] [--force]`, `installed`, `update <skill> --for AGENT` and `uninstall <skill> --from AGENT`.
+
 ## v0.6.0 · 2026-10-25
 
 - Write your own skills: Your skills, at the top of the list, starts one from the format's template, checks the name as you type, and opens it in the editor with the format check running. Download it as `<name>.zip`, or delete it.

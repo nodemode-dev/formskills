@@ -2,8 +2,24 @@
 
 Living log for formskills' window. Source files stay comment-free; what they would have said lives here.
 
-Current build version: v0.6.0
-Last updated: 2026-10-25 · Your skills, the Release row, Trust; search, topics, the format page and Check; editing your own copy; the reader and downloads; where each app's skills come from; chips, cards and the detail pane
+Current build version: v0.7.0
+Last updated: 2026-10-25 · the Install and Installed pages; Your skills, the Release row, Trust; search, topics, the format page and Check; editing your own copy; the reader and downloads; where each app's skills come from; chips, cards and the detail pane
+
+## v0.7.0 · the Install and Installed pages {#v0-7-0}
+
+### index.html, main.ts, app.css · Install
+- refers-to: index.html :: #install, #install-app, #install-skill, .install-group, #install-path, #install-where, #install-go, #install-hint, #install-result · src/main.ts :: Overlay, setOverlay, openInstall, showInstallWhere, runInstall, chosenAgents, projectScope, AGENT_DIRS, returnTo, install-back handler, installAppButton · src/styles/app.css :: .install-group, .install-option, .install-path, #install-where, .install-actions, .install-result, .install-row
+- kind: decision
+- logged: v0.7.0 · 2026-10-25
+
+Install is a fourth overlay, static HTML like Trust, so opening it moves nothing else; the "where it goes" line keeps two lines of room and the result list grows only inside the pane, which scrolls. Install on a skill saves an open edit first and installs the copy when editing (the released skill otherwise); Back reopens what was open (the skill, editing again if it was, your own skill, or the app). Install all follows Download all's enabled state. A refusal that names force adds one button, Install anyway, replacing your changes there, which runs the same install with force. The agent folders in the page mirror `install.rs`; change both together. The groups first had a top rule, but WebKitGTK draws a fieldset's rule beside the legend rather than above it (seen in the real window), so they are plain.
+
+### main.ts, app.css · Installed
+- refers-to: index.html :: #installed, #installed-open, #installed-list · src/main.ts :: showInstalled, originText, Installed · src/styles/app.css :: .installed-row, .installed-head, .installed-where, .installed-info, .bar
+- kind: decision
+- logged: v0.7.0 · 2026-10-25
+
+Each row: the skill folder over where and from what (both clipped, full path as a tooltip), then the state (as installed, changed there with the files, missing, or a newer release), Update and Remove. The state was first last on one clipped line and fell off at 1040 wide; it now has its own column, and below 760 px its own row. Update is off for a changed install (it would need force; the tooltip says how) and for a release that is already newest; Remove takes a second click within four seconds, and reads Remove, losing changes when the folder was changed there. The header gained Installed, so the bar has six columns. Checked at 4x CPU and network throttling, dark 1040 by 720 and light 640 by 520: CLS 0, no errors, no sideways scroll.
 
 ## v0.6.0 · Your skills, the Release row, Trust {#v0-6-0}
 

@@ -2,8 +2,26 @@
 
 Living log for `formskills-core`, `formskills-cli` and `setup/apps.py`. Source files stay comment-free; what they would have said lives here.
 
-Current build version: v0.6.0
-Last updated: 2026-10-25 · pins, one-app update, your own skills, script counts; search, the format check, licences and topics; registered in formcompiler; personal edited copies; no partial download; reading one file and packing downloads; released skills fetched, checked and kept, and the dev mode; the generated list of apps that ship skills
+Current build version: v0.7.0
+Last updated: 2026-10-25 · installing into Claude Code, Codex and Cursor; pins, one-app update, your own skills, script counts; search, the format check, licences and topics; registered in formcompiler; personal edited copies; no partial download; reading one file and packing downloads; released skills fetched, checked and kept, and the dev mode; the generated list of apps that ship skills
+
+## v0.7.0 · installing into agents {#v0-7-0}
+
+### install.rs · where each agent reads skills
+- refers-to: core/src/install.rs :: AGENTS, agent_label, agent_dir, Target::new, Target::root, Target::describe
+- kind: decision
+- logged: v0.7.0 · 2026-10-25
+
+The folders come from each agent's own docs, read 2026-10-25: Claude Code `~/.claude/skills` and `.claude/skills`, Codex `~/.agents/skills` and `.agents/skills`, Cursor `~/.cursor/skills` and `.cursor/skills` (Cursor also reads the Claude Code and Codex folders, which the window says). A project path must be a folder and is canonicalised; the home folder itself is treated as the user scope so one folder never has two records. Whether a running agent then loads the skill was not tried (it needs a signed-in agent); recheck the docs before changing these.
+
+### install.rs · only folders formskills made, and changes kept
+- refers-to: core/src/install.rs :: Record, Origin, State, install, uninstall, update, list, install_many, Outcome · data_dir/installed.json
+- kind: decision
+- logged: v0.7.0 · 2026-10-25
+
+Every install is recorded with its target, folder, origin (release and version, edited copy, own skill or checkout) and a SHA-256 per file. A folder of that name with no record is someone else's and is refused, as is a symlink. A recorded folder whose files differ is "modified": installing again or removing it needs force, and the error says so (the window keys its Install anyway button on "with force"). Each install copies into `.<folder>.formskills-part-<pid>` beside the target and renames it into place, replacing the old folder only after the copy is whole. `list` compares records with the disk and the library and names a newer release; `update` installs the current source again under the same rules. `install_many` returns one Outcome per skill and agent instead of stopping at the first refusal, so an app's set installs everywhere it can and reports the rest; the CLI fails only when every one was refused.
+
+Checked in a scratch home with the signed loopback catalogue: user and project installs for all three agents, a foreign folder and a symlink refused, a modified install refused then forced, install from pinned 1.97.1 then update to 1.97.2 after unpinning, copy and own-skill installs, uninstall plain and forced.
 
 ## v0.6.0 · pins, one-app update, your own skills, script counts {#v0-6-0}
 
