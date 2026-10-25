@@ -2,8 +2,26 @@
 
 Living log for formskills' window. Source files stay comment-free; what they would have said lives here.
 
-Current build version: v0.5.0
-Last updated: 2026-10-25 · search, topics, the format page and Check; editing your own copy; the reader and downloads; where each app's skills come from; chips, cards and the detail pane
+Current build version: v0.6.0
+Last updated: 2026-10-25 · Your skills, the Release row, Trust; search, topics, the format page and Check; editing your own copy; the reader and downloads; where each app's skills come from; chips, cards and the detail pane
+
+## v0.6.0 · Your skills, the Release row, Trust {#v0-6-0}
+
+### index.html, main.ts · Your skills
+- refers-to: index.html :: .card-own, #own-card, #detail-own, #own-form, #own-name, #own-description, #own-create, #own-note, #own-list · src/main.ts :: OWN, loadOwn, showOwn, stageOwn, openOwn, nameProblem, choose, updateControls, renderReport, discard handler
+- kind: decision
+- logged: v0.6.0 · 2026-10-25
+
+The Your skills card is static HTML at the top of the list, so it is in the first frame and the generated cards append after it; it is not one of `cards`, so topic and app filters leave it shown (and leave it chosen: `apply` no longer treats `yours` as an app that left the list, found in the real window). Your own skills open straight in the editor: there is no released original, so Show original is hidden, the Original tab says so, Download reads Download skill and the check panel says "Your skill". The library map gets a `yours` entry (re-added after every library load) so the reader's code finds the skill.
+
+The first throttled run measured CLS 0.26: after New skill, the own pane switched to the full-width editor only after three engine calls, well past the half second that counts as following the click. `stageOwn` now lays out the editor on the click itself (reader shown, editing classes set, editor empty and disabled, "Opening") and the calls fill it in; a failure puts the pane back. CLS 0 after.
+
+### index.html, main.ts, app.css · Release row and Trust
+- refers-to: index.html :: .release-row, #release-pick, #update-app, #release-note, #trust, #trust-open, #trust-close · src/main.ts :: showRelease, setOverlay, shortText, longText · src/styles/app.css :: .release-row, .facts dd[data-f="here"], .bar
+- kind: fix
+- logged: v0.6.0 · 2026-10-25
+
+The Release row is a fixed row of the app detail: a select (Latest, then Keep for each earlier release with skills) and Update this app, with a one-line note that never wraps. Pinning measured CLS 0.002 at first: the Skills here line grew by a sentence and pushed the skill list down; the pin wording moved to the note and that line keeps room for three lines. The Trust page is static HTML like the format page, opened as a third overlay. Adding its button gave the header five items for four grid columns, which pushed the version onto its own line; the bar now has five columns.
 
 ## v0.5.0 · search, topics, the format page and Check {#v0-5-0}
 

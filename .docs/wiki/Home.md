@@ -23,4 +23,4 @@ It does not install skills into an agent tool, push edits back to an app, or sho
 
 ## What comes next
 
-v0.5.0 adds search, topic chips, licences, the format check and the Skill format page. Next, from the parity plan: v0.6.0 (your own new skills from a template, updating or pinning one app's release, a trust notice) and v0.7.0 (installing skills into Claude Code, Codex and Cursor, which the owner has now allowed). The owner's first push, `compile_v*` branch and the family's catalogue key pair are still to come.
+v0.5.0 adds search, topic chips, licences, the format check and the Skill format page; v0.6.0 your own skills, pinning a release, updating one app and the Trust page. Next, from the parity plan: v0.7.0 (installing skills into Claude Code, Codex and Cursor, which the owner has now allowed). The owner's first push, `compile_v*` branch and the family's catalogue key pair are still to come.

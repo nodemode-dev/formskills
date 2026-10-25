@@ -1,5 +1,13 @@
 # Changelog
 
+## v0.6.0 · 2026-10-25
+
+- Write your own skills: Your skills, at the top of the list, starts one from the format's template, checks the name as you type, and opens it in the editor with the format check running. Download it as `<name>.zip`, or delete it.
+- Keep an app on an earlier release: the Release row lists the latest and the earlier releases in the family catalogue; pick one to keep it, or Latest to follow new releases again.
+- Update this app checks and downloads one app's skills again, without the rest.
+- A Trust page says what a skill can make an agent do, what formskills checks and what it does not, and how far to rely on skills. Cards say when a skill holds scripts an agent may run.
+- The command line gains `pin`, `pins`, `new` and `own`; `edit` and `check` take `yours` for your own skills.
+
 ## v0.5.0 · 2026-10-25
 
 - Search every app's skills: type in the box above the chips, and the matching skills appear best first, each with the line that matched; open one at that file. The chips narrow the results.

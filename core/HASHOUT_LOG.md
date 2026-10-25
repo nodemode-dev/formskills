@@ -2,8 +2,33 @@
 
 Living log for `formskills-core`, `formskills-cli` and `setup/apps.py`. Source files stay comment-free; what they would have said lives here.
 
-Current build version: v0.5.0
-Last updated: 2026-10-25 · search, the format check, licences and topics; registered in formcompiler; personal edited copies; no partial download; reading one file and packing downloads; released skills fetched, checked and kept, and the dev mode; the generated list of apps that ship skills
+Current build version: v0.6.0
+Last updated: 2026-10-25 · pins, one-app update, your own skills, script counts; search, the format check, licences and topics; registered in formcompiler; personal edited copies; no partial download; reading one file and packing downloads; released skills fetched, checked and kept, and the dev mode; the generated list of apps that ship skills
+
+## v0.6.0 · pins, one-app update, your own skills, script counts {#v0-6-0}
+
+### catalog.rs, library.rs, pins.rs · an earlier release, checked the same way
+- refers-to: core/src/catalog.rs :: Older, Released.history, Earlier · core/src/library.rs :: from_release, load, Source::Release.pinned, Source::Release.latest, AppSkills.releases, AppSkills.pin · core/src/pins.rs :: load, set, path
+- kind: decision
+- logged: v0.6.0 · 2026-10-25
+
+formcompiler's `catalog.py` gives the stable release a `history` of the next five stable releases, each built by the same `release_entry`, so each carries its own `agents.skills` asset with digest. formskills reads only that list: a pin can name only a release the signed catalogue lists with skills (the CLI and the shell refuse anything else), and the pinned asset goes through `fetch::ensure` like the latest, so the signature, digest and unpacking checks are the same. `ensure` still keeps one version per app, so switching pins downloads again; that keeps the cache small and the code unchanged. When the catalogue drops a pinned release, the library says so and uses the kept copy rather than silently following the latest. Pins live in `pins.json` beside `released/`, written beside and renamed.
+
+Checked against a signed catalogue on loopback (formcompiler's `catalog.sign` with the v0.2.0 test key) with formvis 1.97.2 and 1.97.1 (the older asset given an extra file to tell them apart) and a 1.96.0 without skills: pin 1.97.1 (downloaded, the extra file present, source pinned with 1.97.2 as latest), pin 1.96.0 and 9.9.9 refused with the releases listed, `fetch formvis` re-downloads that app only, unpin returns to 1.97.2, a pin to an unlisted 1.95.0 keeps the kept copy with the reason.
+
+### own.rs, edits.rs · your own skills are copies without an original
+- refers-to: core/src/own.rs :: create, list, template, name_problem, OWN, BASE · core/src/edits.rs :: adopt, copy_dir, download
+- kind: decision
+- logged: v0.6.0 · 2026-10-25
+
+A skill of your own is a folder in `edits/yours/` with the same record as an edited copy (base "your own skill", no digests, no original), so read, write, check, download and discard need no new code; `download` names it `<name>.zip` instead of `-edited`. `yours` is not an app id in the family, so it cannot clash. The template writes the front matter (the description quoted, on one line) and the sections the format suggests; it passes the check as made. Names are refused unless they meet the format's rules (the same ones `check.rs` reports), so a skill can always be installed later under its folder name. Made in a hidden part folder and renamed.
+
+### skills.rs · scripts
+- refers-to: core/src/skills.rs :: Skill.scripts, is_script, SCRIPT_ENDINGS
+- kind: decision
+- logged: v0.6.0 · 2026-10-25
+
+A count of the files a skill carries that an agent could run (by ending: Python, shell, JavaScript and TypeScript, PowerShell, batch, Ruby, Perl), shown on cards as a trust signal. It looks at names only; it does not read or judge the code.
 
 ## v0.5.0 · search, the format check, licences and topics {#v0-5-0}
 

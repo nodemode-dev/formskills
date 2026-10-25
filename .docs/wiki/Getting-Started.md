@@ -28,6 +28,12 @@ On Windows: `formskills_oc_install.bat`, then `formskills.bat`, `formskills.bat 
 ./formskills cli search colour grading                      # skills holding every word, best first
 ./formskills cli check formpdf                              # its skills against the SKILL.md format
 ./formskills cli check formvis formvis-harness --edit       # your copy of one skill
+./formskills cli pin formvis 1.97.1                         # keep an earlier release; pin formvis latest follows again
+./formskills cli pins                                       # what you pinned
+./formskills cli new tidy-notes Tidies meeting notes        # your own skill from the template
+./formskills cli own                                        # your own skills
+./formskills cli edit write yours tidy-notes SKILL.md my.md # edit it (read, download and discard work the same)
+./formskills cli check yours tidy-notes                     # check it
 ./formskills cli read formvis formvis-harness/SKILL.md      # one file, as text
 ./formskills cli download formvis                           # the app's set as a zip in Downloads
 ./formskills cli download formvis formvis-harness --to .    # one skill, into this folder

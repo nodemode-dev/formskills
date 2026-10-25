@@ -2,8 +2,17 @@
 
 Living log for formskills' desktop shell. Source files stay comment-free; what they would have said lives here.
 
-Current build version: v0.5.0
-Last updated: 2026-10-25 · search and the check commands; the edit commands; read_file and download; library and refresh; the shell
+Current build version: v0.6.0
+Last updated: 2026-10-25 · one app at a time, pins, your own skills; search and the check commands; the edit commands; read_file and download; library and refresh; the shell
+
+## v0.6.0 · one app at a time, pins, your own skills {#v0-6-0}
+
+### lib.rs · read_one, refresh_app, pin, own_list, own_new
+- refers-to: src-tauri/src/lib.rs :: read_one, refresh_app, pin, own_list, own_new
+- kind: decision
+- logged: v0.6.0 · 2026-10-25
+
+`read_one` loads a single app (with or without a fresh download) and puts it into the library the shell holds, then returns the whole library, so the page's one render path stays the same. `pin` refuses a version the app's current releases list does not hold before writing `pins.json`. Your own skills need no root in the library: they are read and written through the edit commands with the app name `yours`. Checked in the real window: a pin chosen in the Release row wrote `pins.json` and downloaded 1.97.1 from the signed loopback catalogue.
 
 ## v0.5.0 · search and the check commands {#v0-5-0}
 

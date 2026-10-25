@@ -24,6 +24,9 @@ formskills is where the skills of the Form family of desktop apps (image, video,
 - **Your edits stay yours.** Make your own copy of any skill and edit it with a live preview and the original read-only beside it. The copy is saved as you type and kept in formskills' own folder; the original is never changed, and when a newer release changes it your copy is flagged with the files that changed. Download your copy as a zip whenever you like.
 - **Never hand-kept.** The list of apps is generated from formcompiler's registry (`./formskills apps --compiler PATH`) and records the version and commit it came from.
 - **Find and check.** Search every app's skills by name, description or text, and narrow by topic (Media, Design, Documents, Family) or app. Every skill shows its licence and whether it passes the SKILL.md format check (the open Agent Skills format plus Claude's own rules); Check lists each error and note, runs on your copy after every save, and the Skill format page explains the rules.
+- **Your own skills.** Start one from the format's template under Your skills; it opens in the editor and is checked as you type, kept in formskills' folder, and downloads as `<name>.zip`.
+- **Choose the release.** Keep an app on one of its last five releases instead of the latest, or update one app on its own.
+- **Know what you are trusting.** The Trust page says what a skill can make an agent do, what formskills checks (signature, digest, safe unpacking) and what it does not, and how far to rely on skills; cards say when a skill holds scripts.
 - **Read them properly.** Each app's skills as cards; open one to read its SKILL.md as formatted text, with its sub-skills, references and other files beside it and links between them followed. Skills are shown as text and never run.
 - **Download what shipped.** One skill, or an app's whole set, as a zip shaped exactly like the release asset, saved to Downloads.
 - **A window that does not flicker.** Chips for All and each app, a card per app, a detail pane and reader; painted complete in its first frame, and nothing moves when the skills arrive.
@@ -44,6 +47,9 @@ Requirements: Rust (stable), Node 20.19+, and on Linux WebKitGTK 4.1 for the win
 ./formskills cli download formvis formvis-harness   # a zip in Downloads
 ./formskills cli edit start formvis formvis-harness # your own copy; then edit it in the window
 ./formskills cli edits                              # your copies, and whether their originals changed
+./formskills cli new tidy-notes Tidies meeting notes   # a skill of your own from the template
+./formskills cli pin formvis 1.97.1                 # keep an earlier release (latest to follow again)
+./formskills cli fetch formvis                      # check and download one app again
 ./formskills dev            # the window, reading Form app checkouts beside this one
 ```
 
@@ -56,7 +62,7 @@ On Windows run `formskills_oc_install.bat`, then `formskills.bat`.
 | Path | Role |
 | --- | --- |
 | `core/` | The engine: the list of apps that ship skills (`core/data/apps.json`, generated), the signed catalogue, fetching and keeping released skills, the skills index, search, the format check, downloads, your edited copies |
-| `cli/` | `formskills-cli apps`, `app`, `skills`, `fetch`, `search`, `check`, `read`, `download`, `edits`, `edit ...`, `catalog`, `where`, `version` |
+| `cli/` | `formskills-cli apps`, `app`, `skills`, `fetch`, `search`, `check`, `read`, `download`, `pin`, `pins`, `new`, `own`, `edits`, `edit ...`, `catalog`, `where`, `version` |
 | `src-tauri/` | The shell: the window |
 | `frontend/` | The window: tokens, layers, chips, cards and the detail pane |
 | `setup/apps.py` | Generates `core/data/apps.json` from formcompiler's registry |
@@ -72,6 +78,8 @@ On Windows run `formskills_oc_install.bat`, then `formskills.bat`.
 
 ## Status
 
+v0.6.0: own skills and versions. Your own skills from a template; pinning an app to an earlier release from the catalogue's history; updating one app; the Trust page and script counts. Checked against a signed catalogue on loopback with two formvis releases (pin, a pin refused when the release has no skills or is not listed, a pin the catalogue later drops, unpin, one-app update), your own skill from making to deleting, the window at 4x CPU and network throttling (CLS 0, dark, light, 640 by 480) and the real app (a skill made, kept across a restart; a release pinned through the window).
+
 v0.5.0: find and check. A search box over every app's skills (name, description and text, matched at the start of words), topic chips, a Skill format page, each skill's licence, and a format check for released skills and your copies (`check`). Checked over the 18 checkouts in dev mode (36 skills: one real error found, formpdf-harness's description at 1,362 of 1,024 characters), the window at 4x CPU and network throttling (CLS 0, dark, light and 640 by 480) and in the real app.
 
 v0.4.1: formskills is in formcompiler's registry (`formskills`, `ai.nodemode.formskills`) with `build_app` and `build_app.bat` for its bundles (the Linux .deb built here), under the same id and name in FormPortal, FormTray and FormRanker; formMCP's skill joins the list (18 apps).
@@ -86,7 +94,7 @@ v0.2.0: fetch. The signed catalogue read with FormPortal's trust model; each app
 
 v0.1.0: the scaffold. The list of the 17 Form apps that ship skills, generated from formcompiler's registry; the command line; the window with All and per-app chips, a card per app and a detail pane, painted complete in its first frame.
 
-Next: v0.6.0, your own new skills from a template, updating or pinning one app's release, and a trust notice; then v0.7.0, installing skills into Claude Code, Codex and Cursor. The owner's first push, `compile_v*` branch and the family's catalogue key pair are still to come.
+Next: v0.7.0, installing skills into Claude Code, Codex and Cursor. The owner's first push, `compile_v*` branch and the family's catalogue key pair are still to come.
 
 ## License
 
