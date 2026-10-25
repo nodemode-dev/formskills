@@ -14,7 +14,12 @@ type Source =
   | { kind: "dev"; path: string }
   | { kind: "missing"; reason: string };
 type SkillFile = { path: string; bytes: number; kind: string };
-type Skill = { folder: string; name: string; description: string; files: SkillFile[] };
+type Summary = { errors: number; warnings: number };
+type Skill = { folder: string; name: string; description: string; license: string; check: Summary; files: SkillFile[] };
+type Hit = { app: string; folder: string; name: string; description: string; score: number; matched: string[]; path: string; snippet: string };
+type Finding = { level: "error" | "warning"; path: string; rule: string; message: string };
+type Field = { name: string; required: boolean; set: boolean; chars: number };
+type Report = { folder: string; name: string; license: string; fields: Field[]; errors: number; warnings: number; findings: Finding[]; spec: string };
 type AppSkills = { id: string; source: Source; skills: Skill[] };
 type Library = { catalogue: string; dev: boolean; dev_roots: string[]; apps: AppSkills[] };
 type Invoke = (cmd: string, args?: Record<string, unknown>) => Promise<unknown>;
@@ -40,6 +45,18 @@ function longText(a: AppSkills): string {
   if (s.kind === "kept") return `${plural(a.skills.length, "skill")} from release ${s.version}, kept from an earlier check. The latest could not be read: ${s.reason}`;
   if (s.kind === "dev") return `${plural(a.skills.length, "skill")} from the checkout at ${s.path} (dev mode, not a release).`;
   return `None to show: ${s.reason}`;
+}
+
+function checkText(c: Summary): string {
+  if (c.errors) return `${plural(c.errors, "format error")}${c.warnings ? `, ${plural(c.warnings, "note")}` : ""}`;
+  if (c.warnings) return `Format check passed, ${plural(c.warnings, "note")}`;
+  return "Format check passed";
+}
+
+function licenceText(app: string, skill: Skill): string {
+  if (skill.license) return `Licence ${skill.license}`;
+  const own = list.apps.find((a) => a.id === app)?.licence;
+  return own ? `Licence ${own} (the app's)` : "No licence named";
 }
 
 function el<K extends keyof HTMLElementTagNameMap>(tag: K, cls = "", text = ""): HTMLElementTagNameMap[K] {
@@ -90,8 +107,17 @@ const skillList = document.getElementById("skill-list") as HTMLUListElement;
 const status = document.getElementById("status") as HTMLParagraphElement;
 const refreshButton = document.getElementById("refresh") as HTMLButtonElement;
 
-const chips = [chip("All", "all"), ...list.apps.map((a) => chip(a.name, a.id))];
-chipsBox.append(...chips);
+const topicChips = list.topics.filter((t) => list.apps.some((a) => a.topic === t)).map((t) => {
+  const c = chip(t, `topic:${t}`);
+  c.classList.add("chip-topic");
+  c.title = `Apps for ${t.toLowerCase()}`;
+  return c;
+});
+const appChips = list.apps.map((a) => chip(a.name, a.id));
+const chips = [chip("All", "all"), ...topicChips, ...appChips];
+const sep = el("span", "chip-sep");
+sep.setAttribute("aria-hidden", "true");
+chipsBox.append(chips[0], ...topicChips, sep, ...appChips);
 const cards = list.apps.map((app) => ({ app, node: card(app) }));
 cardsBox.append(...cards.map((c) => c.node));
 
@@ -108,7 +134,7 @@ function field(name: string): Element | null {
 function showSkills(id: string): void {
   const found = library.get(id);
   setText(field("here"), found ? longText(found) : invoke ? HERE : "Open the formskills app to read the released skills.");
-  const marks = (found?.skills ?? []).map((s) => editMark(id, s.folder)).join("|");
+  const marks = (found?.skills ?? []).map((s) => `${s.folder}:${editMark(id, s.folder)}:${s.check.errors}.${s.check.warnings}:${s.license}`).join("|");
   const shown = skillList.dataset.app === id && skillList.dataset.count === String(found?.skills.length ?? -1) && skillList.dataset.marks === marks;
   if (shown) return;
   skillList.dataset.app = id;
@@ -130,7 +156,9 @@ function showSkills(id: string): void {
       const badge = el("span", `skill-mark${mark === "updated" ? " is-updated" : ""}`, mark === "updated" ? "Your copy · original updated" : "Your copy");
       head.append(badge);
     }
-    hit.append(head, el("span", "skill-desc", s.description || "No description in its SKILL.md."));
+    const meta = el("span", "skill-meta");
+    meta.append(el("span", "", licenceText(id, s)), el("span", s.check.errors ? "is-fault" : "", checkText(s.check)));
+    hit.append(head, el("span", "skill-desc", s.description || "No description in its SKILL.md."), meta);
     hit.addEventListener("click", () => openSkill(id, s.folder));
     li.append(hit);
     return li;
@@ -179,6 +207,63 @@ let previewTimer = 0;
 let editSeq = 0;
 let discardArmed = 0;
 
+const checkButton = document.getElementById("check-skill") as HTMLButtonElement;
+const findingsBox = document.getElementById("findings") as HTMLElement;
+const findingsSum = document.getElementById("findings-sum") as HTMLElement;
+const findingsFields = document.getElementById("findings-fields") as HTMLElement;
+const findingsList = document.getElementById("findings-list") as HTMLUListElement;
+const LIMITS: Record<string, number> = { name: 64, description: 1024, compatibility: 500 };
+let checkOpen = false;
+let checkSeq = 0;
+
+function renderReport(r: Report | null, note = ""): void {
+  findingsBox.classList.toggle("is-fault", !!r && r.errors > 0);
+  if (!r) {
+    setText(findingsSum, note);
+    setText(findingsFields, "");
+    findingsList.replaceChildren();
+    return;
+  }
+  const whose = editing ? "Your copy" : "This skill";
+  setText(findingsSum, r.errors ? `${whose}: ${plural(r.errors, "format error")}${r.warnings ? ` and ${plural(r.warnings, "note")}` : ""}` : `${whose} passes the format check${r.warnings ? `, with ${plural(r.warnings, "note")}` : ""}`);
+  const fields = r.fields.filter((f) => f.required || f.set).map((f) => {
+    if (!f.set) return `${f.name} missing`;
+    const most = LIMITS[f.name];
+    return most ? `${f.name} ${f.chars} of ${most}` : `${f.name} set`;
+  });
+  setText(findingsFields, `Fields: ${fields.join(" · ")}`);
+  const items = r.findings.map((f) => {
+    const li = el("li", `finding is-${f.level}`);
+    const where = el("button", "finding-path", f.path);
+    where.type = "button";
+    where.title = `Open ${f.path}`;
+    where.translate = false;
+    where.addEventListener("click", () => void (editing ? openEditFile(f.path) : openFile(f.path)));
+    li.append(el("span", "finding-level", f.level === "error" ? "Error" : "Note"), where, el("span", "finding-text", f.message));
+    return li;
+  });
+  findingsList.replaceChildren(...items);
+}
+
+async function runCheck(): Promise<void> {
+  if (!reading || !invoke) return;
+  const { app, folder } = reading;
+  const seq = ++checkSeq;
+  if (!findingsSum.textContent) setText(findingsSum, "Checking against the skill format");
+  try {
+    const r = (await invoke(editing ? "edit_check" : "check_skill", { app, skill: folder })) as Report;
+    if (seq === checkSeq) renderReport(r);
+  } catch (e) {
+    if (seq === checkSeq) renderReport(null, `Could not check: ${String(e)}`);
+  }
+}
+
+checkButton.addEventListener("click", () => {
+  checkOpen = !checkOpen;
+  updateControls();
+  if (checkOpen) void runCheck();
+});
+
 function editMark(app: string, folder: string): "" | "copy" | "updated" {
   const e = editsMap.get(editKey(app, folder));
   if (!e) return "";
@@ -226,6 +311,10 @@ function updateControls(): void {
   const updated = (copy?.original_changed.length ?? 0) > 0;
   setText(editToggle, editing ? "Show original" : copy ? (updated ? "Your copy (original updated)" : "Edit your copy") : "Edit a copy");
   editToggle.disabled = !invoke;
+  checkButton.disabled = !invoke;
+  checkButton.setAttribute("aria-pressed", String(checkOpen));
+  show(checkButton, !editing);
+  show(findingsBox, editing || checkOpen);
   show(editBar, editing);
   readerBody.classList.toggle("is-editing", editing);
   detailPane.classList.toggle("is-editing", editing);
@@ -270,6 +359,7 @@ async function saveNow(): Promise<void> {
       if (!dirty) setSave(`Saved ${clockNow()}`);
       markEdited();
       updateControls();
+      void runCheck();
     } catch (e) {
       dirty = true;
       setSave(`Could not save: ${String(e)}`, true);
@@ -341,8 +431,9 @@ async function enterEdit(): Promise<void> {
     }
   }
   editing = true;
-  showFiles({ folder, name: copy.name, description: "", files: copy.files });
+  showFiles({ folder, name: copy.name, description: "", license: "", check: { errors: 0, warnings: 0 }, files: copy.files });
   updateControls();
+  void runCheck();
   markEdited();
   const start = copy.files.some((f) => f.path === reading?.path) ? reading.path : "SKILL.md";
   await openEditFile(start);
@@ -355,6 +446,7 @@ async function leaveEdit(save = true): Promise<void> {
   editSeq += 1;
   const skill = currentSkill();
   updateControls();
+  if (checkOpen) void runCheck();
   if (skill && reading) {
     showFiles(skill);
     void openFile(skill.files.some((f) => f.path === reading?.path) ? reading.path : "SKILL.md");
@@ -556,6 +648,9 @@ async function openFile(path: string): Promise<void> {
 function openSkill(app: string, folder: string): void {
   editing = false;
   editSeq += 1;
+  checkOpen = false;
+  checkSeq += 1;
+  renderReport(null);
   reading = { app, folder, path: "SKILL.md" };
   const skill = currentSkill();
   const found = library.get(app);
@@ -598,7 +693,10 @@ downloadApp.addEventListener("click", () => void save(chosen, null, downloadApp)
 downloadSkill.addEventListener("click", () => reading && void save(reading.app, reading.folder, downloadSkill));
 (document.getElementById("back") as HTMLButtonElement).addEventListener("click", () => {
   closeReader();
-  if (chosen) choose(chosen);
+  if (hits && searchBox.value.trim().length >= 2) {
+    setOverlay("results");
+    renderHits();
+  } else if (chosen) choose(chosen);
 });
 
 function showLibrary(lib: Library): void {
@@ -623,6 +721,7 @@ function showLibrary(lib: Library): void {
     }
   }
   void loadEdits();
+  if (overlay === "results") void runSearch();
   const total = lib.apps.reduce((n, a) => n + a.skills.length, 0);
   const withSkills = lib.apps.filter((a) => a.skills.length > 0).length;
   const mode = lib.dev ? `Dev mode: checkouts in ${lib.dev_roots.join(", ") || "no folder"} first, releases otherwise` : "Released skills only";
@@ -669,18 +768,153 @@ function choose(id: string): void {
   if (detail.hidden) detail.hidden = false;
 }
 
+const searchBox = document.getElementById("search") as HTMLInputElement;
+const results = document.getElementById("results") as HTMLElement;
+const resultsTitle = document.getElementById("results-title") as HTMLElement;
+const resultsNote = document.getElementById("results-note") as HTMLElement;
+const hitsList = document.getElementById("hits") as HTMLUListElement;
+const guide = document.getElementById("guide") as HTMLElement;
+const guideOpen = document.getElementById("guide-open") as HTMLButtonElement;
+let overlay: "" | "results" | "guide" = "";
+let hits: Hit[] | null = null;
+let searchNote = "";
+let searchSeq = 0;
+let searchTimer = 0;
+
+function inFilter(appId: string): boolean {
+  if (filter === "all") return true;
+  if (filter.startsWith("topic:")) return list.apps.find((a) => a.id === appId)?.topic === filter.slice(6);
+  return appId === filter;
+}
+
+function setOverlay(next: "" | "results" | "guide"): void {
+  if (next && reading) closeReader();
+  overlay = next;
+  show(results, next === "results");
+  show(guide, next === "guide");
+  guideOpen.setAttribute("aria-pressed", String(next === "guide"));
+  if (next) {
+    show(empty, false);
+    show(detail, false);
+    detailPane.scrollTop = 0;
+  } else if (!reading) {
+    choose(chosen);
+  }
+}
+
+function renderHits(): void {
+  const query = searchBox.value.trim();
+  setText(resultsTitle, `Search: ${query}`);
+  if (!hits) {
+    setText(resultsNote, searchNote);
+    hitsList.replaceChildren();
+    return;
+  }
+  const kept = hits.filter((h) => inFilter(h.app));
+  const elsewhere = hits.length - kept.length;
+  const where = filter === "all" ? "" : ` in ${filter.startsWith("topic:") ? filter.slice(6) : (list.apps.find((a) => a.id === filter)?.name ?? filter)}`;
+  setText(resultsNote, kept.length ? `${plural(kept.length, "skill")}${where} holding every word, best first${elsewhere ? `; ${elsewhere} more under All` : ""}` : `No skill${where} holds every word${elsewhere ? `; ${elsewhere} under All` : ""}. Fewer or shorter words find more.`);
+  const items = kept.map((h) => {
+    const li = el("li", "skill");
+    const hit = el("button", "skill-hit");
+    hit.type = "button";
+    hit.title = `Read ${h.name}${h.path === "SKILL.md" ? "" : ` at ${h.path}`}`;
+    const head = el("span", "skill-head");
+    const name = el("span", "skill-name", h.name);
+    name.translate = false;
+    const from = el("span", "skill-files", list.apps.find((a) => a.id === h.app)?.name ?? h.app);
+    from.translate = false;
+    head.append(name, from);
+    hit.append(head, el("span", "skill-desc", h.description || "No description in its SKILL.md."));
+    if (h.snippet) {
+      const found = el("span", "hit-snippet");
+      const path = el("span", "hit-path", h.path);
+      path.translate = false;
+      found.append(path, el("span", "", h.snippet));
+      hit.append(found);
+    }
+    hit.addEventListener("click", () => {
+      setOverlay("");
+      choose(h.app);
+      cards.find((c) => c.app.id === h.app)?.node.scrollIntoView({ block: "nearest" });
+      openSkill(h.app, h.folder);
+      if (h.path !== "SKILL.md") void openFile(h.path);
+    });
+    li.append(hit);
+    return li;
+  });
+  hitsList.replaceChildren(...items);
+}
+
+async function runSearch(): Promise<void> {
+  const query = searchBox.value.trim();
+  const seq = ++searchSeq;
+  if (query.length < 2) {
+    hits = null;
+    if (overlay === "results") setOverlay("");
+    return;
+  }
+  if (!invoke) {
+    hits = null;
+    searchNote = "Open the formskills app to search the released skills.";
+  } else {
+    try {
+      const found = (await invoke("search", { query })) as Hit[];
+      if (seq !== searchSeq) return;
+      hits = found;
+      searchNote = "";
+    } catch (e) {
+      if (seq !== searchSeq) return;
+      hits = null;
+      searchNote = `Could not search: ${String(e)}`;
+    }
+  }
+  if (overlay !== "results") setOverlay("results");
+  renderHits();
+}
+
+function clearSearch(): void {
+  window.clearTimeout(searchTimer);
+  searchBox.value = "";
+  void runSearch();
+}
+
+searchBox.addEventListener("input", () => {
+  window.clearTimeout(searchTimer);
+  searchTimer = window.setTimeout(() => void runSearch(), 180);
+});
+searchBox.addEventListener("keydown", (e) => {
+  if (e.key === "Escape" && searchBox.value) {
+    e.preventDefault();
+    clearSearch();
+  } else if (e.key === "Enter") {
+    window.clearTimeout(searchTimer);
+    void runSearch();
+  }
+});
+(document.getElementById("results-clear") as HTMLButtonElement).addEventListener("click", () => {
+  clearSearch();
+  searchBox.focus();
+});
+guideOpen.addEventListener("click", () => setOverlay(overlay === "guide" ? (hits ? "results" : "") : "guide"));
+(document.getElementById("guide-close") as HTMLButtonElement).addEventListener("click", () => setOverlay(hits && searchBox.value.trim().length >= 2 ? "results" : ""));
+
 function apply(next: string): void {
   filter = next;
+  const topic = filter.startsWith("topic:") ? filter.slice(6) : "";
   let shown = 0;
   for (const { app, node } of cards) {
-    const visible = filter === "all" || app.id === filter;
+    const visible = inFilter(app.id);
     if (node.hidden === visible) node.hidden = !visible;
     if (visible) shown += 1;
   }
   for (const c of chips) c.setAttribute("aria-pressed", String(c.dataset.filter === filter));
-  setText(count, filter === "all" ? `${list.apps.length} apps ship skills` : `${shown} of ${list.apps.length} apps`);
-  if (filter !== "all") choose(filter);
-  else if (chosen && !list.apps.some((a) => a.id === chosen)) choose("");
+  setText(count, filter === "all" ? `${list.apps.length} apps ship skills` : `${shown} of ${list.apps.length} apps${topic ? ` · ${topic}` : ""}`);
+  if (overlay === "results") renderHits();
+  else if (filter !== "all" && !topic) {
+    if (overlay) setOverlay("");
+    choose(filter);
+  } else if (chosen && !list.apps.some((a) => a.id === chosen)) choose("");
 }
 
 for (const c of chips) c.addEventListener("click", () => apply(c.dataset.filter ?? "all"));
@@ -689,7 +923,12 @@ chipsBox.addEventListener("wheel", (e) => {
   e.preventDefault();
   chipsBox.scrollLeft += e.deltaY;
 }, { passive: false });
-for (const { app, node } of cards) node.firstElementChild?.addEventListener("click", () => choose(app.id));
+for (const { app, node } of cards) {
+  node.firstElementChild?.addEventListener("click", () => {
+    if (overlay) setOverlay("");
+    choose(app.id);
+  });
+}
 apply("all");
 
 if (invoke) {

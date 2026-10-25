@@ -33,7 +33,7 @@ html.booting body {
 
 .bar {
   display: grid;
-  grid-template-columns: auto 1fr auto;
+  grid-template-columns: auto minmax(0, 1fr) auto auto;
   align-items: center;
   gap: var(--sp-3);
   padding-bottom: var(--sp-4);
@@ -119,11 +119,40 @@ html.booting body {
 
 .tools {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-columns: auto minmax(0, 1fr) auto;
   align-items: start;
   gap: var(--sp-3);
   padding: var(--sp-2) 0 0;
   border-top: 1px solid var(--edge);
+}
+
+.search {
+  width: 200px;
+  height: 28px;
+  margin-top: 4px;
+  padding: 0 var(--sp-3);
+  border: 1px solid var(--edge-strong);
+  border-radius: var(--radius-pill);
+  background: var(--ground);
+  color: var(--ink);
+  font: inherit;
+}
+
+.search::placeholder {
+  color: var(--ink-faint);
+}
+
+.search:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+}
+
+.chip-sep {
+  flex: none;
+  width: 1px;
+  height: 20px;
+  margin: 4px var(--sp-1) 0;
+  background: var(--edge-strong);
 }
 
 .chips {
@@ -418,7 +447,7 @@ html.booting body {
 
 .reader {
   display: grid;
-  grid-template-rows: auto auto minmax(0, 1fr);
+  grid-template-rows: auto auto auto minmax(0, 1fr);
   height: 100%;
 }
 
@@ -426,12 +455,149 @@ html.booting body {
   grid-row: 1;
 }
 
-.edit-bar {
+.findings {
   grid-row: 2;
 }
 
-.reader-body {
+.edit-bar {
   grid-row: 3;
+}
+
+.reader-body {
+  grid-row: 4;
+}
+
+.findings {
+  height: 84px;
+  overflow-y: auto;
+  padding: var(--sp-2) var(--sp-4);
+  border-bottom: 1px solid var(--edge);
+  background: var(--ground);
+  font-size: var(--fs-s);
+  scrollbar-width: thin;
+}
+
+@media (max-height: 600px) {
+  .findings {
+    height: 52px;
+  }
+}
+
+.findings-sum {
+  margin: 0;
+  color: var(--ink);
+  font-size: var(--fs-m);
+}
+
+.findings.is-fault .findings-sum {
+  color: var(--fault);
+}
+
+.findings-fields {
+  margin: 2px 0 0;
+  color: var(--ink-faint);
+  font-variant-numeric: tabular-nums;
+}
+
+.findings-list {
+  display: grid;
+  gap: 2px;
+  margin: var(--sp-1) 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.finding {
+  display: grid;
+  grid-template-columns: 3.5em auto minmax(0, 1fr);
+  align-items: baseline;
+  gap: var(--sp-2);
+}
+
+.finding-level {
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.finding.is-error .finding-level {
+  color: var(--fault);
+}
+
+.finding-path {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--ink-soft);
+  font: inherit;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  cursor: pointer;
+}
+
+.finding-path:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+}
+
+.finding-text {
+  color: var(--ink);
+}
+
+.skill-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-1) var(--sp-3);
+  margin-top: var(--sp-1);
+  color: var(--ink-faint);
+  font-size: var(--fs-s);
+}
+
+.skill-meta .is-fault {
+  color: var(--fault);
+}
+
+.hit-snippet {
+  display: block;
+  margin-top: var(--sp-1);
+  overflow-wrap: anywhere;
+  color: var(--ink-faint);
+  font-size: var(--fs-s);
+}
+
+.hit-path {
+  margin-right: var(--sp-2);
+  color: var(--ink-soft);
+}
+
+.pane-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--sp-3);
+}
+
+.pane-title {
+  margin: 0;
+  overflow: hidden;
+  font-size: var(--fs-l);
+  font-weight: 650;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.pane-note {
+  margin: var(--sp-2) 0 0;
+  color: var(--ink-faint);
+  font-size: var(--fs-s);
+}
+
+.results .skill-list {
+  margin-top: var(--sp-3);
+}
+
+.guide-body {
+  max-width: 72ch;
+  margin-top: var(--sp-3);
 }
 
 .reader-head {
@@ -913,6 +1079,14 @@ html.booting body {
 
   .reader-body {
     grid-template-columns: 140px minmax(0, 1fr);
+  }
+
+  .search {
+    width: 140px;
+  }
+
+  .tools .count {
+    min-width: 0;
   }
 
   .reader-body.is-editing {

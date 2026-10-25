@@ -19,6 +19,7 @@
           <h1 translate="no">formskills</h1>
           <p class="sub">The Form apps' released skills: read them, download them, keep your own edits</p>
         </div>
+        <button class="btn btn-quiet" id="guide-open" type="button" aria-pressed="false">Skill format</button>
         <span class="version" id="version" translate="no"></span>
       </header>
       <div class="status-row">
@@ -26,6 +27,7 @@
         <button class="btn" id="refresh" type="button" disabled>Refresh</button>
       </div>
       <div class="tools">
+        <input class="search" id="search" type="search" placeholder="Search skills" aria-label="Search every app's skills" autocomplete="off" spellcheck="false" />
         <div class="chips" id="chips" role="group" aria-label="Show skills from"></div>
         <p class="count" id="count" aria-live="polite"></p>
       </div>
@@ -66,10 +68,16 @@
                 <p class="reader-from" id="reader-from"></p>
               </div>
               <div class="reader-actions">
+                <button class="btn" id="check-skill" type="button" aria-pressed="false">Check</button>
                 <button class="btn" id="edit-toggle" type="button">Edit a copy</button>
                 <button class="btn" id="download-skill" type="button">Download skill</button>
               </div>
             </header>
+            <div class="findings" id="findings" hidden>
+              <p class="findings-sum" id="findings-sum" aria-live="polite"></p>
+              <p class="findings-fields" id="findings-fields"></p>
+              <ul class="findings-list" id="findings-list"></ul>
+            </div>
             <div class="edit-bar" id="edit-bar" hidden>
               <span class="save-state" id="save-state" aria-live="polite"></span>
               <span class="flag" id="flag" hidden>
@@ -93,6 +101,57 @@
                 <div class="side-view" id="preview" role="tabpanel" aria-labelledby="tab-preview"></div>
                 <div class="side-view" id="original" role="tabpanel" aria-labelledby="tab-original" hidden></div>
               </div>
+            </div>
+          </article>
+          <article class="results" id="results" hidden>
+            <header class="pane-head">
+              <h2 class="pane-title" id="results-title">Search</h2>
+              <button class="btn btn-quiet" id="results-clear" type="button">Clear search</button>
+            </header>
+            <p class="pane-note" id="results-note" aria-live="polite"></p>
+            <ul class="skill-list" id="hits" aria-label="Skills found"></ul>
+          </article>
+          <article class="guide" id="guide" hidden>
+            <header class="pane-head">
+              <h2 class="pane-title">The skill format</h2>
+              <button class="btn btn-quiet" id="guide-close" type="button">Close</button>
+            </header>
+            <div class="fs-md guide-body">
+              <p>A skill is a folder holding a <code>SKILL.md</code> file and any files it points to. The Form apps follow the open Agent Skills format, which Claude Code, Codex and Cursor read.</p>
+              <h3 class="fs-md-h fs-md-h3">The folder</h3>
+              <pre><code>skill-name/
+  SKILL.md                    the card: front matter, then instructions
+  sub-skills/x/SUB-SKILL.md   the family's routed parts (optional)
+  references/                 documents read when needed (optional)
+  scripts/                    code the agent can run (optional)
+  assets/                     templates and data (optional)</code></pre>
+              <h3 class="fs-md-h fs-md-h3">SKILL.md</h3>
+              <p>It opens with front matter between two lines of three hyphens, then Markdown instructions.</p>
+              <pre><code>---
+name: pdf-tools
+description: Fills, merges and redacts PDFs. Use when the person works with PDF files.
+license: GPL-3.0-only
+---</code></pre>
+              <div class="fs-md-table">
+                <table>
+                  <thead>
+                    <tr><th>Field</th><th>Needed</th><th>Rules</th></tr>
+                  </thead>
+                  <tbody>
+                    <tr><td><code>name</code></td><td>Required</td><td>1 to 64 characters: lowercase letters, digits and hyphens; no hyphen at either end or two in a row; the same as the folder's name. Claude also refuses XML tags and the words "anthropic" and "claude".</td></tr>
+                    <tr><td><code>description</code></td><td>Required</td><td>1 to 1024 characters saying what the skill does and when to use it; no XML tags. Agents choose skills by it.</td></tr>
+                    <tr><td><code>license</code></td><td>Optional</td><td>A licence name, or a licence file in the skill.</td></tr>
+                    <tr><td><code>compatibility</code></td><td>Optional</td><td>1 to 500 characters on what the skill needs: a product, packages, network access.</td></tr>
+                    <tr><td><code>metadata</code></td><td>Optional</td><td>Extra keys and values for other tools.</td></tr>
+                    <tr><td><code>allowed-tools</code></td><td>Optional</td><td>Tools the skill may use without asking; experimental, not read by every agent.</td></tr>
+                  </tbody>
+                </table>
+              </div>
+              <h3 class="fs-md-h fs-md-h3">How agents read it</h3>
+              <p>Every skill's name and description is read when the agent starts; the rest of <code>SKILL.md</code> when the skill is used; other files only when the instructions call for them. Keep <code>SKILL.md</code> under 500 lines and link other files by paths relative to the file that links them, inside the skill.</p>
+              <h3 class="fs-md-h fs-md-h3">What Check reports</h3>
+              <p>An error breaks a rule above, so an agent may refuse or misread the skill. A note is advice: a long <code>SKILL.md</code>, or a link to a file the skill does not hold. Check runs on every released skill and on your copies while you edit.</p>
+              <p class="pane-note">Sources: the Agent Skills specification (agentskills.io/specification) and Claude's Agent Skills overview (platform.claude.com).</p>
             </div>
           </article>
         </section>

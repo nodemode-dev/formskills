@@ -1,7 +1,9 @@
 use std::process::ExitCode;
 use std::sync::{Arc, Mutex};
 
+use formskills_core::check::{self, Report};
 use formskills_core::edits::{self, Edit};
+use formskills_core::search::{self, Hit};
 use formskills_core::library::{self, AppSkills, FileText, Library};
 use formskills_core::pack::{self, Saved};
 use formskills_core::Apps;
@@ -89,6 +91,27 @@ async fn edit_seen(app: String, skill: String, shown: tauri::State<'_, Shown>) -
 }
 
 #[tauri::command]
+async fn search(query: String, shown: tauri::State<'_, Shown>) -> Result<Vec<Hit>, String> {
+    let apps = library_apps(shown.inner()).ok_or("the skills have not been read yet")?;
+    tauri::async_runtime::spawn_blocking(move || search::search(&apps, &query)).await.map_err(|e| e.to_string())
+}
+
+#[tauri::command]
+async fn check_skill(app: String, skill: String, shown: tauri::State<'_, Shown>) -> Result<Report, String> {
+    let found = entry(shown.inner(), &app)?;
+    let root = found.root.ok_or("this app has no skills here")?;
+    if !found.skills.iter().any(|s| s.folder == skill) {
+        return Err(format!("{app} has no skill {skill:?}"));
+    }
+    tauri::async_runtime::spawn_blocking(move || check::validate(&root.join(&skill), &skill)).await.map_err(|e| e.to_string())
+}
+
+#[tauri::command]
+async fn edit_check(app: String, skill: String) -> Result<Report, String> {
+    tauri::async_runtime::spawn_blocking(move || edits::validate(&app, &skill)).await.map_err(|e| e.to_string())?
+}
+
+#[tauri::command]
 async fn edit_discard(app: String, skill: String) -> Result<(), String> {
     tauri::async_runtime::spawn_blocking(move || edits::discard(&app, &skill)).await.map_err(|e| e.to_string())?
 }
@@ -103,7 +126,7 @@ pub fn run() -> ExitCode {
         eprintln!("formskills: {e}");
         return ExitCode::FAILURE;
     }
-    match tauri::Builder::default().manage(Shown::default()).invoke_handler(tauri::generate_handler![library, refresh, read_file, download, edits, edit_start, edit_read, edit_write, edit_seen, edit_discard, edit_download]).run(tauri::generate_context!()) {
+    match tauri::Builder::default().manage(Shown::default()).invoke_handler(tauri::generate_handler![library, refresh, read_file, download, edits, edit_start, edit_read, edit_write, edit_seen, edit_discard, edit_download, search, check_skill, edit_check]).run(tauri::generate_context!()) {
         Ok(()) => ExitCode::SUCCESS,
         Err(e) => {
             eprintln!("formskills: the window could not start: {e}");
