@@ -5,7 +5,7 @@
 <p align="center"><b>Every Form app's released skills in one place: read them, download them, keep your own edited copies.</b></p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/version-v0.7.0-f97316" alt="version v0.7.0" />
+  <img src="https://img.shields.io/badge/version-v0.7.1-f97316" alt="version v0.7.1" />
   <img src="https://img.shields.io/badge/skills-released%20only-8b5cf6" alt="released skills only" />
   <img src="https://img.shields.io/badge/Tauri-2-24C8DB" alt="Tauri 2" />
   <img src="https://img.shields.io/badge/Rust-stable-B7410E" alt="Rust stable" />

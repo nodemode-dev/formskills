@@ -1,5 +1,9 @@
 # Changelog
 
+## v0.7.1 · 2026-10-25
+
+- The window's build tooling moves to Vite 8.3.5, which clears two command-injection advisories in the development server's editor launcher. It is a development dependency only; nothing in the installed app changes.
+
 ## v0.7.0 · 2026-10-25
 
 - Install skills into an agent: Install on a skill, or Install all on an app, puts the skills into Claude Code (`.claude/skills`), Codex (`.agents/skills`) or Cursor (`.cursor/skills`), for you in every project or in one project folder. Your edited copy installs under the skill's own name, and your own skills install too.
