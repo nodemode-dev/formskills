@@ -180,32 +180,15 @@ fn main() -> ExitCode {
             "install" => (|| {
                 let id = plain.first().copied().ok_or("install needs an app id (or yours) and --to")?;
                 let id = if id == own::OWN { own::OWN.to_string() } else { apps.get(id).map(|a| a.id.clone()).ok_or_else(|| format!("no Form app ships skills under {id:?}"))? };
-                let agents = value("--to").ok_or("install needs --to claude, codex or cursor (comma separated)")?;
-                let folders: Vec<String> = match plain.get(1) {
-                    Some(f) => vec![f.to_string()],
-                    None if id == own::OWN => return Err("install yours needs the skill's name".to_string()),
-                    None => lib.apps.iter().find(|a| a.id == id).map(|a| a.skills.iter().map(|s| s.folder.clone()).collect()).unwrap_or_default(),
-                };
-                if folders.is_empty() {
-                    return Err("there are no skills to install".to_string());
+                let agents: Vec<String> = value("--to").ok_or("install needs --to claude, codex or cursor (comma separated)")?.split(',').map(|a| a.trim().to_string()).filter(|a| !a.is_empty()).collect();
+                let skill = plain.get(1).copied();
+                if skill.is_none() && id == own::OWN {
+                    return Err("install yours needs the skill's name".to_string());
                 }
-                let mut rows = Vec::new();
-                let mut failed = 0;
-                for agent in agents.split(',').map(str::trim).filter(|a| !a.is_empty()) {
-                    let target = install::Target::new(agent, project.as_deref())?;
-                    for folder in &folders {
-                        let done = install::source(&lib.apps, &id, folder, has("--copy")).and_then(|(from, origin)| install::install(&from, folder, origin, &target, has("--force")));
-                        match done {
-                            Ok(state) => rows.push(json!(state)),
-                            Err(e) => {
-                                failed += 1;
-                                rows.push(json!({ "folder": folder, "where": target.describe(), "error": e }));
-                            }
-                        }
-                    }
-                }
+                let rows = install::install_many(&lib.apps, &id, skill, has("--copy"), &agents, project.as_deref(), has("--force"))?;
+                let failed = rows.iter().filter(|r| r.error.is_some()).count();
                 if failed == rows.len() {
-                    return Err(rows.iter().filter_map(|r| r.get("error").and_then(|e| e.as_str())).collect::<Vec<_>>().join("; "));
+                    return Err(rows.iter().filter_map(|r| r.error.clone()).collect::<Vec<_>>().join("; "));
                 }
                 Ok(json!({ "installed": rows, "failed": failed }))
             })(),

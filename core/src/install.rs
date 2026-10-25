@@ -253,6 +253,39 @@ pub fn uninstall(target: &Target, folder: &str, force: bool) -> Result<(), Strin
     save(&records)
 }
 
+#[derive(Debug, Clone, Serialize)]
+pub struct Outcome {
+    pub folder: String,
+    #[serde(rename = "where")]
+    pub where_: String,
+    pub path: Option<String>,
+    pub error: Option<String>,
+}
+
+pub fn install_many(library: &[AppSkills], app: &str, skill: Option<&str>, copy: bool, agents: &[String], project: Option<&str>, force: bool) -> Result<Vec<Outcome>, String> {
+    let folders: Vec<String> = match skill {
+        Some(f) => vec![f.to_string()],
+        None => library.iter().find(|a| a.id == app).map(|a| a.skills.iter().map(|s| s.folder.clone()).collect()).unwrap_or_default(),
+    };
+    if folders.is_empty() {
+        return Err("there are no skills to install".into());
+    }
+    if agents.is_empty() {
+        return Err("choose at least one agent".into());
+    }
+    let mut out = Vec::new();
+    for agent in agents {
+        let target = Target::new(agent, project)?;
+        for folder in &folders {
+            match source(library, app, folder, copy).and_then(|(from, origin)| install(&from, folder, origin, &target, force)) {
+                Ok(state) => out.push(Outcome { folder: folder.clone(), where_: state.where_, path: Some(state.path), error: None }),
+                Err(e) => out.push(Outcome { folder: folder.clone(), where_: target.describe(), path: None, error: Some(e) }),
+            }
+        }
+    }
+    Ok(out)
+}
+
 pub fn update(library: &[AppSkills], target: &Target, folder: &str) -> Result<State, String> {
     let record = load().into_iter().find(|r| r.target == *target && r.folder == folder).ok_or_else(|| format!("formskills did not install {folder} for {}", target.describe()))?;
     let copy = record.origin.kind == "copy";
