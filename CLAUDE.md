@@ -21,6 +21,7 @@ Rules for agents working in this repository. Read the in-tree HASHOUT logs (`cor
 - Every `z-index` comes from `frontend/src/styles/layers.css`; every colour, space and radius from `tokens.css`.
 - Vite stays on `localhost` (`server.host: false`), port 5630, preview 5631.
 - No emoji, and no em dash in Markdown.
+- Tests live in `tests/` folders and run in CI; write only tests this plan or its successor names. The plan is `FAMILY_TEST_PLAN.md` in the formai_dev sidecar; `cargo test --locked -p formskills-core -p formskills-cli` runs them.
 
 ## Trademarks, copyright and licences
 
