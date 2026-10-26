@@ -2,8 +2,31 @@
 
 Living log for `formskills-core`, `formskills-cli` and `setup/apps.py`. Source files stay comment-free; what they would have said lives here.
 
-Current build version: v0.7.0
-Last updated: 2026-10-25 · installing into Claude Code, Codex and Cursor; pins, one-app update, your own skills, script counts; search, the format check, licences and topics; registered in formcompiler; personal edited copies; no partial download; reading one file and packing downloads; released skills fetched, checked and kept, and the dev mode; the generated list of apps that ship skills
+Current build version: v0.7.3
+Last updated: 2026-10-26 · the test suite; installing into Claude Code, Codex and Cursor; pins, one-app update, your own skills, script counts; search, the format check, licences and topics; registered in formcompiler; personal edited copies; no partial download; reading one file and packing downloads; released skills fetched, checked and kept, and the dev mode; the generated list of apps that ship skills
+
+## v0.7.3 · the test suite {#v0-7-3}
+
+### cli/tests · released skills through the command line
+- refers-to: cli/tests/support/mod.rs, cli/tests/released_skills.rs :: Sandbox, Server, write_catalogue, asset, product, older, zip_of, zip_with_link
+- kind: decision
+- logged: v0.7.3 · 2026-10-26
+
+FAMILY_TEST_PLAN v0.3.0 P1. Each test runs the built `formskills-cli` with a cleared environment: HOME, FORMSKILLS_HOME, FORMSKILLS_DOWNLOADS and FORMPORTAL_ROOT point into a fresh temporary folder, so nothing reads or writes the person's data. The catalogue is a file (`FORMSKILLS_CATALOG`) signed by a key made from a fixed seed and trusted through `FORMAI_CATALOG_PUBKEY`; skill sets are served by a loopback HTTP server inside the test, which `catalog::allowed_url` accepts, and the server counts requests so a test can say a set was not fetched again. Covered: only apps the signed catalogue releases list skills; a checkout is read only with FORMSKILLS_DEV; unsigned and wrongly signed catalogues list nothing; a set whose SHA-256 differs is refused and nothing is kept; a matching set is kept once and `download` gives back the released files; entries that leave the folder or are links are refused; a pin takes only releases the catalogue lists; offline uses FormPortal's kept copy under the same signature check.
+
+### core/tests · the format check and reading
+- refers-to: core/tests/skill_format.rs :: check::validate, skills::index, library::read_text
+- kind: decision
+- logged: v0.7.3 · 2026-10-26
+
+The gates `check.rs` enforces, each at its limit and one past it: name 64 characters, description 1024, XML tags in either, the reserved words, lowercase letters, digits and single hyphens, the name matching its folder, a missing card, front matter, name or description. Links from SKILL.md to sub-skills and references resolve, and a broken or escaping link is named. The index sorts files into skill, sub-skill and reference, counts scripts and skips caches. `read_text` refuses `..`, absolute paths and a link out of the folder. The plan also names emoji, em dash and file and size ceilings as upload gates; `check.rs` has none of them, so they are not tested and wait on the owner.
+
+### core/tests/family_contract.rs · F4 and F9
+- refers-to: core/tests/family_contract.rs :: VERSION_SITES, STRIP_EXEMPT
+- kind: decision
+- logged: v0.7.3 · 2026-10-26
+
+The family template: the five version sites agree with the crate and keep a one-digit patch, and no Cargo.toml release profile strips.
 
 ## v0.7.0 · installing into agents {#v0-7-0}
 

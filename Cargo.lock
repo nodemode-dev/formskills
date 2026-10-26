@@ -933,8 +933,12 @@ dependencies = [
 name = "formskills-cli"
 version = "0.7.2"
 dependencies = [
+ "base64 0.22.1",
+ "ed25519-dalek",
  "formskills-core",
  "serde_json",
+ "sha2",
+ "zip",
 ]
 
 [[package]]

@@ -13,3 +13,9 @@ path = "src/main.rs"
 [dependencies]
 formskills-core = { path = "../core" }
 serde_json = "1"
+
+[dev-dependencies]
+base64 = "0.22"
+ed25519-dalek = "2"
+sha2 = "0.10"
+zip = { version = "2", default-features = false, features = ["deflate"] }
