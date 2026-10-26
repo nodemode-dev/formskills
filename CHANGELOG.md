@@ -1,5 +1,9 @@
 # Changelog
 
+## v0.7.3 · 2026-10-26
+
+- A test suite checks that only skills the signed catalogue releases are shown, that a downloaded set matches its release's SHA-256 and unpacks only inside its folder, the SKILL.md format checks at their limits, that sub-skill and reference links resolve, and that reading a file stays inside the skills folder; it runs on every change. Nothing in the app changes.
+
 ## v0.7.2 · 2026-10-26
 
 - Release builds keep their symbols (`strip = false`), because macOS builds fail when the release profile strips the binary. Nothing in the app changes.
