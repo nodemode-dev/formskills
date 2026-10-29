@@ -8,15 +8,24 @@ pub fn path() -> PathBuf {
     data_dir().join("pins.json")
 }
 
+fn read() -> Result<BTreeMap<String, String>, String> {
+    let file = path();
+    match std::fs::read(&file) {
+        Ok(bytes) => serde_json::from_slice(&bytes).map_err(|e| format!("{} cannot be read ({e}); formskills changes no pin until it is repaired or moved away", file.display())),
+        Err(e) if e.kind() == std::io::ErrorKind::NotFound => Ok(BTreeMap::new()),
+        Err(e) => Err(format!("{}: {e}", file.display())),
+    }
+}
+
 pub fn load() -> BTreeMap<String, String> {
-    std::fs::read(path()).ok().and_then(|b| serde_json::from_slice(&b).ok()).unwrap_or_default()
+    read().unwrap_or_default()
 }
 
 pub fn set(app: &str, version: Option<&str>) -> Result<BTreeMap<String, String>, String> {
     if !plain(app) || version.is_some_and(|v| !plain(v)) {
         return Err(format!("{app} {} is not a release formskills can pin", version.unwrap_or("")));
     }
-    let mut pins = load();
+    let mut pins = read()?;
     match version {
         Some(v) => pins.insert(app.to_string(), v.to_string()),
         None => pins.remove(app),

@@ -5,6 +5,15 @@ Living log for `formskills-core`, `formskills-cli` and `setup/apps.py`. Source f
 Current build version: v0.7.3
 Last updated: 2026-10-26 · the test suite; installing into Claude Code, Codex and Cursor; pins, one-app update, your own skills, script counts; search, the format check, licences and topics; registered in formcompiler; personal edited copies; no partial download; reading one file and packing downloads; released skills fetched, checked and kept, and the dev mode; the generated list of apps that ship skills
 
+## Unreleased · resilience {#unreleased}
+
+### install.rs, pins.rs · an unreadable record is never overwritten
+- refers-to: core/src/install.rs :: load, install, uninstall, update, list · core/src/pins.rs :: read, load, set · cli/tests/resilience.rs
+- kind: fix
+- logged: unreleased · 2026-10-28
+
+`installed.json` and `pins.json` were read with any failure taken as empty, so one truncated or hand-broken file made the next install or pin write a list holding only that entry: every earlier install lost its record, and formskills then refused to update or remove those folders as someone else's. A file that exists but does not parse now stops install, uninstall, update and pin with the path and the reason; a missing file is still empty. Listing still shows what it can.
+
 ## v0.7.3 · the test suite {#v0-7-3}
 
 ### cli/tests · released skills through the command line

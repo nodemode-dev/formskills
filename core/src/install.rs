@@ -106,8 +106,13 @@ fn records_path() -> PathBuf {
     data_dir().join("installed.json")
 }
 
-fn load() -> Vec<Record> {
-    std::fs::read(records_path()).ok().and_then(|b| serde_json::from_slice(&b).ok()).unwrap_or_default()
+fn load() -> Result<Vec<Record>, String> {
+    let file = records_path();
+    match std::fs::read(&file) {
+        Ok(bytes) => serde_json::from_slice(&bytes).map_err(|e| format!("{} cannot be read ({e}); formskills changes no install until it is repaired or moved away", file.display())),
+        Err(e) if e.kind() == std::io::ErrorKind::NotFound => Ok(Vec::new()),
+        Err(e) => Err(format!("{}: {e}", file.display())),
+    }
 }
 
 fn save(records: &[Record]) -> Result<(), String> {
@@ -195,7 +200,7 @@ pub fn install(from: &Path, folder: &str, origin: Origin, target: &Target, force
     }
     let root = target.root()?;
     let dest = root.join(folder);
-    let mut records = load();
+    let mut records = load()?;
     let mine = records.iter().position(|r| r.target == *target && r.folder == folder);
     if let Ok(meta) = std::fs::symlink_metadata(&dest) {
         match mine {
@@ -236,7 +241,7 @@ pub fn install(from: &Path, folder: &str, origin: Origin, target: &Target, force
 }
 
 pub fn uninstall(target: &Target, folder: &str, force: bool) -> Result<(), String> {
-    let mut records = load();
+    let mut records = load()?;
     let i = records.iter().position(|r| r.target == *target && r.folder == folder).ok_or_else(|| format!("formskills did not install {folder} for {}; nothing was removed", target.describe()))?;
     let now = state_of(&records[i]);
     if now.state == "modified" && !force {
@@ -287,14 +292,14 @@ pub fn install_many(library: &[AppSkills], app: &str, skill: Option<&str>, copy:
 }
 
 pub fn update(library: &[AppSkills], target: &Target, folder: &str) -> Result<State, String> {
-    let record = load().into_iter().find(|r| r.target == *target && r.folder == folder).ok_or_else(|| format!("formskills did not install {folder} for {}", target.describe()))?;
+    let record = load()?.into_iter().find(|r| r.target == *target && r.folder == folder).ok_or_else(|| format!("formskills did not install {folder} for {}", target.describe()))?;
     let copy = record.origin.kind == "copy";
     let (from, origin) = source(library, &record.origin.app, folder, copy)?;
     install(&from, folder, origin, target, false)
 }
 
 pub fn list(library: Option<&[AppSkills]>) -> Vec<State> {
-    let mut found: Vec<State> = load().iter().map(state_of).collect();
+    let mut found: Vec<State> = load().unwrap_or_default().iter().map(state_of).collect();
     if let Some(apps) = library {
         for s in &mut found {
             if s.record.origin.kind != "release" {
