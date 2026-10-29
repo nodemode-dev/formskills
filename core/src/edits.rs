@@ -68,8 +68,7 @@ fn read_record(app: &str, folder: &str) -> Option<Record> {
 fn write_atomic(target: &Path, bytes: &[u8]) -> Result<(), String> {
     let name = target.file_name().map(|n| n.to_string_lossy().to_string()).unwrap_or_default();
     let part = target.with_file_name(format!(".{name}.part-{}", std::process::id()));
-    if let Err(e) = std::fs::write(&part, bytes).and_then(|()| std::fs::rename(&part, target)) {
-        let _ = std::fs::remove_file(&part);
+    if let Err(e) = crate::durable::replace_file(&part, target, bytes) {
         return Err(format!("{}: {e}", target.display()));
     }
     Ok(())

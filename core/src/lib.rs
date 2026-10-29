@@ -1,6 +1,7 @@
 pub mod apps;
 pub mod catalog;
 pub mod check;
+pub mod durable;
 pub mod edits;
 pub mod fetch;
 pub mod install;
