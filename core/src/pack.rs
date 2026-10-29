@@ -71,8 +71,7 @@ pub fn zip_skills(root: &Path, chosen: &[&Skill], stem: &str, into: Option<&Path
     std::fs::create_dir_all(&dir).map_err(|e| format!("{}: {e}", dir.display()))?;
     let target = free_name(&dir, stem);
     let part = dir.join(format!(".{stem}.zip.part-{}", std::process::id()));
-    if let Err(e) = std::fs::write(&part, &bytes).and_then(|()| std::fs::rename(&part, &target)) {
-        let _ = std::fs::remove_file(&part);
+    if let Err(e) = crate::durable::replace_file(&part, &target, &bytes) {
         return Err(format!("{}: {e}", target.display()));
     }
     Ok(Saved {

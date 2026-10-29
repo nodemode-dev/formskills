@@ -122,8 +122,7 @@ fn save(records: &[Record]) -> Result<(), String> {
     }
     let part = file.with_extension(format!("part-{}", std::process::id()));
     let json = serde_json::to_vec_pretty(records).map_err(|e| e.to_string())?;
-    if let Err(e) = std::fs::write(&part, json).and_then(|()| std::fs::rename(&part, &file)) {
-        let _ = std::fs::remove_file(&part);
+    if let Err(e) = crate::durable::replace_file(&part, &file, &json) {
         return Err(format!("{}: {e}", file.display()));
     }
     Ok(())

@@ -14,6 +14,13 @@ Last updated: 2026-10-26 · the test suite; installing into Claude Code, Codex a
 
 `installed.json` and `pins.json` were read with any failure taken as empty, so one truncated or hand-broken file made the next install or pin write a list holding only that entry: every earlier install lost its record, and formskills then refused to update or remove those folders as someone else's. A file that exists but does not parse now stops install, uninstall, update and pin with the path and the reason; a missing file is still empty. Listing still shows what it can.
 
+### durable.rs · written to disk before the rename
+- refers-to: core/src/durable.rs :: replace_file · core/src/edits.rs :: write_atomic · core/src/install.rs :: save · core/src/pins.rs :: set · core/src/pack.rs :: zip_skills · core/tests/durable.rs
+- kind: fix
+- logged: unreleased · 2026-10-28
+
+Every write beside and rename (a personal edit, `installed.json`, `pins.json`, a download) wrote the part with `fs::write` and renamed it at once. The rename can reach the disk before the data, so a power cut or crash right after a save could leave the person's edited file, or the install records, empty. `replace_file` now syncs the part before renaming it and removes the part on any failure; the old file stays whole until the new one is.
+
 ## v0.7.3 · the test suite {#v0-7-3}
 
 ### cli/tests · released skills through the command line
