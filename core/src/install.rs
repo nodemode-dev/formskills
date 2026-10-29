@@ -220,13 +220,8 @@ pub fn install(from: &Path, folder: &str, origin: Origin, target: &Target, force
         let _ = std::fs::remove_dir_all(&part);
         return Err(e);
     }
-    if dest.exists() {
-        if let Err(e) = std::fs::remove_dir_all(&dest) {
-            let _ = std::fs::remove_dir_all(&part);
-            return Err(format!("{}: {e}", dest.display()));
-        }
-    }
-    if let Err(e) = std::fs::rename(&part, &dest) {
+    let aside = root.join(format!(".{folder}.formskills-old-{}", std::process::id()));
+    if let Err(e) = crate::durable::replace_dir(&part, &dest, &aside) {
         let _ = std::fs::remove_dir_all(&part);
         return Err(format!("{}: {e}", dest.display()));
     }

@@ -12,3 +12,17 @@ pub fn replace_file(part: &Path, target: &Path, bytes: &[u8]) -> std::io::Result
     }
     renamed
 }
+
+pub fn replace_dir(part: &Path, target: &Path, aside: &Path) -> std::io::Result<()> {
+    if std::fs::symlink_metadata(target).is_err() {
+        return std::fs::rename(part, target);
+    }
+    let _ = std::fs::remove_dir_all(aside);
+    std::fs::rename(target, aside)?;
+    if let Err(e) = std::fs::rename(part, target) {
+        let _ = std::fs::rename(aside, target);
+        return Err(e);
+    }
+    let _ = std::fs::remove_dir_all(aside);
+    Ok(())
+}

@@ -21,6 +21,13 @@ Last updated: 2026-10-26 · the test suite; installing into Claude Code, Codex a
 
 Every write beside and rename (a personal edit, `installed.json`, `pins.json`, a download) wrote the part with `fs::write` and renamed it at once. The rename can reach the disk before the data, so a power cut or crash right after a save could leave the person's edited file, or the install records, empty. `replace_file` now syncs the part before renaming it and removes the part on any failure; the old file stays whole until the new one is.
 
+### durable.rs, fetch.rs, install.rs · the old folder moves aside, not away
+- refers-to: core/src/durable.rs :: replace_dir · core/src/fetch.rs :: ensure · core/src/install.rs :: install · core/tests/durable.rs · cli/tests/resilience.rs
+- kind: fix
+- logged: unreleased · 2026-10-28
+
+Fetching a kept release again and installing over an earlier install both deleted the old folder and then renamed the new one in. If the rename failed (a file held open on Windows, a crash between the two), the kept release that offline use falls back on, or the agent's installed skill, was gone with nothing in its place. `replace_dir` renames the old folder to a hidden `.<name>.old-<pid>` (`.formskills-old-<pid>` in an agent folder) beside it, renames the new one in, puts the old one back if that fails, and deletes it only after. `ensure` also removes its part folder when writing `asset.json` or the rename fails; it used to leave it.
+
 ## v0.7.3 · the test suite {#v0-7-3}
 
 ### cli/tests · released skills through the command line

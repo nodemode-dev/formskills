@@ -115,10 +115,15 @@ pub fn ensure(app: &str, channel: &str, version: &str, asset: &Asset, force: boo
     }
     let fetched = SystemTime::now().duration_since(UNIX_EPOCH).map(|d| d.as_secs()).unwrap_or(0);
     let record = Record { app: app.to_string(), version: version.to_string(), channel: channel.to_string(), asset: asset.clone(), fetched };
-    let json = serde_json::to_vec_pretty(&record).map_err(|e| e.to_string())?;
-    std::fs::write(part.join(RECORD), json).map_err(|e| e.to_string())?;
-    let _ = std::fs::remove_dir_all(&final_dir);
-    std::fs::rename(&part, &final_dir).map_err(|e| format!("{}: {e}", final_dir.display()))?;
+    let aside = app_dir.join(format!(".{version}.old-{}", std::process::id()));
+    let placed = serde_json::to_vec_pretty(&record)
+        .map_err(|e| e.to_string())
+        .and_then(|json| std::fs::write(part.join(RECORD), json).map_err(|e| format!("{}: {e}", part.display())))
+        .and_then(|()| crate::durable::replace_dir(&part, &final_dir, &aside).map_err(|e| format!("{}: {e}", final_dir.display())));
+    if let Err(e) = placed {
+        let _ = std::fs::remove_dir_all(&part);
+        return Err(e);
+    }
     if let Ok(read) = std::fs::read_dir(&app_dir) {
         for entry in read.flatten() {
             let path = entry.path();
