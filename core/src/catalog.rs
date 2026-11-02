@@ -8,7 +8,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::places::{flag, portal_root};
 
-pub const DEFAULT_CATALOG: &str = "https://github.com/nodemode-ai/formcompiler/releases/download/catalog/apps.json";
+pub const DEFAULT_CATALOG: &str = "https://dl.formai.studio/catalog/apps.json";
 pub const KEY_ENV: &str = "FORMAI_CATALOG_PUBKEY";
 const TRUSTED_KEYS: &str = include_str!("../catalog_keys.txt");
 const CATALOG_FORMAT: &str = "formai-catalog";
