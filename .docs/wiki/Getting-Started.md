@@ -89,7 +89,7 @@ A checkout counts when `<folder>/<app repository name>/<skills folder>` exists (
 | Variable | What it does |
 | --- | --- |
 | `FORMSKILLS_HOME` | formskills' data folder (default: Application Support `ai.nodemode.formskills` on macOS, `%LOCALAPPDATA%\formskills` on Windows, `~/.local/share/formskills` elsewhere) |
-| `FORMSKILLS_CATALOG` | the catalogue's address: https, loopback http or a file (default: formcompiler's `catalog` release) |
+| `FORMSKILLS_CATALOG` | the catalogue's address: https, loopback http or a file (default: `https://dl.formai.studio/catalog/apps.json`, formcompiler's public download store) |
 | `FORMAI_CATALOG_PUBKEY` | extra trusted catalogue keys, comma separated (shared with FormPortal and formMCP) |
 | `FORMSKILLS_OFFLINE` | `1`: read only FormPortal's kept copy of the catalogue |
 | `FORMPORTAL_ROOT` | where FormPortal keeps its data, for that copy |

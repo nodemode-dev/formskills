@@ -5,7 +5,7 @@
 <p align="center"><b>Every Form app's released skills in one place: read them, download them, keep your own edited copies.</b></p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/version-v0.7.3-f97316" alt="version v0.7.3" />
+  <img src="https://img.shields.io/badge/version-v0.7.4-f97316" alt="version v0.7.4" />
   <img src="https://img.shields.io/badge/skills-released%20only-8b5cf6" alt="released skills only" />
   <img src="https://img.shields.io/badge/Tauri-2-24C8DB" alt="Tauri 2" />
   <img src="https://img.shields.io/badge/Rust-stable-B7410E" alt="Rust stable" />
@@ -77,7 +77,7 @@ On Windows run `formskills_oc_install.bat`, then `formskills.bat`.
 | 5630 | Vite dev server (localhost only) |
 | 5631 | Vite preview (localhost only) |
 
-**Releases.** formskills builds nothing in this repository. After the version bump lands on main, push a branch `compile_vX.Y.Z` cut from that commit; CI runs on it, and formcompiler (`nodemode-ai/formcompiler`) builds the bundles with `./build_app` (`build_app.bat` on Windows) and drafts the release `formskills-vX.Y.Z` (`apps/formskills.json` in its registry). `./build_app` also builds the app on your own machine.
+**Releases.** formskills builds nothing in this repository. After the version bump lands on main, push a branch `compile_vX.Y.Z` cut from that commit; CI runs on it, and formcompiler (`nodemode-dev/formcompiler`) builds the bundles with `./build_app` (`build_app.bat` on Windows) and drafts the release `formskills-vX.Y.Z` (`apps/formskills.json` in its registry). `./build_app` also builds the app on your own machine.
 
 ## Status
 

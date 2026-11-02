@@ -1,5 +1,10 @@
 # Changelog
 
+## v0.7.4 · 2026-11-02
+
+- The family catalogue is read from the public download store, `https://dl.formai.studio/catalog/apps.json` with its signature beside it, instead of formcompiler's private release page. `FORMSKILLS_CATALOG` still overrides it.
+- Links to the Form repositories point at the `nodemode-dev` organisation, and the list of apps that ship skills is regenerated from formcompiler 0.6.1: FormPromo is added under Media, and the licences follow the registry.
+
 ## v0.7.3 · 2026-10-26
 
 - A test suite checks that only skills the signed catalogue releases are shown, that a downloaded set matches its release's SHA-256 and unpacks only inside its folder, the SKILL.md format checks at their limits, that sub-skill and reference links resolve, and that reading a file stays inside the skills folder; it runs on every change. Nothing in the app changes.

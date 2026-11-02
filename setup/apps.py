@@ -8,7 +8,7 @@ ROOT = Path(__file__).resolve().parent.parent
 OUT = ROOT / "core" / "data" / "apps.json"
 FORMAT = "formskills-apps"
 TOPICS = {
-    "Media": ["audio", "encoder", "image", "motion", "photo", "video"],
+    "Media": ["audio", "encoder", "image", "motion", "photo", "promo", "video"],
     "Design": ["layout", "sculpt", "slides", "texture", "vector", "web"],
     "Documents": ["chat", "document", "notes", "pdf", "reference", "spreadsheet"],
     "Family": ["connect", "launcher", "library", "portal", "skill"],
@@ -58,7 +58,7 @@ def build(compiler):
     return {
         "format": FORMAT,
         "format_version": 2,
-        "source": {"repository": "nodemode-ai/formcompiler", "version": version, "commit": git(compiler, "rev-parse", "HEAD")},
+        "source": {"repository": "nodemode-dev/formcompiler", "version": version, "commit": git(compiler, "rev-parse", "HEAD")},
         "topics": list(TOPICS),
         "apps": apps,
     }
@@ -66,7 +66,7 @@ def build(compiler):
 
 def main():
     parser = argparse.ArgumentParser(description="core/data/apps.json from formcompiler's registry: the Form apps that ship skills")
-    parser.add_argument("--compiler", required=True, help="a checkout of nodemode-ai/formcompiler")
+    parser.add_argument("--compiler", required=True, help="a checkout of nodemode-dev/formcompiler")
     parser.add_argument("--check", action="store_true", help="fail when core/data/apps.json differs")
     args = parser.parse_args()
     text = json.dumps(build(Path(args.compiler).resolve()), indent=2, ensure_ascii=False) + "\n"

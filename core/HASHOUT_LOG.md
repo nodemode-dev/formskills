@@ -2,8 +2,17 @@
 
 Living log for `formskills-core`, `formskills-cli` and `setup/apps.py`. Source files stay comment-free; what they would have said lives here.
 
-Current build version: v0.7.3
-Last updated: 2026-10-26 · the test suite; installing into Claude Code, Codex and Cursor; pins, one-app update, your own skills, script counts; search, the format check, licences and topics; registered in formcompiler; personal edited copies; no partial download; reading one file and packing downloads; released skills fetched, checked and kept, and the dev mode; the generated list of apps that ship skills
+Current build version: v0.7.4
+Last updated: 2026-11-02 · the catalogue from the public download store; 2026-10-26 · the test suite; installing into Claude Code, Codex and Cursor; pins, one-app update, your own skills, script counts; search, the format check, licences and topics; registered in formcompiler; personal edited copies; no partial download; reading one file and packing downloads; released skills fetched, checked and kept, and the dev mode; the generated list of apps that ship skills
+
+## v0.7.4 · the catalogue from the public download store {#v0-7-4}
+
+### catalog.rs, setup/apps.py · dl.formai.studio
+- refers-to: core/src/catalog.rs :: DEFAULT_CATALOG · setup/apps.py :: TOPICS, build, main · core/data/apps.json · core/tests/catalog_default.rs
+- kind: decision
+- logged: v0.7.4 · 2026-11-02
+
+`DEFAULT_CATALOG` was the `catalog` release on formcompiler's own GitHub page, a private repository that never serves the public. formcompiler's feed now copies the signed catalogue to its download store (formcompiler `docs/GO_PUBLIC.md` section 4), so the default is `https://dl.formai.studio/catalog/apps.json`, the address FormPortal reads. The signature is still `<url>.sig` (`catalog/apps.json.sig` in the store), and the skills archives the catalogue names already carry the store's addresses once formcompiler publishes there. `FORMSKILLS_CATALOG`, loopback http, files, `FORMSKILLS_OFFLINE` and FormPortal's kept copy are unchanged. The repositories moved to the `nodemode-dev` organisation: the generator's `source.repository` and the docs say so, and `apps.json` was regenerated from formcompiler 0.6.1 (f0e3201): the new repository addresses, FormPromo (19 apps), the registry's current licences and `released` flags. FormPromo's kind `promo` had no topic, which stopped the generator; it joins Media. `catalog_default.rs` pins the default and its signature address.
 
 ## Unreleased · resilience {#unreleased}
 
