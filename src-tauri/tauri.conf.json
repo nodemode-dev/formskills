@@ -1,6 +1,6 @@
 {
   "$schema": "https://schema.tauri.app/config/2",
-  "productName": "formskills",
+  "productName": "FormSkills",
   "version": "0.7.4",
   "identifier": "ai.nodemode.formskills",
   "build": {
@@ -14,7 +14,7 @@
       "csp": "default-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline'; script-src 'self'"
     },
     "windows": [
-      { "label": "main", "title": "formskills", "width": 1040, "height": 720, "minWidth": 640, "minHeight": 480, "resizable": true, "center": true, "backgroundColor": "#14161b" }
+      { "label": "main", "title": "FormSkills", "width": 1040, "height": 720, "minWidth": 640, "minHeight": 480, "resizable": true, "center": true, "backgroundColor": "#14161b" }
     ]
   },
   "bundle": {
