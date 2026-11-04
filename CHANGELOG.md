@@ -1,5 +1,9 @@
 # Changelog
 
+## v0.7.6 · 2026-11-04
+
+- The README follows the Form family layout and has screenshots of the reader, library, search and format check. Nothing in the app changes.
+
 ## v0.7.5 · 2026-11-03
 
 - The app icon is the unified family icon on the desktop and in the window, and the app is named FormSkills in its window title and installer.
