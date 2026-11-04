@@ -1,110 +1,168 @@
-<p align="center"><img src="assets/formskills_icon.png" width="160" alt="formskills icon" /></p>
-
-<h1 align="center">formskills</h1>
-
-<p align="center"><b>Every Form app's released skills in one place: read them, download them, keep your own edited copies.</b></p>
-
 <p align="center">
-  <img src="https://img.shields.io/badge/version-v0.7.4-f97316" alt="version v0.7.4" />
-  <img src="https://img.shields.io/badge/skills-released%20only-8b5cf6" alt="released skills only" />
-  <img src="https://img.shields.io/badge/Tauri-2-24C8DB" alt="Tauri 2" />
-  <img src="https://img.shields.io/badge/Rust-stable-B7410E" alt="Rust stable" />
-  <img src="https://img.shields.io/badge/Node.js-20.19%2B-339933?logo=nodedotjs&logoColor=white" alt="Node.js 20.19+" />
-  <img src="https://img.shields.io/badge/license-GPL--3.0-555555" alt="license GPL 3.0" />
+  <img src="assets/app-icon/formskills-256.png" width="128" height="128" alt="FormSkills icon: a pink and violet slash on a dark rounded square">
 </p>
 
-formskills is where the skills of the Form family of desktop apps (image, video, audio, layout, vector, notes, slides and the rest, by nodemode.ai) are found. Each app ships its agent skills with every release; formskills lists them by app, shows each one as formatted text with its sub-skills and references, lets you download a skill or an app's whole set, and keeps your own edited copies beside the originals. It shows exactly what shipped: no unreleased work, and nothing is ever changed in an app.
+<h1 align="center">FormSkills</h1>
 
-**Stack:** Rust (`formskills-core`, `formskills-cli`) · Tauri 2 shell · vanilla TypeScript + Vite window with zero runtime dependencies · **Scale:** 18 Form apps that ship skills, from formcompiler's registry
+<p align="center">
+  <b>Agent skills; every Form app's released skills in one place.</b><br>
+  Read them, download them and keep your own edited copies,<br>
+  then install them into Claude Code, Codex or Cursor. Runs on your own computer.
+</p>
 
-## Highlights
+<p align="center">
+  <img alt="version 0.7.6" src="https://img.shields.io/badge/version-0.7.6-eef0f4?style=flat-square">
+  <img alt="Rust" src="https://img.shields.io/badge/Rust-stable-B7410E?style=flat-square&logo=rust&logoColor=white">
+  <img alt="Tauri 2" src="https://img.shields.io/badge/Tauri-2-24C8DB?style=flat-square">
+  <img alt="macOS, Windows, Linux" src="https://img.shields.io/badge/macOS%20%C2%B7%20Windows%20%C2%B7%20Linux-native-2f7bf5?style=flat-square">
+  <img alt="License: GPL-3.0-only" src="https://img.shields.io/badge/license-GPL--3.0--only-3a3a3a?style=flat-square">
+  <img alt="Status: early" src="https://img.shields.io/badge/status-early-d69e2e?style=flat-square">
+</p>
 
-- **Released skills only.** What formskills shows is what each app's latest release carries: the skills asset named in the signed family catalogue, its digest checked, kept on this computer and reused until a new release changes it. No `main`, no watch step, no copy kept in this repository. A dev mode (`./formskills dev`) reads local checkouts instead, for building the apps.
-- **One place for skills.** formMCP gives agents the Form apps' tools; formskills is where their skills live. The two do not overlap.
-- **Your edits stay yours.** Make your own copy of any skill and edit it with a live preview and the original read-only beside it. The copy is saved as you type and kept in formskills' own folder; the original is never changed, and when a newer release changes it your copy is flagged with the files that changed. Download your copy as a zip whenever you like.
-- **Never hand-kept.** The list of apps is generated from formcompiler's registry (`./formskills apps --compiler PATH`) and records the version and commit it came from.
-- **Find and check.** Search every app's skills by name, description or text, and narrow by topic (Media, Design, Documents, Family) or app. Every skill shows its licence and whether it passes the SKILL.md format check (the open Agent Skills format plus Claude's own rules); Check lists each error and note, runs on your copy after every save, and the Skill format page explains the rules.
-- **Your own skills.** Start one from the format's template under Your skills; it opens in the editor and is checked as you type, kept in formskills' folder, and downloads as `<name>.zip`.
-- **Choose the release.** Keep an app on one of its last five releases instead of the latest, or update one app on its own.
-- **Know what you are trusting.** The Trust page says what a skill can make an agent do, what formskills checks (signature, digest, safe unpacking) and what it does not, and how far to rely on skills; cards say when a skill holds scripts.
-- **Read them properly.** Each app's skills as cards; open one to read its SKILL.md as formatted text, with its sub-skills, references and other files beside it and links between them followed. Skills are shown as text and never run.
-- **Download what shipped.** One skill, or an app's whole set, as a zip shaped exactly like the release asset, saved to Downloads.
-- **Install into your agent.** Put a skill, an app's set, your copy or your own skill into Claude Code, Codex or Cursor, for you or for one project. formskills writes only folders it made, keeps any change made there unless you choose to lose it, and its Installed page updates or removes what it put in.
-- **A window that does not flicker.** Chips for All and each app, a card per app, a detail pane and reader; painted complete in its first frame, and nothing moves when the skills arrive.
+<p align="center">
+  <a href="https://formskill.formai.studio/"><b>Download FormSkills on formai.studio</b></a> ·
+  <a href="#run-it-from-source">Run it from source</a>
+</p>
 
-## Quick start
+<br>
 
-Requirements: Rust (stable), Node 20.19+, and on Linux WebKitGTK 4.1 for the window (the installer prints the packages).
+<p align="center">
+  <img src="docs/images/formskills-hero.png" alt="FormSkills reading the layers-and-masks sub-skill of formvis-driving, with the skill's files listed beside the formatted text" width="100%">
+  <br>
+  <sub>A real skill open in the reader: its sub-skills and references on the left, the formatted SKILL text on the right.</sub>
+</p>
 
-```bash
-./formskills_oc_install     # macOS / Linux
-./formskills                # the window on localhost:5630
-./formskills cli apps       # the apps that ship skills, as JSON
-./formskills cli skills formvis   # its latest released skills and where they came from
-./formskills cli fetch      # download every app's latest released skills again
-./formskills cli search mask                         # every skill holding the words, best first
-./formskills cli check formpdf                       # its skills against the SKILL.md format (exit 1 on an error)
-./formskills cli read formvis formvis-harness/SKILL.md
-./formskills cli download formvis formvis-harness   # a zip in Downloads
-./formskills cli edit start formvis formvis-harness # your own copy; then edit it in the window
-./formskills cli edits                              # your copies, and whether their originals changed
-./formskills cli new tidy-notes Tidies meeting notes   # a skill of your own from the template
-./formskills cli pin formvis 1.97.1                 # keep an earlier release (latest to follow again)
-./formskills cli fetch formvis                      # check and download one app again
-./formskills cli install formvis --to claude,codex  # every formvis skill into Claude Code and Codex, for you
-./formskills cli installed                          # what formskills installed, and whether it changed
-./formskills dev            # the window, reading Form app checkouts beside this one
+<p align="center">
+  <a href="#features">Features</a> ·
+  <a href="#everything-in-the-box">In the box</a> ·
+  <a href="#built-for-agents">Agents</a> ·
+  <a href="#under-the-hood">Under the hood</a> ·
+  <a href="#download">Download</a> ·
+  <a href="#run-it-from-source">Run from source</a>
+</p>
+
+<br>
+
+<table>
+  <tr>
+    <td width="25%" valign="top"><h3>Released only</h3>Shows what each app's latest signed release carries, with its digest checked. No unreleased work.</td>
+    <td width="25%" valign="top"><h3>Your edits stay yours</h3>Edit a copy beside the read-only original. It is flagged when a new release changes the original.</td>
+    <td width="25%" valign="top"><h3>Read, never run</h3>Skills are shown as text and never executed. Cards say when a skill holds scripts.</td>
+    <td width="25%" valign="top"><h3>Agent-ready</h3>The same engine runs from the window and from a JSON command line, and installs skills into three agents.</td>
+  </tr>
+</table>
+
+<br>
+
+## Features
+
+<table>
+  <tr>
+    <td width="50%" valign="top"><img src="docs/images/formskills-library.png" alt="The FormVis app card selected, listing its four released skills with their descriptions" width="100%"><br><sub>One card per app, and every skill it shipped.</sub>
+      <h3>A library of skills</h3>Chips for All, each topic and each app. Pin an app to one of its last five releases, or update one app alone.</td>
+    <td width="50%" valign="top"><img src="docs/images/formskills-search.png" alt="Search results for the word mask across every app's skills, best match first" width="100%"><br><sub>Search across every app's skills by name, description or text.</sub>
+      <h3>Find the right skill</h3>Results are ranked and show where the words matched. Narrow by topic or app.</td>
+  </tr>
+  <tr>
+    <td width="50%" valign="top"><img src="docs/images/formskills-check.png" alt="A format check reporting that formvis-driving passes, with name and description lengths" width="100%"><br><sub>The SKILL.md format check on a released skill.</sub>
+      <h3>Checked against the format</h3>Every skill shows its licence and whether it passes the open Agent Skills format plus Claude's own rules.</td>
+    <td width="50%" valign="top"><img src="docs/images/formskills-editor.webp" alt="An edited copy of a released skill with the Markdown source on the left and a live preview on the right" width="100%"><br><sub>Your copy, with a live preview and the original one click away.</sub>
+      <h3>Edit a copy</h3>Saved as you type in FormSkills' own folder. Download your copy as a zip whenever you like.</td>
+  </tr>
+</table>
+
+## Everything in the box
+
+<table>
+  <tr>
+    <td width="33%" valign="top"><h4>19 Form apps</h4>Every Form app that ships skills, listed from formcompiler's registry</td>
+    <td width="33%" valign="top"><h4>Actions</h4>Read · Search · Check · Download one or a whole set · Pin a release · Edit a copy · Write your own · Install · Update · Remove</td>
+    <td width="33%" valign="top"><h4>Agents</h4>Claude Code (<code>~/.claude/skills</code>) · Codex (<code>~/.agents/skills</code>) · Cursor (<code>~/.cursor/skills</code>), for you or for one project</td>
+  </tr>
+</table>
+
+## Built for agents
+
+Every action in the window is also a `formskills-cli` command that prints JSON, run through the `./formskills cli` launcher.
+
+```sh
+./formskills cli search mask                          # every skill holding the word, best first
+./formskills cli check formpdf                        # an app's skills against the SKILL.md format (exit 1 on an error)
+./formskills cli read formvis formvis-harness/SKILL.md  # one file of a skill, as text
+./formskills cli install formvis --to claude,codex    # every formvis skill into Claude Code and Codex
 ```
 
-The catalogue is trusted exactly as FormPortal and formMCP trust it (`core/catalog_keys.txt` plus `FORMAI_CATALOG_PUBKEY`); until the family's key exists, formskills shows any skills it kept earlier and says why it could not read the catalogue. The wiki's Getting Started page lists every setting.
+`./formskills cli help` lists them all. See [`AGENTS.md`](AGENTS.md).
 
-On Windows run `formskills_oc_install.bat`, then `formskills.bat`.
+## Under the hood
 
-## Where things live
+- **Engine:** `formskills-core` fetches the signed family catalogue, checks each skills asset's SHA-256, unpacks it safely and keeps it until a newer release.
+- **Trust:** the catalogue is verified with the same key model as FormPortal and formMCP, and reads never leave the skills folder.
+- **Shell and window:** a Tauri 2 shell around a vanilla TypeScript and Vite window with zero runtime dependencies.
+- **Generated list:** the apps that ship skills come from formcompiler's registry (`./formskills apps`).
+- **Tested:** 31 Rust tests (catalogue trust, digests, safe unpacking, the format checks, link resolution).
 
-| Path | Role |
-| --- | --- |
-| `core/` | The engine: the list of apps that ship skills (`core/data/apps.json`, generated), the signed catalogue, fetching and keeping released skills, the skills index, search, the format check, downloads, your edited copies, installing into agents |
-| `cli/` | `formskills-cli apps`, `app`, `skills`, `fetch`, `search`, `check`, `read`, `download`, `pin`, `pins`, `new`, `own`, `edits`, `edit ...`, `install`, `installed`, `update`, `uninstall`, `catalog`, `where`, `version` |
-| `src-tauri/` | The shell: the window |
-| `frontend/` | The window: tokens, layers, chips, cards and the detail pane |
+## Download
+
+| Platform | Download | Release |
+|---|---|---|
+| macOS | [Download FormSkills for macOS](https://formai.studio/get/formskill/macos) | [FormSkills releases on FormCompiler](https://github.com/nodemode-dev/formcompiler/releases?q=formskills-v&expanded=true) |
+| Windows | [Download FormSkills for Windows](https://formai.studio/get/formskill/windows) | [FormSkills releases on FormCompiler](https://github.com/nodemode-dev/formcompiler/releases?q=formskills-v&expanded=true) |
+| Linux | [Download FormSkills for Linux](https://formai.studio/get/formskill/linux) | [FormSkills releases on FormCompiler](https://github.com/nodemode-dev/formcompiler/releases?q=formskills-v&expanded=true) |
+
+All FormSkills builds are compiled and released from [FormCompiler](https://github.com/nodemode-dev/formcompiler); this repo holds the source.
+
+## Run it from source
+
+Want to contribute or try the latest code? Run it straight from this repo.
+
+**Requires:** Rust (stable), Node 20.19+, and on Linux WebKitGTK 4.1 for the window (the installer prints the packages).
+
+```sh
+git clone git@github.com:nodemode-dev/formskills.git
+cd formskills
+./formskills_oc_install   # checks tools, installs the window packages, fetches the Rust crates
+./formskills              # starts the interface on localhost:5630 and opens the desktop window
+```
+
+The window needs its Tauri shell to read skills; the interface alone in a browser only says so. `./formskills dev` reads Form app checkouts beside this one instead of releases.
+
+On Windows run `formskills_oc_install.bat`, then `formskills.bat`. Ports: 5630 (Vite dev server) and 5631 (preview), localhost only.
+
+> [!IMPORTANT]
+> **Status:** early. Agents loading installed skills is taken from each agent's docs, not tried here.
+
+**Contributing:** branch from `main`, keep changes to source here, and leave packaging and releases to formcompiler. See [`.docs/BRANCHING.md`](.docs/BRANCHING.md) and [`AGENTS.md`](AGENTS.md).
+
+## Repository
+
+| Path | What it is |
+|---|---|
+| `core/` | The engine: apps list, signed catalogue, fetching, search, format check, downloads, edits, installs |
+| `cli/` | `formskills-cli`, the JSON command line |
+| `src-tauri/` | The Tauri shell that opens the window |
+| `frontend/` | The window: chips, cards, detail pane and reader |
 | `setup/apps.py` | Generates `core/data/apps.json` from formcompiler's registry |
-| `assets/` | The owner's icon |
-| `.docs/wiki/` | Getting Started, Architecture |
 
-| Port | Service |
-| --- | --- |
-| 5630 | Vite dev server (localhost only) |
-| 5631 | Vite preview (localhost only) |
+Docs: [`.docs/wiki`](.docs/wiki) · Agents: [`CLAUDE.md`](CLAUDE.md), [`AGENTS.md`](AGENTS.md) · Contributing: [`.docs/BRANCHING.md`](.docs/BRANCHING.md)
 
-**Releases.** formskills builds nothing in this repository. After the version bump lands on main, push a branch `compile_vX.Y.Z` cut from that commit; CI runs on it, and formcompiler (`nodemode-dev/formcompiler`) builds the bundles with `./build_app` (`build_app.bat` on Windows) and drafts the release `formskills-vX.Y.Z` (`apps/formskills.json` in its registry). `./build_app` also builds the app on your own machine.
+<br>
 
-## Status
+---
 
-v0.7.0: installing into agents. Install a skill, an app's set, an edited copy or your own skill into Claude Code, Codex or Cursor, for you or one project, and update or remove it from the Installed page. Checked in a scratch home against a signed catalogue on loopback with two formvis releases: user and project installs for each agent, a foreign folder and a symlink refused, a changed install kept until forced, an install from an older pinned release updated to the newer one, copy and own-skill installs, removal; the window at 4x CPU and network throttling (CLS 0, dark 1040 by 720 and light 640 by 520) and the real app (an app's set installed into Claude Code and listed). That a running agent loads the installed folders is taken from each agent's docs, not tried here.
+## Maintainers
 
-v0.6.0: own skills and versions. Your own skills from a template; pinning an app to an earlier release from the catalogue's history; updating one app; the Trust page and script counts. Checked against a signed catalogue on loopback with two formvis releases (pin, a pin refused when the release has no skills or is not listed, a pin the catalogue later drops, unpin, one-app update), your own skill from making to deleting, the window at 4x CPU and network throttling (CLS 0, dark, light, 640 by 480) and the real app (a skill made, kept across a restart; a release pinned through the window).
+| Maintainer | Role |
+|---|---|
+| [@nodemode-ai](https://github.com/nodemode-ai) | Owner |
+| [@gbarnai](https://github.com/gbarnai) | Co-owner |
 
-v0.5.0: find and check. A search box over every app's skills (name, description and text, matched at the start of words), topic chips, a Skill format page, each skill's licence, and a format check for released skills and your copies (`check`). Checked over the 18 checkouts in dev mode (36 skills: one real error found, formpdf-harness's description at 1,362 of 1,024 characters), the window at 4x CPU and network throttling (CLS 0, dark, light and 640 by 480) and in the real app.
-
-v0.4.1: formskills is in formcompiler's registry (`formskills`, `ai.nodemode.formskills`) with `build_app` and `build_app.bat` for its bundles (the Linux .deb built here), under the same id and name in FormPortal, FormTray and FormRanker; formMCP's skill joins the list (18 apps).
-
-v0.4.0: your own edited copies. A copy per skill in formskills' own folder, an editor with live preview and the read-only original beside it, saved as you type, flagged with the changed files when the original moves on, marked as seen, downloaded or discarded; the original is never written. Checked with the real engine behind the window (copy, edit, upstream change, restart, seen, download, discard; CLS 0 under 4x CPU throttling, dark, light and 640 by 480) and in the real app, quit and started again.
-
-v0.3.1: a failed download leaves no partial file (written beside and renamed when complete; checked on a full disk).
-
-v0.3.0: the viewer. Skill cards, a reader with the skill's files grouped as skill, sub-skills, references and other files, Markdown rendered without ever parsing HTML, links between a skill's own files followed, and downloads of a skill or an app's set shaped like the release asset. Checked: reading refuses paths and links that leave the skills folder; the formvis set downloads byte for byte like formcompiler's asset; the window at 4x CPU and network throttling through opening, reading, downloading and switching (CLS 0), and in the real app.
-
-v0.2.0: fetch. The signed catalogue read with FormPortal's trust model; each app's latest released skills asset downloaded, its SHA-256 checked, unpacked safely and kept, reused until a new release; the kept copy shown with the reason when the network or catalogue fails; a dev mode for local checkouts; the window shows each app's skill count and source and the chosen app's skills. Checked by hand with real assets built by formcompiler and a signed catalogue on loopback (every trust, digest, unsafe-archive, upgrade and offline case), and all 17 checkouts in dev mode (35 skills); the window at 4x CPU and network throttling (CLS 0) and in the real app.
-
-v0.1.0: the scaffold. The list of the 17 Form apps that ship skills, generated from formcompiler's registry; the command line; the window with All and per-app chips, a card per app and a detail pane, painted complete in its first frame.
-
-Next: v0.7.0, installing skills into Claude Code, Codex and Cursor. The owner's first push, `compile_v*` branch and the family's catalogue key pair are still to come.
+Code owners are set in [`.github/CODEOWNERS`](.github/CODEOWNERS).
 
 ## License
 
-formskills is licensed under the GNU General Public License v3.0 (`LICENSE`, SPDX `GPL-3.0-only`), as ComfyUI and formpromo are. Copyright 2026 NodeAgentc, Inc. `NOTICE.md` lists the work it includes or depends on.
+FormSkills is licensed under the GNU General Public License v3.0 ([`LICENSE`](LICENSE), SPDX `GPL-3.0-only`). Copyright 2026 NodeAgentc, Inc. Third-party notices: [`NOTICE.md`](NOTICE.md).
 
-## Trademarks
+<sub>Screenshot content: the released skills of the Form apps, read from local checkouts of their repositories.</sub>
 
-The names of the Form apps belong to their owner. Claude Code, Codex and Cursor are named only as the agent tools the skills are written for; formskills is not affiliated with or endorsed by Anthropic, OpenAI or Anysphere.
+Claude Code, Codex and Cursor are named only as the agent tools the skills are written for. FormSkills is an independent project and is not affiliated with or endorsed by Anthropic, OpenAI or Anysphere.
