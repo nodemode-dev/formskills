@@ -1,7 +1,17 @@
 # Changelog
 
+## v0.7.7 · 2026-11-04
+
+- README in the Form family template (Mackin's #6), merged with main. The README's version is in its shields badge now, so the F4 version check in `core/tests/family_contract.rs` reads `<img alt="version X"`.
+
+## v0.7.6 · 2026-11-04
+
+- The README follows the Form family layout and has screenshots of the reader, library, search and format check. Nothing in the app changes.
+
 ## v0.7.5 · 2026-11-03
 
+- The app icon is the unified family icon on the desktop and in the window, and the app is named FormSkills in its window title and installer.
+- The repository names its owners in `.github/CODEOWNERS`.
 - The installers and the app metadata name NodeAgentc, Inc. as the publisher, with the licence (GPL-3.0-only): the bundle sets `publisher`, `copyright`, `license` and `licenseFile`, so the macOS About panel, the Windows file properties and installer, and the Linux packages say the same. No change to the app itself.
 
 ## v0.7.4 · 2026-11-02
