@@ -102,6 +102,10 @@ Every action in the window is also a `formskills-cli` command that prints JSON, 
 - **Generated list:** the apps that ship skills come from formcompiler's registry (`./formskills apps`).
 - **Tested:** 31 Rust tests (catalogue trust, digests, safe unpacking, the format checks, link resolution).
 
+## Demo
+
+Open [`demo/index.html`](demo/index.html) in a browser, from `file://` or any static server, to try the real window on sample skills: read, search, check, edit a copy, install into a virtual agent folder and download zips, or open your own skill folder or zip. It needs no backend or network. See [`demo/README.md`](demo/README.md).
+
 ## Download
 
 | Platform | Download | Release |
