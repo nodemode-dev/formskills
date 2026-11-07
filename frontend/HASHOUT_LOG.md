@@ -130,6 +130,13 @@ Measured in Chromium at 4x CPU and a slow network (150 ms latency, 200 kB/s), da
 
 Family rule from `FAMILY_DEV_PLAN.md` v0.4.x Phase 2b (formai_dev sidecar): every frontend installs with zero `npm audit` findings. Vite 8.3.2 carries a `launch-editor` with two command-injection advisories in the dev server (ledger FB-004); 8.3.5 clears them. Dev dependency only, nothing in the shipped bundle changed. Verified after `npm install`: `npm audit` reports 0 vulnerabilities, `npm run typecheck` passes, `vite build` succeeds (outDir outside the repo), and the dev server answers 200 on `http://localhost:5630/` with no Network address printed.
 
+### public/splash.html, src/main.ts · the splash page and the ready call
+- refers-to: frontend/public/splash.html · frontend/src/main.ts :: app_ready call after `booting` is removed
+- kind: decision
+- logged: v0.8.2 · 2026-11-07
+
+`splash.html` is formvis's card with the app name, `formskills.png` and `formskillsSplashDone`; it lives in `public/` so it reaches `frontend/dist` untouched. `main.ts` invokes `app_ready` two animation frames after the `booting` class is removed, i.e. once the final layout is painted; without the shell (a browser, the demo) there is no `invoke` or the demo's stand-in rejects the command, and the rejection is swallowed.
+
 ### styles/tokens.css · the Form family colours
 - refers-to: frontend/src/styles/tokens.css :: :root, prefers-color-scheme light
 - kind: decision
