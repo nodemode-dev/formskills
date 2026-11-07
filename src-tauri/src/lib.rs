@@ -1,3 +1,4 @@
+mod extensions;
 mod reveal;
 
 use std::process::ExitCode;
@@ -197,7 +198,10 @@ pub fn run() -> ExitCode {
         eprintln!("formskills: {e}");
         return ExitCode::FAILURE;
     }
-    match tauri::Builder::default().manage(Shown::default()).setup(|app| {
+    let builder = tauri::Builder::default().register_asynchronous_uri_scheme_protocol(extensions::SCHEME, |_ctx, request, responder| {
+        std::thread::spawn(move || responder.respond(extensions::serve(request)));
+    });
+    match builder.manage(Shown::default()).setup(|app| {
         let handle = app.handle().clone();
         reveal::round_splash(&handle);
         if let Some(main) = handle.get_webview_window("main") {
@@ -207,7 +211,7 @@ pub fn run() -> ExitCode {
             reveal::conceal(&main);
         }
         Ok(())
-    }).invoke_handler(tauri::generate_handler![reveal::app_ready, library, refresh, read_file, download, edits, edit_start, edit_read, edit_write, edit_seen, edit_discard, edit_download, search, check_skill, edit_check, refresh_app, pin, own_list, own_new, install_skills, installed, install_update, install_remove]).run(tauri::generate_context!()) {
+    }).invoke_handler(tauri::generate_handler![reveal::app_ready, library, refresh, read_file, download, edits, edit_start, edit_read, edit_write, edit_seen, edit_discard, edit_download, search, check_skill, edit_check, refresh_app, pin, own_list, own_new, install_skills, installed, install_update, install_remove, extensions::extensions_list, extensions::extensions_stamp, extensions::extension_requests, extensions::extension_answer, extensions::extension_save, extensions::open_portal]).run(tauri::generate_context!()) {
         Ok(()) => ExitCode::SUCCESS,
         Err(e) => {
             eprintln!("formskills: the window could not start: {e}");

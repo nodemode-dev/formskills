@@ -5,6 +5,15 @@ Living log for formskills' desktop shell. Source files stay comment-free; what t
 Current build version: v0.7.5
 Last updated: 2026-11-03 · v0.7.5 the bundle names the publisher and the licence; 2026-10-25 · the install commands; one app at a time, pins, your own skills; search and the check commands; the edit commands; read_file and download; library and refresh; the shell
 
+## v0.9.0 · the formext:// protocol and the extension commands {#v0-9-0}
+
+### src/extensions.rs, src/lib.rs, tauri.conf.json · formext://
+- refers-to: src-tauri/src/extensions.rs :: SCHEME, base, prefix, split, decode, serve, extensions_list, extensions_stamp, extension_requests, extension_answer, extension_save, open_portal · src-tauri/src/lib.rs :: run · src-tauri/tauri.conf.json :: app.security.csp
+- kind: decision
+- logged: v0.9.0 · 2026-11-07
+
+formskills has no HTTP server, so extension files are served on an asynchronous URI scheme protocol, `formext`, in the contract's shape `formext://{id}/{version}/{path}`. macOS and Linux webviews keep the id as the host; Windows webviews reach a custom scheme as `http://formext.localhost/{id}/{version}/{path}`, so `split` takes either form and `base` gives the window the one its platform uses. Every answer, 404 included, carries the contract's headers from `extensions::headers_for`; HTML gets the CSP with the extension's own absolute prefix as BASE (`formext://{id}/{version}/`), since a sandboxed frame's opaque origin never matches `'self'`. The list is resolved again for every file, so a reload in FormPortal is seen at once and a refused or removed extension serves nothing. The window CSP adds `frame-src formext: http://formext.localhost`. Each request runs on its own thread so a large file never holds the webview. The commands are thin: `extensions_list` (the listing with this base), `extensions_stamp`, `extension_requests` and `extension_answer` (the command line's queue), `extension_save` (Downloads), `open_portal` (the fixed `formai://extensions?product=formskills` through `open`, `cmd /C start` or `xdg-open`; no other address). Not compiled here (no GTK in the round's machine); read against Tauri 2.12.5's `register_asynchronous_uri_scheme_protocol` and `UriSchemeResponder::respond`.
+
 ## v0.8.2 · the splash, the rounded corners and the reveal {#v0-8-2}
 
 ### src/reveal.rs, src/lib.rs, tauri.conf.json · splash window, reveal contract
