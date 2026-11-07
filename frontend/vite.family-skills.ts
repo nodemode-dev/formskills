@@ -48,7 +48,7 @@ export function familySkills(): Plugin {
         const releases: Release[] = [];
         for (const tag of git(repo, ["tag", "--sort=-v:refname"]).split("\n").filter(Boolean)) {
           const found = releaseAt(repo, tag);
-          if (found) releases.push(found);
+          if (found && JSON.stringify(found.skills) !== JSON.stringify(releases[releases.length - 1]?.skills)) releases.push(found);
           if (releases.length === KEPT) break;
         }
         if (releases.length) out[name] = releases;
