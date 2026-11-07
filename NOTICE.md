@@ -23,6 +23,10 @@ Its dependencies are MIT, Apache-2.0 or dual MIT and Apache-2.0, with some BSD-3
 
 Every new dependency, binary, font or data file gets a row here before it is used.
 
+## Browser demo
+
+The demo in `demo/` adds no dependency: it is built with the Vite and TypeScript already listed above, bundles the window's own code, and reads zips with the browser's built-in `DecompressionStream`. Its sample skills are generated in `demo/src/samples.ts` from `core/data/apps.json` and are the owner's text, written for the demo; they are not any Form app's skills. `demo/formskills.png` is a copy of the owner's icon in `frontend/public/`.
+
 ## Desktop shell: crates under other licences
 
 Tauri links these crates unedited (no `[patch]` and no vendored copy):
