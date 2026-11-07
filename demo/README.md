@@ -26,7 +26,7 @@ No backend, no Tauri, no network and no CDN: every script, style and sample is i
 
 - The window is the real one; only the engine behind it is replaced. The stand-in ports the engine's front matter reader, Check rules, search scoring and template from `core/src`.
 - The skills are the apps' own. At build time `frontend/vite.family-skills.ts` reads `.claude/skills` from each app repository's latest release tag (and the newest earlier tag whose skills differ) with `git show`, from the folder beside this repository or `FORM_FAMILY_DIR`, and embeds the text read-only in the bundle. Nothing is stored as a skill file in this tree. FormPortal has an earlier release to pin; apps with no repository there show no skills.
-- The icons and screenshots in `media/` are the apps' own art; `CREDITS.md` lists each file and its licence.
+- The icons in `media/icons/` are the family's own artwork; the screenshots in `media/shots/` are demo captures of nine apps, whose visible media is credited in `CREDITS.md`. `CREDITS.md` lists each file and its licence.
 - The catalogue is not read and nothing is signed or digest checked; the source line and the install pane say so.
 - Installs go to a virtual folder in this browser's storage, never to disk. Your edits, pins and installs are kept in `localStorage` when the browser allows it and the demo works without it.
 

@@ -19,6 +19,8 @@ The owner found generated samples dull, and the brief for this pass asks for the
 - kind: decision
 - logged: v0.8.1 · 2026-11-07
 
+The docs hero captures of the sibling repos were used first and then dropped: they show photographs of unverifiable source and licence. The screenshots are now the sibling demos' own verified opening screens (sidecar `demo-screenshot.png`), nine apps; formMCP and formportal captures still showed those old hero images, so those two are icon only. The strip and the app pane figure are 16 by 9 boxes. The eight apps without skills take their icons from the family icon pack in formtray. On app pages the window says a kept release's "latest could not be read", which reads like a fault here; an observer on the "Skills here" line rewrites that clause to "as tagged when this demo was built" and the reason now states that no signature or digest is checked.
+
 Icons are painted by CSS on `.card-head::before` and `#detail-app .detail-head::before`, keyed by the cards' existing `data-app`, so the window's nodes are not touched; apps without an icon keep a quiet square so every card has the same indentation. `media/media.css` is a plain stylesheet outside the Vite build, because Vite would hash and move the images it finds in bundled CSS and `emptyOutDir` would clear them. The screenshot sits in a figure with a fixed 16 by 10 box in the app pane, hidden for apps without one in the same task that shows the pane, so nothing is repainted. The opening pane is static markup: an icon wall whose buttons click the real cards, three screenshots, then the note and the try list.
 
 ### demo/src/look.ts · the install line
