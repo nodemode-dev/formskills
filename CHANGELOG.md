@@ -1,5 +1,9 @@
 # Changelog
 
+## v0.8.3 · 2026-11-07
+
+- Two more browser demos, each on a different part of the app: `demos/author/` (write a skill, fix what Check reports as you type, edit a copy of a released skill beside its original, package it as a zip) and `demos/install/` (installs per agent, what an update changes file by file with SHA-256 digests, pinning a release, the Trust page). Each runs the real window against demo 1's engine stand-in with its own saved state, and all three demos link to one another. The app, the engine and the installers are unchanged.
+
 ## v0.8.2 · 2026-11-07
 
 - The app opens with the Form family's splash (a rounded 360 by 200 card with the icon and a progress bar), keeps the window unseen until the list has painted and shows it whole after at least 2.6 s, with no white frame. The browser demo opens in the family's Studio Dark and warm paper colours.
