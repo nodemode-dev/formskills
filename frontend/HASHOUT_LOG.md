@@ -33,7 +33,7 @@ The document is what the window already holds: the view, the library, the open s
 - kind: fix
 - logged: v0.9.0 · 2026-11-07
 
-Panels open through the kit's `open()`, which asks for consent and only then creates the frame; a dock article made for a declined panel is removed again. `initExtensions` returns the first listing's promise (or `null` when the page has no `#ext-open`, so the demos still reveal at once), and `main.ts` keeps the `booting` class until that listing has filled the menu and rows, at most 2 s, so the Extensions menu opened right after start already holds the contributed commands. The browser build answers `app_ready` with `null` (it has no splash to reveal) instead of 400.
+Panels open through the kit's `open()`, which asks for consent and only then creates the frame; a dock article made for a declined panel is removed again. `initExtensions` returns the first listing's promise (or `null` when the page has no `#ext-open`, so the demos still reveal at once), and `main.ts` keeps the `booting` class until that listing has filled the menu and rows, at most 2 s, so the Extensions menu opened right after start already holds the contributed commands. The browser build answers `app_ready` with `null` (it has no splash to reveal) instead of 400, and answers HEAD under `/api/extensions/files/` with the same status and headers as GET and no body, instead of falling through to Vite's index page.
 
 ## v0.7.0 · the Install and Installed pages {#v0-7-0}
 

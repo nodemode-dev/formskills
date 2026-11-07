@@ -93,7 +93,7 @@ function notFound(res: ServerResponse): void {
   res.end();
 }
 
-async function serveFile(res: ServerResponse, rest: string): Promise<void> {
+async function serveFile(res: ServerResponse, rest: string, head: boolean): Promise<void> {
   let parts: string[];
   try {
     parts = rest.split("/").map(decodeURIComponent);
@@ -115,6 +115,10 @@ async function serveFile(res: ServerResponse, rest: string): Promise<void> {
   res.statusCode = 200;
   res.setHeader("Content-Type", found.type);
   for (const [k, v] of Object.entries(found.headers)) res.setHeader(k, v);
+  if (head) {
+    res.end();
+    return;
+  }
   createReadStream(found.path).on("error", () => res.end()).pipe(res);
 }
 
@@ -129,8 +133,8 @@ export function engineBridge(): Plugin {
           void json(["extensions", "list"]).then((v) => send(res, 200, v), (e) => send(res, 500, { error: String(e) }));
           return;
         }
-        if (req.method === "GET" && url.startsWith("/api/extensions/files/")) {
-          void serveFile(res, url.slice("/api/extensions/files/".length));
+        if ((req.method === "GET" || req.method === "HEAD") && url.startsWith("/api/extensions/files/")) {
+          void serveFile(res, url.slice("/api/extensions/files/".length), req.method === "HEAD");
           return;
         }
         if (req.method === "POST" && url.startsWith("/api/engine/")) {
