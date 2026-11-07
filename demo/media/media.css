@@ -1,0 +1,180 @@
+.card-head {
+  align-items: center;
+  justify-content: flex-start;
+}
+
+.card-head::before {
+  content: "";
+  flex: none;
+  width: 24px;
+  height: 24px;
+  border-radius: var(--radius-s);
+  background: var(--control) center / cover no-repeat;
+}
+
+.card-head .card-kind {
+  margin-left: auto;
+}
+
+.card-own .card-head::before {
+  background-image: url("../formskills.png");
+}
+
+.card[data-app="formmd"] .card-head::before,
+#detail-app[data-app="formmd"] .detail-head::before { background-image: url("icons/form.md.webp"); }
+.card[data-app="formmcp"] .card-head::before,
+#detail-app[data-app="formmcp"] .detail-head::before { background-image: url("icons/formMCP.webp"); }
+.card[data-app="formcut"] .card-head::before,
+#detail-app[data-app="formcut"] .detail-head::before { background-image: url("icons/formcut.webp"); }
+.card[data-app="formslide"] .card-head::before,
+#detail-app[data-app="formslide"] .detail-head::before { background-image: url("icons/formdeck.webp"); }
+.card[data-app="formencoder"] .card-head::before,
+#detail-app[data-app="formencoder"] .detail-head::before { background-image: url("icons/formencoder.webp"); }
+.card[data-app="formlit"] .card-head::before,
+#detail-app[data-app="formlit"] .detail-head::before { background-image: url("icons/formlit.webp"); }
+.card[data-app="formpdf"] .card-head::before,
+#detail-app[data-app="formpdf"] .detail-head::before { background-image: url("icons/formpdf.webp"); }
+.card[data-app="formai"] .card-head::before,
+#detail-app[data-app="formai"] .detail-head::before { background-image: url("icons/formportal.webp"); }
+.card[data-app="formvfx"] .card-head::before,
+#detail-app[data-app="formvfx"] .detail-head::before { background-image: url("icons/formvfx.webp"); }
+.card[data-app="formvis"] .card-head::before,
+#detail-app[data-app="formvis"] .detail-head::before { background-image: url("icons/formvis.webp"); }
+.card[data-app="formwav"] .card-head::before,
+#detail-app[data-app="formwav"] .detail-head::before { background-image: url("icons/formwav.webp"); }
+
+#detail-app .detail-head {
+  align-items: center;
+  justify-content: flex-start;
+}
+
+#detail-app .detail-head::before {
+  content: "";
+  flex: none;
+  width: var(--icon-s);
+  height: var(--icon-s);
+  border-radius: var(--radius-m);
+  background: var(--control) center / cover no-repeat;
+}
+
+#detail-app .detail-kind {
+  margin-left: auto;
+}
+
+.demo-shot {
+  aspect-ratio: 16 / 10;
+  margin: 0 0 var(--sp-5);
+  overflow: hidden;
+  border: 1px solid var(--edge);
+  border-radius: var(--radius-m);
+  background: var(--control);
+}
+
+.demo-shot[hidden] {
+  display: none;
+}
+
+.demo-shot img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: top left;
+}
+
+.detail-empty {
+  align-content: start;
+  height: auto;
+  max-width: 68ch;
+  gap: var(--sp-4);
+}
+
+.demo-hero-title {
+  margin: 0;
+  font-size: var(--fs-xl);
+  font-weight: 650;
+  line-height: 1.2;
+}
+
+.demo-hero-sub {
+  margin: 0;
+  color: var(--ink-soft);
+  font-size: var(--fs-l);
+}
+
+.demo-wall {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--sp-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.demo-wall button {
+  display: grid;
+  justify-items: center;
+  gap: var(--sp-1);
+  width: 76px;
+  padding: var(--sp-2) 0;
+  border: 1px solid transparent;
+  border-radius: var(--radius-m);
+  background: transparent;
+  color: var(--ink-soft);
+  font: inherit;
+  font-size: var(--fs-s);
+  cursor: pointer;
+}
+
+.demo-wall button:hover {
+  border-color: var(--edge-strong);
+  background: var(--control);
+}
+
+.demo-wall img {
+  display: block;
+  width: var(--icon-s);
+  height: var(--icon-s);
+  border-radius: var(--radius-m);
+}
+
+.demo-strip {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--sp-3);
+  margin: 0;
+}
+
+.demo-strip figure {
+  margin: 0;
+}
+
+.demo-strip .frame {
+  aspect-ratio: 16 / 10;
+  overflow: hidden;
+  border: 1px solid var(--edge);
+  border-radius: var(--radius-m);
+  background: var(--control);
+}
+
+.demo-strip img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: top left;
+}
+
+.demo-strip figcaption {
+  margin-top: var(--sp-1);
+  color: var(--ink-faint);
+  font-size: var(--fs-s);
+}
+
+.detail-empty .demo-try {
+  justify-self: center;
+  max-width: 60ch;
+  margin: 0;
+  text-align: left;
+}
