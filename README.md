@@ -123,6 +123,8 @@ Open [`demo/index.html`](demo/index.html) in a browser, from `file://` or any st
 
 All FormSkills builds are compiled and released from [FormCompiler](https://github.com/nodemode-dev/formcompiler); this repo holds the source.
 
+**Updates come through FormPortal.** FormSkills updates the skills it installs, but not the app itself: install [FormPortal](https://formai.studio/formportal/) and it keeps FormSkills up to date, or download the new version from the links above.
+
 ## Run it from source
 
 Want to contribute or try the latest code? Run it straight from this repo.
