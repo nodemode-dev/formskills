@@ -1,6 +1,6 @@
 use std::process::ExitCode;
 
-use formskills_core::{catalog, check, edits, install, library, own, pack, pins, places, search, Apps, CORE_VERSION};
+use formskills_core::{catalog, check, edits, extensions, install, library, own, pack, pins, places, search, Apps, CORE_VERSION};
 use serde_json::json;
 
 const HELP: &str = "formskills-cli: formskills without the window
@@ -30,6 +30,9 @@ const HELP: &str = "formskills-cli: formskills without the window
   edit seen <id> <skill>             note the original's current version as the one your copy follows
   edit download <id> <skill> [--to DIR]   your copy as <skill>-edited.zip
   edit discard <id> <skill>          delete your copy
+  extensions [list]   the extensions FormPortal installed and form.ext runs for formskills: id, name, version, source, state, reason, commands (JSON)
+  extensions command <id> <command> [args-json]   ask the open formskills window to run an extension's command, with its consent rules (JSON)
+  extensions stamp    when FormPortal's lists for formskills last changed (JSON)
   catalog         whether the signed family catalogue can be used now, and why not
   where           the folder formskills keeps released skills in
   version         formskills' version
@@ -41,6 +44,99 @@ Released skills only, unless FORMSKILLS_DEV=1: then an app's checkout in a FORMS
 
 fn print(value: &serde_json::Value) {
     println!("{}", serde_json::to_string_pretty(value).unwrap_or_default());
+}
+
+fn read_input(from: &str) -> Result<String, String> {
+    if from == "-" {
+        let mut text = String::new();
+        std::io::Read::read_to_string(&mut std::io::stdin(), &mut text).map(|_| text).map_err(|e| e.to_string())
+    } else {
+        std::fs::read_to_string(from).map_err(|e| format!("{from}: {e}"))
+    }
+}
+
+fn run_extensions(args: &[String]) -> ExitCode {
+    let base = args.iter().position(|a| a == "--base").and_then(|i| args.get(i + 1)).cloned().unwrap_or_else(|| "/api/extensions/files".to_string());
+    let plain: Vec<&str> = {
+        let mut out = Vec::new();
+        let mut skip = false;
+        for a in args {
+            if skip {
+                skip = false;
+            } else if a == "--base" {
+                skip = true;
+            } else {
+                out.push(a.as_str());
+            }
+        }
+        out
+    };
+    let result: Result<serde_json::Value, String> = match plain.first().copied().unwrap_or("list") {
+        "list" => Ok(extensions::listing(&base, None)),
+        "stamp" => {
+            let (enabled, dev) = extensions::stamp(extensions::PRODUCT, None);
+            Ok(json!({ "stamp": [enabled, dev] }))
+        }
+        "file" => match (plain.get(1), plain.get(2), plain.get(3)) {
+            (Some(id), Some(version), Some(path)) => {
+                let found = extensions::list(None);
+                match extensions::file_for(&found, id, version, path) {
+                    Some((target, kind)) => {
+                        let headers: serde_json::Map<String, serde_json::Value> = extensions::headers_for(kind, &base).into_iter().map(|(k, v)| (k.to_string(), json!(v))).collect();
+                        Ok(json!({ "path": target.display().to_string(), "type": kind, "headers": headers }))
+                    }
+                    None => Err("not found".to_string()),
+                }
+            }
+            _ => Err("extensions file <id> <version> <path>".to_string()),
+        },
+        "command" => match (plain.get(1), plain.get(2)) {
+            (Some(id), Some(cmd)) => {
+                let args = match plain.get(3) {
+                    Some(text) => serde_json::from_str(text).map_err(|e| format!("the args are not JSON: {e}")),
+                    None => Ok(json!({})),
+                };
+                args.and_then(|a| {
+                    let found = extensions::list(None);
+                    let Some(ext) = found.iter().find(|e| e.id == *id) else {
+                        return Err(format!("no extension {id:?} for formskills; `formskills-cli extensions list` lists them"));
+                    };
+                    if ext.state != "ready" {
+                        return Err(format!("{} is refused: {}", ext.name, ext.reason));
+                    }
+                    if !ext.commands.iter().any(|c| c["id"] == json!(cmd)) {
+                        return Err(format!("{} has no command {cmd}", ext.name));
+                    }
+                    extensions::ask(id, cmd, a).map(|r| json!({ "id": id, "command": cmd, "result": r }))
+                })
+            }
+            _ => Err("extensions command <id> <command> [args-json]".to_string()),
+        },
+        "requests" => Ok(json!(extensions::take())),
+        "answer" => match (plain.get(1), plain.get(2)) {
+            (Some(key), Some(from)) => read_input(from)
+                .and_then(|t| serde_json::from_str::<serde_json::Value>(&t).map_err(|e| e.to_string()))
+                .and_then(|v| {
+                    let outcome = match v.get("error").and_then(|e| e.as_str()) {
+                        Some(e) => Err(e.to_string()),
+                        None => Ok(v.get("result").cloned().unwrap_or(serde_json::Value::Null)),
+                    };
+                    extensions::answer(key, outcome).map(|()| json!({ "answered": key }))
+                }),
+            _ => Err("extensions answer <key> <file|->".to_string()),
+        },
+        other => Err(format!("unknown extensions action {other:?}; use list, command or stamp")),
+    };
+    match result {
+        Ok(v) => {
+            print(&v);
+            ExitCode::SUCCESS
+        }
+        Err(e) => {
+            eprintln!("formskills: {e}");
+            ExitCode::FAILURE
+        }
+    }
 }
 
 fn main() -> ExitCode {
@@ -143,6 +239,9 @@ fn main() -> ExitCode {
                 ExitCode::FAILURE
             }
         };
+    }
+    if command == "extensions" {
+        return run_extensions(&args[1..]);
     }
     let apps = match Apps::bundled() {
         Ok(apps) => apps,

@@ -5,6 +5,29 @@ Living log for `formskills-core`, `formskills-cli` and `setup/apps.py`. Source f
 Current build version: v0.8.3
 Last updated: 2026-11-02 · the catalogue from the public download store; 2026-10-26 · the test suite; installing into Claude Code, Codex and Cursor; pins, one-app update, your own skills, script counts; search, the format check, licences and topics; registered in formcompiler; personal edited copies; no partial download; reading one file and packing downloads; released skills fetched, checked and kept, and the dev mode; the generated list of apps that ship skills
 
+## v0.9.0 · the extension host's resolver, the request queue and the command line {#v0-9-0}
+
+### extensions.rs · a line-for-line port of formext_host.py
+- refers-to: core/src/extensions.rs :: portal_root, version_tuple, Extension, Extension::public, check, resolve, stamp, csp_for, file_for, headers_for, TYPES, PERMISSIONS, id_re, local_re, version_re · core/src/lib.rs
+- kind: decision
+- logged: v0.9.0 · 2026-11-07
+
+The Form Extension Contract (API 1) kit's `host/python/formext_host.py`, ported function for function with its refusal messages word for word, so FormPortal, form.ext and every app say the same thing about the same manifest. Python's loose readings are kept on purpose: `str()` of a missing value is `None`, `!r` quotes with single quotes, `format_version: true` passes because `True == 1`, `or` treats an empty value as missing, and a refused row keeps the name read before the refusal. Python's regular expressions are hand matchers (no regex crate): the same character classes and lengths; Python's `$` would also take a trailing newline, which no real id holds. `portal_root` is the contract's (macOS prefers `studio.formai.portal`), not `places::portal_root`, which FormPortal's kept catalogue copy still uses. `file_for` refuses the extension folder itself being a symlink, as the Python does (it checks every ancestor that resolves to the root). It follows the kit as revised during the round: a development row takes its manifest's x.y.z version before the id and product checks (so a refused one shows its real version), a non-text `entry.ui` (null included) is refused as "not a path inside the package", and a non-object `entry` or `contributes` counts as empty. Checked against the Python on 34 manifests and 13 file paths (`/home/claude/ext/work/host-formskills/parity.py` in the round's scratch): identical lists and identical 200/404 answers. The app version is `CORE_VERSION`, so an extension with `minimum_app` 0.9.0 is refused until the round's bump.
+
+### extensions.rs · request queue, save
+- refers-to: core/src/extensions.rs :: requests_dir, ask, take, answer, save_download, save_name, SAVE_LIMIT
+- kind: decision
+- logged: v0.9.0 · 2026-11-07
+
+formskills has no MCP server and no route into its window, and an extension only runs as a page in the window. So `extensions command` writes `extension-requests/<ms>-<pid>.json` under the data folder; the window takes it (rename to `.taken`) on its 2 s tick, runs the command with the same consent as its menu, and writes `.answer` (written as `.part` and renamed). The asker gives up after 10 s untaken ("the formskills window is not open") or 130 s unanswered, just over the contract's 120 s headless limit, and removes its own files. `save_download` is how `files.save` lands: Downloads (or `FORMSKILLS_DOWNLOADS`), a plain file name only, "name (2).ext" when taken, written through `durable::replace_file`, at most 200 MB.
+
+### cli/src/main.rs · extensions
+- refers-to: cli/src/main.rs :: run_extensions, read_input, HELP
+- kind: decision
+- logged: v0.9.0 · 2026-11-07
+
+`extensions list` (the default) prints the listing with `stamp`, the root and each extension's public record; `--base` sets the files prefix (default `/api/extensions/files`, the own-origin shape). `extensions command <id> <command> [args-json]` checks the id, state and command first, then asks the window. `stamp`, `file`, `requests` and `answer` are for the browser build's Vite bridge (`frontend/vite.engine.ts`); `file` prints the resolved path, type and headers or fails with "not found" and nothing else. It runs before `Apps::bundled` because it needs no app list.
+
 ## v0.7.4 · the catalogue from the public download store {#v0-7-4}
 
 ### catalog.rs, setup/apps.py · dl.formai.studio
