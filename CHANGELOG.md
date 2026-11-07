@@ -2,7 +2,7 @@
 
 ## v0.8.1 · 2026-11-07
 
-- The browser demo opens on the Form apps' real released skills (21 skills from 11 apps, read from their release tags at build time) with each app's real icon and window screenshot, instead of generated samples; the install pane no longer claims a signature and digest check the demo does not do. The app, the engine and the installers are unchanged.
+- The browser demo opens on the Form apps' real released skills (21 skills from 11 apps, read from their release tags at build time) with each app's real icon and window screenshot, instead of generated samples; the install pane no longer claims a signature and digest check the demo does not do. The window's tokens move to the Form family colours (Studio Dark and warm paper, orange only as the highlight, the violet second accent dropped); layouts are unchanged. The engine and the installers are unchanged.
 
 ## v0.8.0 · 2026-11-07
 

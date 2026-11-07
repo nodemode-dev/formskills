@@ -129,3 +129,10 @@ Measured in Chromium at 4x CPU and a slow network (150 ms latency, 200 kB/s), da
 - logged: v0.7.1 · 2026-10-25
 
 Family rule from `FAMILY_DEV_PLAN.md` v0.4.x Phase 2b (formai_dev sidecar): every frontend installs with zero `npm audit` findings. Vite 8.3.2 carries a `launch-editor` with two command-injection advisories in the dev server (ledger FB-004); 8.3.5 clears them. Dev dependency only, nothing in the shipped bundle changed. Verified after `npm install`: `npm audit` reports 0 vulnerabilities, `npm run typecheck` passes, `vite build` succeeds (outDir outside the repo), and the dev server answers 200 on `http://localhost:5630/` with no Network address printed.
+
+### styles/tokens.css · the Form family colours
+- refers-to: frontend/src/styles/tokens.css :: :root, prefers-color-scheme light
+- kind: decision
+- logged: v0.8.1 · 2026-11-07
+
+The owner found the cool blue-grey surfaces off the family look, so both themes take the Form family values (`form-redesign-kit/data/family-kit.md`): Studio Dark `#050505` ground, `#111111` panes, `#191919` raised controls, hairlines `#222124` and `#34333a`, ink `#f7f7f7`, `#a4a4a4`, `#717072`, errors `#f87171`; warm paper `#e2e0d8`, `#ecebe6`, `#f9f8f4`, `#d6d2c6`, `#c4bfb1`, ink `#26241d`, `#4c4a40`, `#8b887a`, errors `#c2362f`. Orange `#f97316` stays the highlight (active chip, selected card, focus). The violet second accent is gone: `--accent-2` is formskills' own hue `#ffc069`, used only for its own marks (edited-file dot, found-text mark, quote rule). Controls are solid raised surfaces now, not translucent white or black, so hover and press step through the two hairline tones. No selector or layout changed. Faint ink on the paper `#ecebe6` is the family's `#8b887a` (about 3:1), used only for hints and meta lines.
