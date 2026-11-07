@@ -7,6 +7,7 @@
     <title>FormSkills demo</title>
     <link rel="icon" href="formskills.png" />
     <link rel="stylesheet" href="assets/demo.css" />
+    <link rel="stylesheet" href="media/media.css" />
     <script defer src="assets/demo.js"></script>
   </head>
   <body>
@@ -43,11 +44,31 @@
         </ul>
         <section class="detail" id="detail" aria-live="polite">
           <div class="detail-empty" id="detail-empty">
-            <p class="demo-note">Demo. This page runs the real FormSkills window against sample skills generated for it. Nothing is downloaded from a network, installs go to a virtual agent folder kept in this browser, and downloads are real zip files.</p>
+            <h2 class="demo-hero-title">What the Form apps teach an agent</h2>
+            <p class="demo-hero-sub">The skills below are the ones the family's apps ship, read from each app's latest release tag. Open any app to read, check, copy, install or download them.</p>
+            <ul class="demo-wall" aria-label="Apps with skills in this demo">
+              <li><button type="button" data-open="formcut"><img src="media/icons/formcut.webp" alt="" width="40" height="40" />formcut</button></li>
+              <li><button type="button" data-open="formvis"><img src="media/icons/formvis.webp" alt="" width="40" height="40" />formvis</button></li>
+              <li><button type="button" data-open="formlit"><img src="media/icons/formlit.webp" alt="" width="40" height="40" />formlit</button></li>
+              <li><button type="button" data-open="formwav"><img src="media/icons/formwav.webp" alt="" width="40" height="40" />formwav</button></li>
+              <li><button type="button" data-open="formslide"><img src="media/icons/formdeck.webp" alt="" width="40" height="40" />formdeck</button></li>
+              <li><button type="button" data-open="formpdf"><img src="media/icons/formpdf.webp" alt="" width="40" height="40" />formpdf</button></li>
+              <li><button type="button" data-open="formvfx"><img src="media/icons/formvfx.webp" alt="" width="40" height="40" />formvfx</button></li>
+              <li><button type="button" data-open="formencoder"><img src="media/icons/formencoder.webp" alt="" width="40" height="40" />formencoder</button></li>
+              <li><button type="button" data-open="formmd"><img src="media/icons/form.md.webp" alt="" width="40" height="40" />form.md</button></li>
+              <li><button type="button" data-open="formai"><img src="media/icons/formportal.webp" alt="" width="40" height="40" />formportal</button></li>
+              <li><button type="button" data-open="formmcp"><img src="media/icons/formMCP.webp" alt="" width="40" height="40" />formMCP</button></li>
+            </ul>
+            <div class="demo-strip">
+              <figure><div class="frame"><img src="media/shots/formcut.webp" alt="formcut with a timeline open" width="1280" height="800" /></div><figcaption>formcut</figcaption></figure>
+              <figure><div class="frame"><img src="media/shots/formlit.webp" alt="formlit developing a photo" width="1280" height="720" /></div><figcaption>formlit</figcaption></figure>
+              <figure><div class="frame"><img src="media/shots/formwav.webp" alt="formwav with an effects chain open" width="1280" height="720" /></div><figcaption>formwav</figcaption></figure>
+            </div>
+            <p class="demo-note">Demo. The skills are the apps' own text, taken from their release tags when the demo was built and shown read-only. Nothing is downloaded from a network and no signature or digest is checked here. Installs go to a virtual agent folder kept in this browser, and downloads are real zip files.</p>
             <ol class="demo-try">
-              <li>Search for a word such as <code>timeline</code> or <code>limits</code>, then open a hit.</li>
+              <li>Search for a word such as <code>timeline</code> or <code>mask</code>, then open a hit.</li>
               <li>Open a skill, press Check, then Edit a copy and change the description to see Check run as you type.</li>
-              <li>With a copy made, choose its app and pick the earlier release to see the copy flagged as changed in the original.</li>
+              <li>Copy a FormPortal skill, choose FormPortal and pick the earlier release to see the copy flagged as changed in the original.</li>
               <li>Install a skill, open Installed, and save the virtual folders as a zip.</li>
               <li>Open Your skills and add a folder, a SKILL.md or a zip of your own, or drop one anywhere on the page.</li>
             </ol>
@@ -61,6 +82,7 @@
               <span class="detail-kind" data-f="kind"></span>
             </header>
             <p class="detail-summary" data-f="summary"></p>
+            <figure class="demo-shot" id="demo-shot" hidden><img alt="" width="1280" height="800" /></figure>
             <dl class="facts">
               <dt>Skills folder</dt>
               <dd data-f="skills" translate="no"></dd>

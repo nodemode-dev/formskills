@@ -5,3 +5,4 @@ import "./demo.css";
 import "./shim";
 import "../../frontend/src/main";
 import "./import";
+import "./look";

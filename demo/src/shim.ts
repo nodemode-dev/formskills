@@ -1,37 +1,35 @@
 import list from "../../core/data/apps.json";
 import { asText, cloneFiles, digests, frontMatter, indexSkills, nameProblem, plainPath, readText, search, skillFiles, template, validate, byteLength, type Files, type FileText, type Report, type Skill, type Tree } from "./model";
-import { releases, sampleTree } from "./samples";
+import { shipped } from "./family";
 import { copyOf, load, save, type EditRec, type InstRec, type Origin, type Target } from "./store";
 import { writeZip } from "./zip";
 
 const OWN = "yours";
 const OWN_BASE = "your own skill";
-const REASON = "this demo carries sample skills and reads no network";
+const REASON = "this demo was built from the family's release tags and reads no network, so no signature or digest is checked";
+const ABSENT = "this app's repository was not beside formskills when the demo was built";
 const AGENTS: Record<string, [string, string]> = { claude: ["Claude Code", ".claude/skills"], codex: ["Codex", ".agents/skills"], cursor: ["Cursor", ".cursor/skills"] };
 
 const state = load();
-const latest = sampleTree("latest");
-const earlier = sampleTree("earlier");
-const index = new Map<string, Tree>();
+const family = shipped();
 const skillsCache = new Map<string, Skill[]>();
 
-type Current = { id: string; version: string; latest: string; earlier: string; tree: Tree; skills: Skill[] };
+type Current = { id: string; version: string; versions: string[]; tree: Tree; skills: Skill[] };
 
 function currentOf(id: string): Current | null {
-  const at = list.apps.findIndex((a) => a.id === id);
-  if (at < 0) return null;
-  const [top, prev] = releases(at);
-  const pinned = state.pins[id] === prev ? prev : null;
-  const version = pinned ?? top;
-  const tree = (pinned ? earlier : latest).get(id) as Tree;
+  if (!list.apps.some((a) => a.id === id)) return null;
+  const found = family.get(id);
+  if (!found) return { id, version: "", versions: [], tree: new Map(), skills: [] };
+  const pin = state.pins[id];
+  const version = pin && found.versions.slice(1).includes(pin) ? pin : found.versions[0];
+  const tree = found.trees.get(version) as Tree;
   const key = `${id}@${version}`;
-  index.set(key, tree);
   let skills = skillsCache.get(key);
   if (!skills) {
     skills = indexSkills(tree);
     skillsCache.set(key, skills);
   }
-  return { id, version, latest: top, earlier: prev, tree, skills };
+  return { id, version, versions: found.versions, tree, skills };
 }
 
 function libraryApps(): Current[] {
@@ -40,14 +38,14 @@ function libraryApps(): Current[] {
 
 function library() {
   return {
-    catalogue: "sample skills bundled with the demo, not a signed catalogue",
+    catalogue: "the family's release tags, read when the demo was built, not a signed catalogue",
     dev: false,
     dev_roots: [] as string[],
     apps: libraryApps().map((c) => ({
       id: c.id,
-      source: { kind: "kept", channel: "stable", version: c.version, reason: REASON },
+      source: c.version ? { kind: "kept", channel: "stable", version: c.version, reason: REASON } : { kind: "missing", reason: ABSENT },
       skills: c.skills,
-      releases: [c.latest, c.earlier],
+      releases: c.versions,
       pin: state.pins[c.id] ?? null,
     })),
   };
@@ -201,7 +199,7 @@ async function handle(cmd: string, args: Record<string, unknown> = {}): Promise<
       if (!cur) throw new Error(`${app} is not an app that ships skills`);
       if (cmd === "pin") {
         const v = typeof args.version === "string" ? args.version : "";
-        if (v && v === cur.earlier) state.pins[app] = v;
+        if (v && cur.versions.slice(1).includes(v)) state.pins[app] = v;
         else delete state.pins[app];
         save(state);
       }
