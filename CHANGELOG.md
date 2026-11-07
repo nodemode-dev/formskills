@@ -1,5 +1,9 @@
 # Changelog
 
+## v0.9.1 · 2026-11-07
+
+- Merges Greg's pull request, docs(readme): updates come through FormPortal. The README's Download section now says FormPortal keeps formskills up to date, with a link, and that a new version can also be downloaded from the links above. Released together with the extension host from v0.9.0 below; the app is otherwise unchanged. The three demos are rebuilt for the version they show, and so also carry the skills of the newest release tags in the sibling repositories (FormCut 2.12.5, FormPortal 0.61.0, FormDeck 0.30.8, FormWav 2.22.4).
+
 ## v0.9.0 · 2026-11-07
 
 - Extensions, under the Form Extension Contract API 1: formskills loads the extensions FormPortal installs (`enabled.json`) and the ones form.ext runs from a folder (`dev.json`), checks each manifest and shows refusals with their reason, and serves each extension's files from `formext://` with the contract's headers, refusing traversal, symlinks and other file types. An Extensions menu in the header (each contributed command, Extensions Panel, Reload Extensions, Manage in FormPortal), the Extensions panel, dock panels in the detail pane and dialog panels, consent once per version before the extension's frame exists, and one Undo step for each change an extension makes to your copies. Extensions read the view, the library, the open skill and file, your copies and your own skills (`docs/EXTENSIONS.md`). Agents run contributed commands with `formskills-cli extensions list` and `extensions command`, which the open window answers. No extension ships with the app; the first one, Trigger Tester, installs from FormPortal.

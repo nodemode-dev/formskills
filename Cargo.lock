@@ -922,7 +922,7 @@ dependencies = [
 
 [[package]]
 name = "formskills"
-version = "0.9.0"
+version = "0.9.1"
 dependencies = [
  "formskills-core",
  "objc2",
@@ -933,7 +933,7 @@ dependencies = [
 
 [[package]]
 name = "formskills-cli"
-version = "0.9.0"
+version = "0.9.1"
 dependencies = [
  "base64 0.22.1",
  "ed25519-dalek",
@@ -945,7 +945,7 @@ dependencies = [
 
 [[package]]
 name = "formskills-core"
-version = "0.9.0"
+version = "0.9.1"
 dependencies = [
  "base64 0.22.1",
  "ed25519-dalek",
