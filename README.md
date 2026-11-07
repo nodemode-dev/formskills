@@ -94,6 +94,10 @@ Every action in the window is also a `formskills-cli` command that prints JSON, 
 
 `./formskills cli help` lists them all. See [`AGENTS.md`](AGENTS.md).
 
+## Extensions
+
+formskills loads extensions under the Form Extension Contract, API 1: FormPortal installs them, form.ext runs one from a folder while you make it. The Extensions button in the header lists their commands, Extensions Panel shows each one with its version, source, permissions and state, and their panels open beside your skills. Each runs in a sandbox, asks before it first runs, and can only do what the window can: read the library and the open skill, and write your own copies and skills, one undoable step at a time. `./formskills cli extensions list` and `extensions command` reach them from an agent. The API is in [`docs/EXTENSIONS.md`](docs/EXTENSIONS.md).
+
 ## Under the hood
 
 - **Engine:** `formskills-core` fetches the signed family catalogue, checks each skills asset's SHA-256, unpacks it safely and keeps it until a newer release.

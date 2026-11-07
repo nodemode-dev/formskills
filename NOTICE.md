@@ -20,6 +20,7 @@ Its dependencies are MIT, Apache-2.0 or dual MIT and Apache-2.0, with some BSD-3
 | zip 2 (flate2, miniz_oxide, crc32fast, zopfli) | unpacking skills assets and writing downloads (`core`); zip is MIT, miniz_oxide MIT, Zlib or Apache-2.0, zopfli Apache-2.0 |
 | tauri 2, tauri-build | the desktop shell |
 | Vite, TypeScript, @tauri-apps/cli, @types/node (build only) | building the window and the app; not shipped |
+| Form Extension Contract kit, Apache-2.0, nodemode | the extension host: `frontend/src/formext/host-bridge.ts` copied unchanged, and `core/src/extensions.rs` ported from its `formext_host.py` |
 
 Every new dependency, binary, font or data file gets a row here before it is used.
 

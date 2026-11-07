@@ -8,6 +8,7 @@ formskills is where the Form family's skills are found: every Form app's release
 | --- | --- |
 | [Getting Started](Getting-Started) | install from source, run the window and the command line, refresh the list |
 | [Architecture](Architecture) | the engine, the list and where it comes from, the shell, the window |
+| [Extensions](Extensions) | extensions from FormPortal and form.ext: the menu, the panel, permissions, undo, agents |
 
 ## What it does
 
