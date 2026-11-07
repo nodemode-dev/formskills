@@ -1,5 +1,29 @@
 # Changelog
 
+## v0.9.1 · 2026-11-07
+
+- Merges Greg's pull request, docs(readme): updates come through FormPortal. The README's Download section now says FormPortal keeps formskills up to date, with a link, and that a new version can also be downloaded from the links above. Released together with the extension host from v0.9.0 below; the app is otherwise unchanged. The three demos are rebuilt for the version they show, and so also carry the skills of the newest release tags in the sibling repositories (FormCut 2.12.5, FormPortal 0.61.0, FormDeck 0.30.8, FormWav 2.22.4).
+
+## v0.9.0 · 2026-11-07
+
+- Extensions, under the Form Extension Contract API 1: formskills loads the extensions FormPortal installs (`enabled.json`) and the ones form.ext runs from a folder (`dev.json`), checks each manifest and shows refusals with their reason, and serves each extension's files from `formext://` with the contract's headers, refusing traversal, symlinks and other file types. An Extensions menu in the header (each contributed command, Extensions Panel, Reload Extensions, Manage in FormPortal), the Extensions panel, dock panels in the detail pane and dialog panels, consent once per version before the extension's frame exists, and one Undo step for each change an extension makes to your copies. Extensions read the view, the library, the open skill and file, your copies and your own skills (`docs/EXTENSIONS.md`). Agents run contributed commands with `formskills-cli extensions list` and `extensions command`, which the open window answers. No extension ships with the app; the first one, Trigger Tester, installs from FormPortal.
+
+## v0.8.3 · 2026-11-07
+
+- Two more browser demos, each on a different part of the app: `demos/author/` (write a skill, fix what Check reports as you type, edit a copy of a released skill beside its original, package it as a zip) and `demos/install/` (installs per agent, what an update changes file by file with SHA-256 digests, pinning a release, the Trust page). Each runs the real window against demo 1's engine stand-in with its own saved state, and all three demos link to one another. The app, the engine and the installers are unchanged.
+
+## v0.8.2 · 2026-11-07
+
+- The app opens with the Form family's splash (a rounded 360 by 200 card with the icon and a progress bar), keeps the window unseen until the list has painted and shows it whole after at least 2.6 s, with no white frame. The browser demo opens in the family's Studio Dark and warm paper colours.
+
+## v0.8.1 · 2026-11-07
+
+- The browser demo opens on the Form apps' real released skills (21 skills from 11 apps, read from their release tags at build time) with each app's real icon and window screenshot, instead of generated samples; the install pane no longer claims a signature and digest check the demo does not do. The window's tokens move to the Form family colours (Studio Dark and warm paper, orange only as the highlight, the violet second accent dropped); layouts are unchanged. The engine and the installers are unchanged.
+
+## v0.8.0 · 2026-11-07
+
+- A browser demo in `demo/`: the real window runs from `file://` or any static server on generated sample skills, with a TypeScript stand-in for the engine. Read, search, check, edit a copy, install into a virtual agent folder and download zips, or open your own skill folder, SKILL.md or zip. `npm run build:demo` in `frontend/` rebuilds it. The app, the engine and the installers are unchanged.
+
 ## v0.7.7 · 2026-11-04
 
 - README in the Form family template (Mackin's #6), merged with main. The README's version is in its shields badge now, so the F4 version check in `core/tests/family_contract.rs` reads `<img alt="version X"`.

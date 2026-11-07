@@ -1,0 +1,97 @@
+.demo-import {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--sp-2);
+  padding: var(--sp-3) 0;
+  border-top: 1px solid var(--edge);
+  margin-top: var(--sp-3);
+}
+
+.demo-import .hint {
+  flex: 1 1 240px;
+}
+
+.demo-import-note {
+  display: block;
+  min-height: 2.9em;
+  margin: 0;
+  color: var(--ink-faint);
+  font-size: var(--fs-s);
+}
+
+.demo-import-note.is-fault {
+  color: var(--fault);
+}
+
+.demo-note {
+  padding: var(--sp-3) var(--sp-4);
+  border: 1px solid var(--edge);
+  border-radius: var(--radius-m);
+  background: var(--accent-soft);
+  color: var(--ink-soft);
+  font-size: var(--fs-m);
+}
+
+.demo-try {
+  margin: var(--sp-2) 0 0;
+  padding-left: var(--sp-5);
+  color: var(--ink-soft);
+  font-size: var(--fs-m);
+}
+
+.demo-try li {
+  margin: var(--sp-1) 0;
+}
+
+.demo-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  margin: var(--sp-3) 0 0;
+}
+
+.demo-drop {
+  position: fixed;
+  inset: var(--sp-4);
+  z-index: var(--z-overlay);
+  display: grid;
+  place-items: center;
+  border: 2px dashed var(--accent);
+  border-radius: var(--radius-l);
+  background: var(--glass-solid);
+  color: var(--ink);
+  font-size: var(--fs-l);
+  pointer-events: none;
+}
+
+.demo-drop[hidden] {
+  display: none;
+}
+
+.demo-links {
+  display: flex;
+  gap: var(--sp-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.demo-links a {
+  color: var(--ink-faint);
+  text-decoration: none;
+}
+
+.demo-links a:hover,
+.demo-links a[aria-current="page"] {
+  color: var(--ink);
+}
+
+.demo-hidden-input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  opacity: 0;
+  pointer-events: none;
+}

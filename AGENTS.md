@@ -6,6 +6,10 @@ formskills is the Form family's viewer of released skills: a Rust engine (`forms
 
 `./formskills cli apps` lists the Form apps that ship skills, with the folder each app keeps them in. `./formskills cli skills <app>` gives that app's latest released skills (name, description, files) and where they came from; `./formskills cli read <app> <skill>/<path>` prints one of its files, and `./formskills cli download <app> [skill]` saves them as a zip. The person's own edited copies are listed by `./formskills cli edits` and read with `./formskills cli edit read <app> <skill> <path>`; change one only when the person asks, with `edit write`. Released skills only, unless dev mode is asked for (`./formskills dev cli skills`), which reads checkouts beside this one.
 
+## Extensions
+
+`./formskills cli extensions list` lists the extensions installed for formskills (id, name, version, source, state, reason, commands). `./formskills cli extensions command <id> <command> ['<args json>']` asks the open formskills window to run one of their commands; the window asks the person first if that extension version was never allowed, and the call fails if they say Not Now or no window is open. Extensions can change only the person's own copies and skills; `docs/EXTENSIONS.md` lists what they can do.
+
 ## Changing formskills' code
 
 Read `CLAUDE.md`, then the in-tree `HASHOUT_LOG.md` files (`core`, `frontend`, `src-tauri`). The list in `core/data/apps.json` is generated: run `./formskills apps --compiler <formcompiler checkout>`, never edit it by hand.

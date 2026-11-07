@@ -2,12 +2,13 @@
 
 formskills is where the Form family's skills are found: every Form app's released skills, listed by app, to read, download and keep your own edited copies of.
 
-**Current version:** v0.7.7 · **Stack:** Rust (`formskills-core`, `formskills-cli`) · Tauri 2 shell · vanilla TypeScript and Vite window · **Team:** one owner (nodemode-ai)
+**Current version:** v0.9.1 · **Stack:** Rust (`formskills-core`, `formskills-cli`) · Tauri 2 shell · vanilla TypeScript and Vite window · **Team:** one owner (nodemode-ai)
 
 | Page | What it covers |
 | --- | --- |
 | [Getting Started](Getting-Started) | install from source, run the window and the command line, refresh the list |
 | [Architecture](Architecture) | the engine, the list and where it comes from, the shell, the window |
+| [Extensions](Extensions) | extensions from FormPortal and form.ext: the menu, the panel, permissions, undo, agents |
 
 ## What it does
 

@@ -11,7 +11,7 @@
 </p>
 
 <p align="center">
-  <img alt="version 0.7.7" src="https://img.shields.io/badge/version-0.7.7-eef0f4?style=flat-square">
+  <img alt="version 0.9.1" src="https://img.shields.io/badge/version-0.9.1-eef0f4?style=flat-square">
   <img alt="Rust" src="https://img.shields.io/badge/Rust-stable-B7410E?style=flat-square&logo=rust&logoColor=white">
   <img alt="Tauri 2" src="https://img.shields.io/badge/Tauri-2-24C8DB?style=flat-square">
   <img alt="macOS, Windows, Linux" src="https://img.shields.io/badge/macOS%20%C2%B7%20Windows%20%C2%B7%20Linux-native-2f7bf5?style=flat-square">
@@ -94,6 +94,10 @@ Every action in the window is also a `formskills-cli` command that prints JSON, 
 
 `./formskills cli help` lists them all. See [`AGENTS.md`](AGENTS.md).
 
+## Extensions
+
+formskills loads extensions under the Form Extension Contract, API 1: FormPortal installs them, form.ext runs one from a folder while you make it. The Extensions button in the header lists their commands, Extensions Panel shows each one with its version, source, permissions and state, and their panels open beside your skills. Each runs in a sandbox, asks before it first runs, and can only do what the window can: read the library and the open skill, and write your own copies and skills, one undoable step at a time. `./formskills cli extensions list` and `extensions command` reach them from an agent. The API is in [`docs/EXTENSIONS.md`](docs/EXTENSIONS.md).
+
 ## Under the hood
 
 - **Engine:** `formskills-core` fetches the signed family catalogue, checks each skills asset's SHA-256, unpacks it safely and keeps it until a newer release.
@@ -101,6 +105,13 @@ Every action in the window is also a `formskills-cli` command that prints JSON, 
 - **Shell and window:** a Tauri 2 shell around a vanilla TypeScript and Vite window with zero runtime dependencies.
 - **Generated list:** the apps that ship skills come from formcompiler's registry (`./formskills apps`).
 - **Tested:** 31 Rust tests (catalogue trust, digests, safe unpacking, the format checks, link resolution).
+
+## Demo
+
+Open [`demo/index.html`](demo/index.html) in a browser, from `file://` or any static server, to try the real window on the family's real released skills, with each app's icon and screenshot: read, search, check, edit a copy, install into a virtual agent folder and download zips, or open your own skill folder or zip. It needs no backend or network. See [`demo/README.md`](demo/README.md). Two more demos, each on a different part of the app:
+
+- [`demos/author/index.html`](demos/author/index.html): write a skill, fix what Check reports as you type, edit a copy of a released skill beside its original, package it as a zip.
+- [`demos/install/index.html`](demos/install/index.html): install into Claude Code, Codex and Cursor, read what an update changes file by file, pin a release, read what Trust promises.
 
 ## Download
 

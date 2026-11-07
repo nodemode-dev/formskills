@@ -3,6 +3,7 @@ pub mod catalog;
 pub mod check;
 pub mod durable;
 pub mod edits;
+pub mod extensions;
 pub mod fetch;
 pub mod install;
 pub mod library;

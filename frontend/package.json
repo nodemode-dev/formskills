@@ -1,7 +1,7 @@
 {
   "name": "formskills",
   "private": true,
-  "version": "0.7.7",
+  "version": "0.9.1",
   "description": "formskills' window: the Form apps' released skills",
   "license": "GPL-3.0-only",
   "type": "module",
@@ -12,6 +12,7 @@
     "dev": "vite",
     "build": "tsc --noEmit && vite build",
     "typecheck": "tsc --noEmit",
+    "build:demo": "tsc --noEmit -p ../demo/tsconfig.json && vite build --config vite.demo.config.ts",
     "tauri": "tauri"
   },
   "devDependencies": {

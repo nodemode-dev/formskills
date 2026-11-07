@@ -1,5 +1,8 @@
 import list from "../../core/data/apps.json";
 import { renderMarkdown, splitFrontMatter } from "./markdown";
+import { engineInvoke } from "./engine-bridge";
+import { emit, emitSoon, initExtensions, type Op } from "./extensions";
+import { ERR, HostError, type ExtensionRecord } from "./formext/host-bridge";
 
 type App = (typeof list.apps)[number];
 
@@ -7,6 +10,7 @@ declare const __APP_VERSION__: string;
 
 const STATES: Record<string, string> = { live: "Live", public: "Public", prelaunch: "Coming" };
 const HERE = "Checking the app's latest release.";
+const EXTENSIONS_WAIT_MS = 2000;
 
 type Source =
   | { kind: "release"; channel: string; version: string; downloaded: boolean; pinned: boolean; latest: string }
@@ -25,7 +29,8 @@ const OWN = "yours";
 type Library = { catalogue: string; dev: boolean; dev_roots: string[]; apps: AppSkills[] };
 type Invoke = (cmd: string, args?: Record<string, unknown>) => Promise<unknown>;
 
-const invoke = (window as unknown as { __TAURI__?: { core?: { invoke?: Invoke } } }).__TAURI__?.core?.invoke;
+const tauriInvoke = (window as unknown as { __TAURI__?: { core?: { invoke?: Invoke } } }).__TAURI__?.core?.invoke;
+const invoke = tauriInvoke ?? engineInvoke();
 const library = new Map<string, AppSkills>();
 
 function plural(n: number, word: string): string {
@@ -324,7 +329,7 @@ function updateControls(): void {
   show(findingsBox, editing || checkOpen);
   show(editBar, editing);
   readerBody.classList.toggle("is-editing", editing);
-  detailPane.classList.toggle("is-editing", editing);
+  detailPane.classList.toggle("is-editing", editing && !overlay);
   show(doc, !editing);
   show(editorWrap, editing);
   show(side, editing);
@@ -364,6 +369,7 @@ async function saveNow(): Promise<void> {
       const copy = (await invoke("edit_write", { app, skill: folder, path, text })) as Edit;
       editsMap.set(editKey(app, folder), copy);
       if (!dirty) setSave(`Saved ${clockNow()}`);
+      emit("document.changed", { reason: "edit" });
       markEdited();
       updateControls();
       void runCheck();
@@ -402,6 +408,7 @@ async function openEditFile(path: string): Promise<void> {
   await saveNow();
   editPath = path;
   reading.path = path;
+  emitSoon("selection.changed", selection);
   const seq = ++editSeq;
   for (const b of filesNav.querySelectorAll<HTMLButtonElement>(".file")) b.setAttribute("aria-current", String(b.dataset.path === path));
   editor.disabled = true;
@@ -627,6 +634,7 @@ async function openFile(path: string): Promise<void> {
   const skill = currentSkill();
   if (!reading || !skill || !invoke) return;
   reading.path = path;
+  emitSoon("selection.changed", selection);
   for (const b of filesNav.querySelectorAll<HTMLButtonElement>(".file")) b.setAttribute("aria-current", String(b.dataset.path === path));
   const seq = ++readSeq;
   const { app, folder } = reading;
@@ -667,6 +675,7 @@ function openSkill(app: string, folder: string): void {
   checkSeq += 1;
   renderReport(null);
   reading = { app, folder, path: "SKILL.md" };
+  emitSoon("selection.changed", selection);
   const skill = currentSkill();
   const found = library.get(app);
   if (!skill || !found) return;
@@ -685,6 +694,7 @@ function closeReader(): void {
   editing = false;
   editSeq += 1;
   reading = null;
+  emitSoon("selection.changed", selection);
   readSeq += 1;
   if (!reader.hidden) reader.hidden = true;
   detailPane.classList.remove("is-reading", "is-editing");
@@ -745,6 +755,8 @@ function showLibrary(lib: Library): void {
   const mode = lib.dev ? `Dev mode: checkouts in ${lib.dev_roots.join(", ") || "no folder"} first, releases otherwise` : "Released skills only";
   setText(status, `${mode} · ${plural(total, "skill")} from ${withSkills} of ${lib.apps.length} apps · ${lib.catalogue}`);
   status.title = status.textContent ?? "";
+  lastLibrary = lib;
+  emit("document.changed", { reason: "library" });
 }
 
 async function load(cmd: "library" | "refresh"): Promise<void> {
@@ -762,6 +774,7 @@ async function load(cmd: "library" | "refresh"): Promise<void> {
 
 function choose(id: string): void {
   chosen = id;
+  emitSoon("selection.changed", selection);
   const app = list.apps.find((a) => a.id === id);
   for (const { app: a, node } of cards) {
     const hit = node.firstElementChild as HTMLButtonElement;
@@ -854,6 +867,7 @@ async function loadOwn(): Promise<void> {
     library.set(OWN, { id: OWN, source: { kind: "missing", reason: "your own skills" }, skills: ownSkills, releases: [], pin: null });
     setText(ownCount, ownSkills.length ? `${plural(ownSkills.length, "skill")} of yours` : "None yet");
     if (chosen === OWN && !reading) showOwn();
+    emitSoon("document.changed", () => ({ reason: "own" }));
   } catch {
     return;
   }
@@ -982,7 +996,9 @@ const guide = document.getElementById("guide") as HTMLElement;
 const guideOpen = document.getElementById("guide-open") as HTMLButtonElement;
 const trust = document.getElementById("trust") as HTMLElement;
 const trustOpen = document.getElementById("trust-open") as HTMLButtonElement;
-type Overlay = "" | "results" | "guide" | "trust" | "install" | "installed";
+type Overlay = "" | "results" | "guide" | "trust" | "install" | "installed" | "extensions" | "panel";
+const extensionsPane = document.getElementById("extensions") as HTMLElement | null;
+const extensionPanels = document.getElementById("ext-panels") as HTMLElement | null;
 let overlay: Overlay = "";
 let hits: Hit[] | null = null;
 let searchNote = "";
@@ -996,13 +1012,20 @@ function inFilter(appId: string): boolean {
 }
 
 function setOverlay(next: Overlay): void {
-  if (next && reading) closeReader();
+  if (next && reading && next !== "extensions" && next !== "panel") closeReader();
   overlay = next;
+  if (reading) {
+    show(reader, !next);
+    detailPane.classList.toggle("is-reading", !next);
+    detailPane.classList.toggle("is-editing", !next && editing);
+  }
   show(results, next === "results");
   show(guide, next === "guide");
   show(trust, next === "trust");
   show(installPane, next === "install");
   show(installedPane, next === "installed");
+  if (extensionsPane) show(extensionsPane, next === "extensions");
+  if (extensionPanels) show(extensionPanels, next === "panel");
   guideOpen.setAttribute("aria-pressed", String(next === "guide"));
   trustOpen.setAttribute("aria-pressed", String(next === "trust"));
   installedOpen.setAttribute("aria-pressed", String(next === "installed"));
@@ -1340,4 +1363,305 @@ if (invoke) {
   setText(status, "Preview in a browser: open the formskills app to read the released skills.");
 }
 
-document.documentElement.classList.remove("booting");
+let lastLibrary: Library | null = null;
+type Step = { label: string; ext: string; undo: (() => Promise<void>)[] };
+let lastStep: Step | null = null;
+const undoButton = document.getElementById("ext-undo") as HTMLButtonElement | null;
+const EXT_COMMANDS: { id: string; title: string; args?: Record<string, string> }[] = [
+  { id: "choose", title: "Show an app's skills", args: { app: "an app id, or yours" } },
+  { id: "open-skill", title: "Open a skill", args: { app: "an app id, or yours", skill: "the skill's folder" } },
+  { id: "open-file", title: "Open a file of the open skill", args: { path: "a path in the skill" } },
+  { id: "filter", title: "Show some apps", args: { filter: "all, topic:<Topic> or an app id" } },
+  { id: "search", title: "Search every app's skills", args: { query: "two characters or more" } },
+  { id: "read-file", title: "Read a file of an app's skills", args: { app: "an app id", path: "the skill folder, then the path in it" } },
+  { id: "check", title: "Check a skill against the format", args: { app: "an app id, or yours", skill: "the skill's folder", copy: "true to check your copy" } },
+  { id: "edit-start", title: "Make your copy of a skill", args: { app: "an app id", skill: "the skill's folder" } },
+  { id: "edit-read", title: "Read a file of your copy", args: { app: "an app id, or yours", skill: "the skill's folder", path: "a path in the copy" } },
+  { id: "edit-write", title: "Write a file of your copy", args: { app: "an app id, or yours", skill: "the skill's folder", path: "a file in the copy", text: "the new text" } },
+  { id: "own-new", title: "Start a skill of your own", args: { name: "lowercase letters, digits and hyphens", description: "what it does and when to use it" } },
+  { id: "edits", title: "List your copies" },
+  { id: "own", title: "List your own skills" },
+  { id: "download", title: "Download skills as a zip in Downloads", args: { app: "an app id", skill: "one skill's folder (optional)" } },
+  { id: "refresh", title: "Check every app's latest release again" },
+];
+
+function appName(id: string): string {
+  return id === OWN ? "Your skills" : (list.apps.find((a) => a.id === id)?.name ?? id);
+}
+
+function selection() {
+  return {
+    chosen: chosen ? { id: chosen, name: appName(chosen) } : null,
+    reading: reading ? { app: reading.app, folder: reading.folder, name: currentSkill()?.name ?? reading.folder, path: reading.path, editing } : null,
+  };
+}
+
+function paneShown(): string {
+  if (overlay) return overlay;
+  if (reading) return "reader";
+  if (chosen === OWN) return "own";
+  return chosen ? "app" : "apps";
+}
+
+function viewSnapshot() {
+  const now = selection();
+  return { what: "view", app: "formskills", version: __APP_VERSION__, chosen: now.chosen, pane: paneShown(), reading: now.reading, filter, search: searchBox.value.trim() };
+}
+
+function librarySnapshot() {
+  return {
+    what: "library",
+    catalogue: lastLibrary?.catalogue ?? "",
+    dev: lastLibrary?.dev ?? false,
+    apps: (lastLibrary?.apps ?? []).map((a) => ({ id: a.id, name: appName(a.id), source: a.source, releases: a.releases, pin: a.pin, skills: a.skills })),
+  };
+}
+
+async function engine(cmd: string, args?: Record<string, unknown>): Promise<unknown> {
+  if (!invoke) throw new HostError(ERR.UNAVAILABLE, "the browser preview has no engine; open the formskills app");
+  try {
+    return await invoke(cmd, args);
+  } catch (e) {
+    throw new HostError(ERR.REFUSED, String(e));
+  }
+}
+
+async function readDocument(what = "view"): Promise<unknown> {
+  if (what === "view") return viewSnapshot();
+  if (what === "selection") return { what, ...selection() };
+  if (what === "library") return librarySnapshot();
+  if (what === "edits") return { what, edits: await engine("edits") };
+  if (what === "own") return { what, skills: await engine("own_list") };
+  if (what === "skill" || what === "file") {
+    if (!reading) return null;
+    const { app, folder, path } = reading;
+    if (what === "skill") return { what, app, ...(currentSkill() ?? { folder, name: folder }), copy: editsMap.get(editKey(app, folder)) ?? null };
+    if (editing) return { what, app, folder, path, editing, bytes: new Blob([editor.value]).size, text: editor.disabled ? null : editor.value };
+    const file = (await engine("read_file", { app, path: `${folder}/${path}` })) as FileText;
+    return { what, app, folder, path, editing, bytes: file.bytes, text: file.text };
+  }
+  throw new HostError(ERR.INVALID, `formskills' document has no part ${what}; use view, selection, library, skill, file, edits or own`);
+}
+
+function syncEditor(app: string, folder: string, path: string, text: string): void {
+  if (!reading || reading.app !== app || reading.folder !== folder || !editing) return;
+  markEdited();
+  updateControls();
+  if (editPath !== path) return;
+  editor.value = text;
+  dirty = false;
+  setSave(`Saved ${clockNow()}`);
+  renderPreview();
+  void runCheck();
+}
+
+async function runAppCommand(command: string, raw: unknown, step: Step): Promise<unknown> {
+  const a = (raw && typeof raw === "object" ? raw : {}) as Record<string, unknown>;
+  const str = (k: string): string => {
+    const v = a[k];
+    if (typeof v !== "string" || !v) throw new HostError(ERR.INVALID, `${command} needs ${k}`);
+    return v;
+  };
+  const opt = (k: string): string => (typeof a[k] === "string" ? (a[k] as string) : "");
+  switch (command) {
+    case "choose": {
+      const app = str("app");
+      if (app !== OWN && !list.apps.some((x) => x.id === app)) throw new HostError(ERR.REFUSED, `no Form app ships skills under ${app}`);
+      if (overlay) setOverlay("");
+      choose(app);
+      if (app === OWN) await loadOwn();
+      return viewSnapshot();
+    }
+    case "open-skill": {
+      const app = str("app");
+      const skill = str("skill");
+      if (!library.get(app)?.skills.some((s) => s.folder === skill)) throw new HostError(ERR.REFUSED, `${appName(app)} has no skill ${skill}`);
+      if (overlay) setOverlay("");
+      if (app === OWN) await openOwn(skill);
+      else {
+        choose(app);
+        openSkill(app, skill);
+      }
+      return viewSnapshot();
+    }
+    case "open-file": {
+      const path = str("path");
+      if (!reading) throw new HostError(ERR.REFUSED, "no skill is open");
+      const files = editing ? editsMap.get(editKey(reading.app, reading.folder))?.files : currentSkill()?.files;
+      if (!files?.some((f) => f.path === path)) throw new HostError(ERR.REFUSED, `${reading.folder} has no file ${path}`);
+      await (editing ? openEditFile(path) : openFile(path));
+      return viewSnapshot();
+    }
+    case "filter": {
+      const next = str("filter");
+      const ok = next === "all" || (next.startsWith("topic:") && list.topics.includes(next.slice(6))) || list.apps.some((x) => x.id === next);
+      if (!ok) throw new HostError(ERR.INVALID, `${next} is not all, topic:<Topic> or an app id`);
+      apply(next);
+      return viewSnapshot();
+    }
+    case "search": {
+      const query = str("query");
+      if (query.trim().length < 2) throw new HostError(ERR.INVALID, "search needs two characters or more");
+      searchBox.value = query;
+      await runSearch();
+      return hits ?? [];
+    }
+    case "read-file":
+      return engine("read_file", { app: str("app"), path: str("path") });
+    case "check":
+      return engine(a.copy === true ? "edit_check" : "check_skill", { app: str("app"), skill: str("skill") });
+    case "edit-start": {
+      const app = str("app");
+      const skill = str("skill");
+      if (app === OWN) throw new HostError(ERR.REFUSED, "your own skills have no original to copy; write them with edit-write");
+      const key = editKey(app, skill);
+      const had = editsMap.get(key);
+      if (had) return had;
+      const made = (await engine("edit_start", { app, skill })) as Edit;
+      editsMap.set(key, made);
+      step.undo.push(async () => {
+        if (reading?.app === app && reading.folder === skill && editing) await leaveEdit(false);
+        await engine("edit_discard", { app, skill });
+        editsMap.delete(key);
+        if (chosen) showSkills(chosen);
+        updateControls();
+      });
+      if (chosen) showSkills(chosen);
+      updateControls();
+      emitSoon("document.changed", () => ({ reason: "edit" }));
+      return made;
+    }
+    case "edit-read":
+      return engine("edit_read", { app: str("app"), skill: str("skill"), path: str("path") });
+    case "edit-write": {
+      const app = str("app");
+      const skill = str("skill");
+      const path = str("path");
+      const text = a.text;
+      if (typeof text !== "string") throw new HostError(ERR.INVALID, "edit-write needs text");
+      if (reading?.app === app && reading.folder === skill && editing && editPath === path) await saveNow();
+      const before = (await engine("edit_read", { app, skill, path })) as FileText;
+      if (before.text === null) throw new HostError(ERR.REFUSED, `${path} is not text in your copy`);
+      const old = before.text;
+      const copy = (await engine("edit_write", { app, skill, path, text })) as Edit;
+      editsMap.set(editKey(app, skill), copy);
+      syncEditor(app, skill, path, text);
+      step.undo.push(async () => {
+        const back = (await engine("edit_write", { app, skill, path, text: old })) as Edit;
+        editsMap.set(editKey(app, skill), back);
+        syncEditor(app, skill, path, old);
+      });
+      if (chosen) showSkills(chosen);
+      emitSoon("document.changed", () => ({ reason: "edit" }));
+      return copy;
+    }
+    case "own-new": {
+      const made = (await engine("own_new", { name: str("name"), description: opt("description") })) as Edit;
+      editsMap.set(editKey(OWN, made.folder), made);
+      await loadOwn();
+      step.undo.push(async () => {
+        if (reading?.app === OWN && reading.folder === made.folder) {
+          editing = false;
+          closeReader();
+        }
+        await engine("edit_discard", { app: OWN, skill: made.folder });
+        editsMap.delete(editKey(OWN, made.folder));
+        await loadOwn();
+        if (chosen === OWN && !reading) showOwn();
+      });
+      return made;
+    }
+    case "edits":
+      return engine("edits");
+    case "own":
+      return engine("own_list");
+    case "download": {
+      const saved = (await engine("download", { app: str("app"), skill: opt("skill") || null })) as { path: string; name: string };
+      setText(status, `Saved ${saved.name} to ${saved.path}`);
+      return saved;
+    }
+    case "refresh":
+      await load("refresh");
+      return librarySnapshot();
+  }
+  throw new HostError(ERR.REFUSED, `formskills has no command ${command}; app.commands lists them`);
+}
+
+function finishStep(step: Step): void {
+  if (!step.undo.length) return;
+  lastStep = step;
+  setText(status, `${step.label} (${step.ext})`);
+  status.title = status.textContent ?? "";
+  if (undoButton) {
+    undoButton.title = `Undo ${step.label}`;
+    show(undoButton, true);
+  }
+}
+
+async function applyOps(ext: ExtensionRecord, label: string, ops: Op[]): Promise<{ applied: number; results: unknown[] }> {
+  const step: Step = { label: label.trim().slice(0, 80) || ext.name, ext: ext.name, undo: [] };
+  const results: unknown[] = [];
+  try {
+    for (const op of ops) results.push(await runAppCommand(op.command, op.args ?? {}, step));
+  } catch (e) {
+    finishStep(step);
+    const err = e as { code?: number; message?: string };
+    throw new HostError(typeof err.code === "number" ? err.code : ERR.REFUSED, `${ops[results.length]?.command}: ${err.message ?? String(e)}`);
+  }
+  finishStep(step);
+  return { applied: results.length, results };
+}
+
+async function runOne(ext: ExtensionRecord, command: string, args: unknown): Promise<unknown> {
+  const step: Step = { label: EXT_COMMANDS.find((c) => c.id === command)?.title ?? command, ext: ext.name, undo: [] };
+  try {
+    return await runAppCommand(command, args, step);
+  } finally {
+    finishStep(step);
+  }
+}
+
+undoButton?.addEventListener("click", async () => {
+  const step = lastStep;
+  if (!step) return;
+  lastStep = null;
+  undoButton.disabled = true;
+  try {
+    for (const undo of [...step.undo].reverse()) await undo();
+    setText(status, `Undid ${step.label} (${step.ext})`);
+    emit("document.changed", { reason: "undo" });
+  } catch (e) {
+    setText(status, `Could not undo ${step.label}: ${String(e)}`);
+  } finally {
+    undoButton.disabled = false;
+    show(undoButton, false);
+  }
+});
+
+const extensionsListed = initExtensions({
+  invoke,
+  tauri: !!tauriInvoke,
+  version: __APP_VERSION__,
+  status: (text) => {
+    setText(status, text);
+    status.title = text;
+  },
+  showPane: (pane) => setOverlay(pane),
+  paneShown,
+  readDocument,
+  commands: () => EXT_COMMANDS,
+  apply: applyOps,
+  run: runOne,
+});
+
+function reveal(): void {
+  document.documentElement.classList.remove("booting");
+  if (invoke) {
+    requestAnimationFrame(() => requestAnimationFrame(() => {
+      void invoke("app_ready").catch(() => undefined);
+    }));
+  }
+}
+
+if (extensionsListed) void Promise.race([extensionsListed, new Promise((done) => window.setTimeout(done, EXTENSIONS_WAIT_MS))]).then(reveal);
+else reveal();

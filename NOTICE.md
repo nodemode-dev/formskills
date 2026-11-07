@@ -20,8 +20,15 @@ Its dependencies are MIT, Apache-2.0 or dual MIT and Apache-2.0, with some BSD-3
 | zip 2 (flate2, miniz_oxide, crc32fast, zopfli) | unpacking skills assets and writing downloads (`core`); zip is MIT, miniz_oxide MIT, Zlib or Apache-2.0, zopfli Apache-2.0 |
 | tauri 2, tauri-build | the desktop shell |
 | Vite, TypeScript, @tauri-apps/cli, @types/node (build only) | building the window and the app; not shipped |
+| Form Extension Contract kit, Apache-2.0, nodemode | the extension host: `frontend/src/formext/host-bridge.ts` copied unchanged, and `core/src/extensions.rs` ported from its `formext_host.py` |
 
 Every new dependency, binary, font or data file gets a row here before it is used.
+
+## Browser demo
+
+The demo in `demo/` adds no dependency: it is built with the Vite and TypeScript already listed above, bundles the window's own code, and reads zips with the browser's built-in `DecompressionStream`. The skills it lists are the Form apps' own, read at build time from each app repository's release tags and embedded read-only in the bundle (Apache-2.0 or GPL-3.0-only, each as its app's `LICENSE` states). Its app icons (`demo/media/icons/`) are the family's own artwork, and its app screenshots (`demo/media/shots/`) are demo captures of nine apps whose visible media is Pexels, NASA, Gutenberg, LibriVox or other public-domain or CC0 work, credited in `demo/CREDITS.md` and in each app's own credits. Every file, its source and its licence is in `demo/CREDITS.md`. `demo/formskills.png` is a copy of the owner's icon in `frontend/public/`.
+
+The author demo in `demos/author/` and the install demo in `demos/install/` add no dependency either and import demo 1's code by path. Each carries a byte copy of `demo/media/` and `demo/formskills.png`, with every file, its source and its licence in `demos/author/CREDITS.md` and `demos/install/CREDITS.md`. The sample skills under the author demo's Your skills (`demos/author/src/seed.ts`) are written for it by the project (GPL-3.0-only); the released skills in both are the apps' own text, embedded at build time as in `demo/`.
 
 ## Desktop shell: crates under other licences
 

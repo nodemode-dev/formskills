@@ -5,6 +5,24 @@ Living log for formskills' desktop shell. Source files stay comment-free; what t
 Current build version: v0.7.5
 Last updated: 2026-11-03 · v0.7.5 the bundle names the publisher and the licence; 2026-10-25 · the install commands; one app at a time, pins, your own skills; search and the check commands; the edit commands; read_file and download; library and refresh; the shell
 
+## v0.9.0 · the formext:// protocol and the extension commands {#v0-9-0}
+
+### src/extensions.rs, src/lib.rs, tauri.conf.json · formext://
+- refers-to: src-tauri/src/extensions.rs :: SCHEME, base, prefix, split, decode, serve, extensions_list, extensions_stamp, extension_requests, extension_answer, extension_save, open_portal · src-tauri/src/lib.rs :: run · src-tauri/tauri.conf.json :: app.security.csp
+- kind: decision
+- logged: v0.9.0 · 2026-11-07
+
+formskills has no HTTP server, so extension files are served on an asynchronous URI scheme protocol, `formext`, in the contract's shape `formext://{id}/{version}/{path}`. macOS and Linux webviews keep the id as the host; Windows webviews reach a custom scheme as `http://formext.localhost/{id}/{version}/{path}`, so `split` takes either form and `base` gives the window the one its platform uses. Every answer, 404 included, carries the contract's headers from `extensions::headers_for`; HTML gets the CSP with the extension's own absolute prefix as BASE (`formext://{id}/{version}/`), since a sandboxed frame's opaque origin never matches `'self'`. The list is resolved again for every file, so a reload in FormPortal is seen at once and a refused or removed extension serves nothing. The window CSP adds `frame-src formext: http://formext.localhost`. Each request runs on its own thread so a large file never holds the webview. The commands are thin: `extensions_list` (the listing with this base), `extensions_stamp`, `extension_requests` and `extension_answer` (the command line's queue), `extension_save` (Downloads), `open_portal` (the fixed `formai://extensions?product=formskills` through `open`, `cmd /C start` or `xdg-open`; no other address). Not compiled here (no GTK in the round's machine); read against Tauri 2.12.5's `register_asynchronous_uri_scheme_protocol` and `UriSchemeResponder::respond`.
+
+## v0.8.2 · the splash, the rounded corners and the reveal {#v0-8-2}
+
+### src/reveal.rs, src/lib.rs, tauri.conf.json · splash window, reveal contract
+- refers-to: src-tauri/src/reveal.rs :: mark_launch, conceal, app_ready, show_main, set_seen, round_splash · src-tauri/src/lib.rs :: run · src-tauri/tauri.conf.json :: app.windows, app.macOSPrivateApi
+- kind: decision
+- logged: v0.8.2 · 2026-11-07
+
+The owner asked for every Form desktop app to carry formvis's splash. `reveal.rs` is formvis's file with the traffic-light call dropped (formskills has the native title bar) and the done hook named `formskillsSplashDone`. The splash stays up until the page has painted and 2.6 s have passed since launch, its bar finishes in 220 ms, then the main window appears whole and the splash closes; after 20 s the main window is shown anyway. On macOS the main window is on screen at alpha 0 and lets clicks through until then, because a hidden web view stops its animation frames; elsewhere it is built hidden by the config and shown at once by `setup` (formvis builds it visible there), so it is up while the page paints. `round_splash` makes the splash window non-opaque with a clear background and masks the content layer to a 16 px radius; that needs `macOSPrivateApi` and tauri's `macos-private-api` feature, plus objc2 and objc2-app-kit on macOS only. Both windows are listed in the capability. The page calls `app_ready` through `withGlobalTauri`; the command needs no permission row because `build.rs` declares no app manifest. The splash's inline script runs under the CSP because Tauri adds the hash of an inline script in a frontend HTML file to `script-src` at build. Differences from formvis: the main window comes from the config rather than a builder (the windows have no sidecar to wait for), and its `backgroundColor` is the reveal's `#0a0a0a` instead of the old `#14161b`. Not compiled here: `cargo check` was skipped on the shared machine; the Rust was read line by line against formvis's `reveal.rs` and `main.rs`. The splash page was rendered at 360 by 200 with a transparent page background.
+
 ## v0.7.5 · the publisher and the licence in the bundle {#publisher}
 
 ### tauri.conf.json, Cargo.toml · publisher, copyright, license, licenseFile, authors
