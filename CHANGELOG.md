@@ -1,5 +1,9 @@
 # Changelog
 
+## v0.8.0 · 2026-11-07
+
+- A browser demo in `demo/`: the real window runs from `file://` or any static server on generated sample skills, with a TypeScript stand-in for the engine. Read, search, check, edit a copy, install into a virtual agent folder and download zips, or open your own skill folder, SKILL.md or zip. `npm run build:demo` in `frontend/` rebuilds it. The app, the engine and the installers are unchanged.
+
 ## v0.7.7 · 2026-11-04
 
 - README in the Form family template (Mackin's #6), merged with main. The README's version is in its shields badge now, so the F4 version check in `core/tests/family_contract.rs` reads `<img alt="version X"`.
