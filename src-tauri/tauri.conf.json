@@ -10,11 +10,13 @@
   },
   "app": {
     "withGlobalTauri": true,
+    "macOSPrivateApi": true,
     "security": {
       "csp": "default-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline'; script-src 'self'"
     },
     "windows": [
-      { "label": "main", "title": "FormSkills", "width": 1040, "height": 720, "minWidth": 640, "minHeight": 480, "resizable": true, "center": true, "backgroundColor": "#14161b" }
+      { "label": "splash", "title": "FormSkills", "url": "splash.html", "width": 360, "height": 200, "resizable": false, "decorations": false, "center": true, "transparent": true, "shadow": false, "visible": false },
+      { "label": "main", "title": "FormSkills", "width": 1040, "height": 720, "minWidth": 640, "minHeight": 480, "resizable": true, "center": true, "visible": false, "backgroundColor": "#0a0a0a" }
     ]
   },
   "bundle": {

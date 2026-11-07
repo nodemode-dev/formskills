@@ -925,6 +925,8 @@ name = "formskills"
 version = "0.8.1"
 dependencies = [
  "formskills-core",
+ "objc2",
+ "objc2-app-kit",
  "tauri",
  "tauri-build",
 ]
