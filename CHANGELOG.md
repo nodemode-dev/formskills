@@ -1,5 +1,9 @@
 # Changelog
 
+## v0.8.2 · 2026-11-07
+
+- The app opens with the Form family's splash (a rounded 360 by 200 card with the icon and a progress bar), keeps the window unseen until the list has painted and shows it whole after at least 2.6 s, with no white frame. The browser demo opens in the family's Studio Dark and warm paper colours.
+
 ## v0.8.1 · 2026-11-07
 
 - The browser demo opens on the Form apps' real released skills (21 skills from 11 apps, read from their release tags at build time) with each app's real icon and window screenshot, instead of generated samples; the install pane no longer claims a signature and digest check the demo does not do. The window's tokens move to the Form family colours (Studio Dark and warm paper, orange only as the highlight, the violet second accent dropped); layouts are unchanged. The engine and the installers are unchanged.
