@@ -5,6 +5,36 @@ Living log for formskills' window. Source files stay comment-free; what they wou
 Current build version: v0.7.0
 Last updated: 2026-10-25 · the Install and Installed pages; Your skills, the Release row, Trust; search, topics, the format page and Check; editing your own copy; the reader and downloads; where each app's skills come from; chips, cards and the detail pane
 
+## v0.9.0 · extensions {#v0-9-0}
+
+### formext/host-bridge.ts, extensions.ts · the host
+- refers-to: src/formext/host-bridge.ts · src/extensions.ts :: initExtensions, HostContext, emit, emitSoon, theme, TOKENS, consent, confirmSave, openFiles, saveFile, rowFor, refreshRow, renderMenu, apply, reload, tick, answer, openPanel, runCommand, closeDocked
+- kind: decision
+- logged: v0.9.0 · 2026-11-07
+
+`formext/host-bridge.ts` is the Form Extension Contract kit's file, copied unchanged (Apache-2.0, NOTICE). `extensions.ts` wraps it: handlers for read, apply, commands and run come from `main.ts`; notify writes the status line, which is where formskills tells the person what happened (it has no toasts); consent and the save question are `<dialog>`s in formskills' style, one at a time; `files.open` is a file input (the system picker in the app, the browser's in a browser), `files.save` goes to Downloads in the app and is a browser download in a browser; `net.fetch` is left out (-32003) because the window never reaches the network. The theme maps Studio Dark onto the contract's names (`--bg` ground, `--panel` pane, `--text` ink, `--muted` soft ink, `--accent`, `--border` edge, `--radius` small radius, plus float, control, fault, live) and is sent again when the system scheme changes. The window does nothing when the page has no `#ext-open` (the demos import `main.ts` with their own HTML).
+
+### index.html, extensions.css, app.css · menu, panel, dialogs, zero flash
+- refers-to: index.html :: #ext-menu, #ext-open, #ext-pop, #ext-pop-commands, #ext-pop-sep, #ext-pop-panel, #ext-pop-reload, #ext-pop-manage, #ext-undo, #extensions, #ext-rows, #ext-empty, #ext-root, #ext-panels, #ext-hidden, #ext-consent, #ext-save, #ext-dialog · src/styles/extensions.css · src/styles/app.css :: .bar, .status-row
+- kind: decision
+- logged: v0.9.0 · 2026-11-07
+
+formskills has no menu bar; the header holds its app-wide commands, so the Extensions menu is a header button with a popover (`--z-overlay`): each contributed command as `Name: Title`, a separator when there is one, then Extensions Panel, Reload Extensions and Manage in FormPortal. The panel is one more detail-pane article like Installed; dock panels are articles in `#ext-panels` titled `Name: Panel`, kept alive (hidden) while another pane shows, closed with Close; dialog panels use the one `#ext-dialog`. Unlike the other overlays, the Extensions panel and dock panels do not close the reader: they hide it (and its reading and editing classes) and Close shows it again, so an extension sees the skill and file the person had open. Everything is in the HTML before the first paint and absolute or in hidden panes, so nothing moves when extensions arrive. `.bar` and `.status-row` became `grid-auto-flow: column` with only the first columns fixed, which lays out the old children exactly as before and gives the Extensions button and Undo a column only while they are shown. Rows are keyed by id with a signature; a reload replaces only rows whose record or state changed and moves none that did not; the menu is rebuilt only when its text changes.
+
+### main.ts · document, commands, one undo step, events, the browser build
+- refers-to: src/main.ts :: tauriInvoke, invoke, EXT_COMMANDS, selection, paneShown, viewSnapshot, librarySnapshot, engine, readDocument, syncEditor, runAppCommand, finishStep, applyOps, runOne, undoButton, lastLibrary, Overlay, setOverlay · src/engine-bridge.ts :: engineInvoke · vite.engine.ts :: engineBridge, HANDLERS · vite.config.ts :: ENGINE, __ENGINE_BRIDGE__
+- kind: decision
+- logged: v0.9.0 · 2026-11-07
+
+The document is what the window already holds: the view, the library, the open skill and file, your copies, your own skills (`docs/EXTENSIONS.md`). The command catalogue is the window's own actions and engine calls; installing, pinning, discarding and marking seen are left to the person. formskills had no undo: each `document.apply` (and each `app.run` of a writing command) collects what it wrote, and the status line's Undo writes the old text back and discards a copy or skill it made, in reverse, one step kept. An extension writing the file open in the editor first saves the person's typing, then the editor takes the new text in place. `document.changed` follows a library read, a save, your skills changing and an Undo; `selection.changed` follows choose, open skill, open file and closing the reader, coalesced to one per turn. The browser build: `FORMSKILLS_ENGINE=1 npm run dev` adds a Vite middleware that answers the window's invoke calls with `formskills-cli` (its JSON commands) and serves `/api/extensions` and `/api/extensions/files/...` through the same Rust resolver, so the window in a plain browser reads real skills and runs real extensions; without the variable the bridge code is compiled out.
+
+### extensions.ts, main.ts, vite.engine.ts · consent before the frame, the menu before the first paint
+- refers-to: src/extensions.ts :: initExtensions, openPanel · src/main.ts :: EXTENSIONS_WAIT_MS, reveal · vite.engine.ts :: HANDLERS.app_ready
+- kind: fix
+- logged: v0.9.0 · 2026-11-07
+
+Panels open through the kit's `open()`, which asks for consent and only then creates the frame; a dock article made for a declined panel is removed again. `initExtensions` returns the first listing's promise (or `null` when the page has no `#ext-open`, so the demos still reveal at once), and `main.ts` keeps the `booting` class until that listing has filled the menu and rows, at most 2 s, so the Extensions menu opened right after start already holds the contributed commands. The browser build answers `app_ready` with `null` (it has no splash to reveal) instead of 400.
+
 ## v0.7.0 · the Install and Installed pages {#v0-7-0}
 
 ### index.html, main.ts, app.css · Install

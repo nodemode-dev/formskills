@@ -1,15 +1,19 @@
 import { readFileSync } from "node:fs";
 import { defineConfig } from "vite";
+import { engineBridge } from "./vite.engine";
 
 const FRONTEND_PORT = 5630;
 const pkg = JSON.parse(readFileSync(new URL("./package.json", import.meta.url), "utf-8")) as { version: string };
+const ENGINE = process.env.FORMSKILLS_ENGINE === "1";
 
-export default defineConfig({
+export default defineConfig(({ command }) => ({
   root: ".",
   publicDir: "public",
   clearScreen: false,
+  plugins: ENGINE ? [engineBridge()] : [],
   define: {
     __APP_VERSION__: JSON.stringify(pkg.version),
+    __ENGINE_BRIDGE__: JSON.stringify(ENGINE && command === "serve"),
   },
   server: {
     port: FRONTEND_PORT,
@@ -28,4 +32,4 @@ export default defineConfig({
     target: "es2022",
     assetsInlineLimit: 0,
   },
-});
+}));

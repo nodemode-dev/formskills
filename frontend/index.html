@@ -9,6 +9,7 @@
     <link rel="stylesheet" href="/src/styles/tokens.css" />
     <link rel="stylesheet" href="/src/styles/layers.css" />
     <link rel="stylesheet" href="/src/styles/app.css" />
+    <link rel="stylesheet" href="/src/styles/extensions.css" />
     <script type="module" src="/src/main.ts"></script>
   </head>
   <body>
@@ -22,10 +23,21 @@
         <button class="btn btn-quiet" id="installed-open" type="button" aria-pressed="false">Installed</button>
         <button class="btn btn-quiet" id="trust-open" type="button" aria-pressed="false">Trust</button>
         <button class="btn btn-quiet" id="guide-open" type="button" aria-pressed="false">Skill format</button>
+        <div class="ext-menu" id="ext-menu">
+          <button class="btn btn-quiet" id="ext-open" type="button" aria-haspopup="menu" aria-expanded="false" aria-controls="ext-pop">Extensions</button>
+          <div class="ext-pop" id="ext-pop" role="menu" aria-label="Extensions" hidden>
+            <div class="ext-pop-commands" id="ext-pop-commands" hidden></div>
+            <div class="ext-pop-sep" id="ext-pop-sep" role="separator" hidden></div>
+            <button class="ext-pop-item" id="ext-pop-panel" type="button" role="menuitem">Extensions Panel</button>
+            <button class="ext-pop-item" id="ext-pop-reload" type="button" role="menuitem">Reload Extensions</button>
+            <button class="ext-pop-item" id="ext-pop-manage" type="button" role="menuitem">Manage in FormPortal</button>
+          </div>
+        </div>
         <span class="version" id="version" translate="no"></span>
       </header>
       <div class="status-row">
         <p class="status" id="status" aria-live="polite"></p>
+        <button class="btn btn-small" id="ext-undo" type="button" hidden>Undo</button>
         <button class="btn" id="refresh" type="button" disabled>Refresh</button>
       </div>
       <div class="tools">
@@ -183,6 +195,23 @@
             <p class="pane-note" id="installed-note">Skills formskills put into an agent's folder. It never touches a folder it did not write, and keeps any change you made there unless you choose to lose it.</p>
             <ul class="installed-list" id="installed-list"></ul>
           </article>
+          <article class="guide" id="extensions" hidden>
+            <header class="pane-head">
+              <h2 class="pane-title">Extensions</h2>
+              <span class="pane-actions">
+                <button class="btn btn-quiet" id="ext-reload" type="button">Reload</button>
+                <button class="btn btn-quiet" id="extensions-close" type="button">Close</button>
+              </span>
+            </header>
+            <p class="pane-note">Extensions add to formskills. Each runs in a sandbox and reaches the window only through what you allow it; formskills asks before one first runs.</p>
+            <ul class="ext-rows" id="ext-rows"></ul>
+            <div class="ext-empty" id="ext-empty" hidden>
+              <p class="ext-empty-text">No extensions yet. Find them in FormPortal or make one with form.ext.</p>
+              <button class="btn" id="ext-manage" type="button">Manage in FormPortal</button>
+            </div>
+            <p class="pane-note ext-root" id="ext-root"></p>
+          </article>
+          <div class="ext-panels" id="ext-panels" hidden></div>
           <article class="guide" id="trust" hidden>
             <header class="pane-head">
               <h2 class="pane-title">Trust and how far to rely on skills</h2>
@@ -254,5 +283,32 @@ license: GPL-3.0-only
         <span class="source" id="source"></span>
       </footer>
     </div>
+    <div class="ext-hidden" id="ext-hidden" aria-hidden="true"></div>
+    <dialog class="dialog" id="ext-consent" aria-labelledby="ext-consent-title">
+      <h2 class="dialog-title" id="ext-consent-title">Allow this extension?</h2>
+      <p class="dialog-note" id="ext-consent-from"></p>
+      <p class="dialog-text">It asks to:</p>
+      <ul class="dialog-list" id="ext-consent-list"></ul>
+      <p class="dialog-note">It runs in a sandbox and can do only what formskills itself can. formskills remembers your answer for this version; a newer version that asks for more asks again.</p>
+      <div class="dialog-actions">
+        <button class="btn" id="ext-consent-no" type="button">Not Now</button>
+        <button class="btn btn-accent" id="ext-consent-yes" type="button">Allow</button>
+      </div>
+    </dialog>
+    <dialog class="dialog" id="ext-save" aria-labelledby="ext-save-title">
+      <h2 class="dialog-title" id="ext-save-title">Save?</h2>
+      <p class="dialog-note" id="ext-save-note"></p>
+      <div class="dialog-actions">
+        <button class="btn" id="ext-save-no" type="button">Cancel</button>
+        <button class="btn btn-accent" id="ext-save-yes" type="button">Save</button>
+      </div>
+    </dialog>
+    <dialog class="dialog dialog-panel" id="ext-dialog" aria-labelledby="ext-dialog-title">
+      <header class="pane-head">
+        <h2 class="dialog-title" id="ext-dialog-title" translate="no"></h2>
+        <button class="btn btn-quiet" id="ext-dialog-close" type="button">Close</button>
+      </header>
+      <div class="ext-dialog-body" id="ext-dialog-body"></div>
+    </dialog>
   </body>
 </html>

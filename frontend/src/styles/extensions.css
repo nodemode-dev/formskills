@@ -1,0 +1,278 @@
+.ext-menu {
+  position: relative;
+}
+
+.ext-pop {
+  position: absolute;
+  top: calc(100% + var(--sp-1));
+  right: 0;
+  z-index: var(--z-overlay);
+  display: grid;
+  min-width: 240px;
+  max-width: 360px;
+  padding: var(--sp-1);
+  border: 1px solid var(--edge-strong);
+  border-radius: var(--radius-m);
+  background: var(--glass-solid);
+  box-shadow: var(--shadow);
+}
+
+.ext-pop-commands {
+  display: grid;
+}
+
+.ext-pop-item {
+  display: block;
+  width: 100%;
+  min-height: 28px;
+  padding: 0 var(--sp-3);
+  overflow: hidden;
+  border: 0;
+  border-radius: var(--radius-s);
+  background: transparent;
+  color: var(--ink);
+  font: inherit;
+  text-align: left;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  cursor: pointer;
+}
+
+.ext-pop-item:hover,
+.ext-pop-item:focus-visible {
+  background: var(--control-hover);
+  outline: none;
+}
+
+.ext-pop-sep {
+  height: 1px;
+  margin: var(--sp-1) var(--sp-2);
+  background: var(--edge);
+}
+
+.pane-actions {
+  display: flex;
+  gap: var(--sp-2);
+}
+
+.ext-rows {
+  display: grid;
+  gap: 0;
+  margin: var(--sp-3) 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ext-row {
+  display: grid;
+  gap: var(--sp-1);
+  padding: var(--sp-3) 0;
+  border-top: 1px solid var(--edge);
+}
+
+.ext-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--sp-2);
+  min-width: 0;
+}
+
+.ext-version,
+.ext-source {
+  color: var(--ink-faint);
+  font-size: var(--fs-s);
+  font-variant-numeric: tabular-nums;
+}
+
+.ext-state {
+  margin-left: auto;
+  overflow: hidden;
+  font-size: var(--fs-s);
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
+
+.ext-state.is-ready {
+  color: var(--live);
+}
+
+.ext-state.is-note {
+  color: var(--accent);
+}
+
+.ext-state.is-fault {
+  color: var(--fault);
+  white-space: normal;
+}
+
+.ext-desc {
+  margin: 0;
+  color: var(--ink-soft);
+}
+
+.ext-foot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-2);
+}
+
+.ext-chips,
+.ext-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-1);
+}
+
+.ext-chip {
+  height: 22px;
+  padding: 0 var(--sp-2);
+  border: 1px solid var(--edge);
+  border-radius: var(--radius-pill);
+  color: var(--ink-soft);
+  font-size: var(--fs-s);
+  line-height: 20px;
+}
+
+.ext-chip.is-none {
+  color: var(--ink-faint);
+}
+
+.ext-path {
+  margin: 0;
+  overflow: hidden;
+  color: var(--ink-faint);
+  font-size: var(--fs-s);
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.ext-empty {
+  display: grid;
+  justify-items: start;
+  gap: var(--sp-3);
+  margin-top: var(--sp-4);
+}
+
+.ext-empty-text {
+  margin: 0;
+  color: var(--ink-soft);
+}
+
+.ext-root {
+  margin-top: var(--sp-4);
+  overflow-wrap: anywhere;
+}
+
+.ext-panels {
+  height: 100%;
+}
+
+.ext-panel {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  gap: var(--sp-3);
+  height: 100%;
+}
+
+.ext-panel-body {
+  min-height: 0;
+  overflow: hidden;
+  border: 1px solid var(--edge);
+  border-radius: var(--radius-m);
+  background: var(--pane);
+}
+
+.ext-panel-body .formext-frame {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+
+.ext-hidden {
+  position: absolute;
+  width: 0;
+  height: 0;
+  overflow: hidden;
+}
+
+.dialog {
+  width: min(440px, calc(100vw - 2 * var(--sp-5)));
+  padding: var(--sp-5);
+  border: 1px solid var(--edge-strong);
+  border-radius: var(--radius-l);
+  background: var(--float);
+  color: var(--ink);
+  box-shadow: var(--shadow);
+}
+
+.dialog::backdrop {
+  background: rgb(0 0 0 / 0.45);
+}
+
+.dialog-title {
+  margin: 0;
+  font-size: var(--fs-l);
+  font-weight: 650;
+}
+
+.dialog-note {
+  margin: var(--sp-2) 0 0;
+  color: var(--ink-faint);
+  font-size: var(--fs-s);
+  overflow-wrap: anywhere;
+}
+
+.dialog-text {
+  margin: var(--sp-3) 0 0;
+}
+
+.dialog-list {
+  margin: var(--sp-1) 0 0;
+  padding-left: var(--sp-5);
+}
+
+.dialog-list li {
+  margin: var(--sp-1) 0;
+}
+
+.dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--sp-2);
+  margin-top: var(--sp-5);
+}
+
+.btn-accent {
+  border-color: var(--accent);
+  background: var(--accent);
+  color: var(--ground);
+}
+
+.btn-accent:hover:not(:disabled) {
+  background: var(--accent-2);
+}
+
+.dialog-panel {
+  width: min(720px, calc(100vw - 2 * var(--sp-5)));
+}
+
+.ext-dialog-body {
+  height: min(60vh, 520px);
+  margin-top: var(--sp-3);
+  overflow: hidden;
+  border: 1px solid var(--edge);
+  border-radius: var(--radius-m);
+  background: var(--pane);
+}
+
+.ext-dialog-body .formext-frame {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
