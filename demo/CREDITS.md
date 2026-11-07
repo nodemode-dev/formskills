@@ -28,18 +28,18 @@ Each is the app's hero screenshot from `docs/images/<name>-hero.*` in the app's 
 
 ## Skills (built into `assets/demo.js`)
 
-The skills the demo lists are not files in this folder. `frontend/vite.family-skills.ts` reads them at build time with `git show` from each app repository's latest release tag (and the one before it, where an earlier tag carries skills) under `.claude/skills`, and the build embeds them read-only in `assets/demo.js`. They are the apps' own text, unedited, shown as text and never run. The repository's CLAUDE.md says an app's skills are never copied into formskills' tree; the demo keeps to that for the source tree (no skill file is stored as a file here) and renders them only at build time into the bundle, as the demo brief allows.
+The skills the demo lists are not files in this folder. `frontend/vite.family-skills.ts` reads them at build time with `git show` from each app repository's latest release tag (and the newest earlier tag whose skills differ, where there is one) under `.claude/skills`, and the build embeds them read-only in `assets/demo.js`. They are the apps' own text, unedited, shown as text and never run. The repository's CLAUDE.md says an app's skills are never copied into formskills' tree; the demo keeps to that for the source tree (no skill file is stored as a file here) and renders them only at build time into the bundle, as the demo brief allows.
 
 | App | Repository | Release tag shown | Earlier tag | Licence |
 | --- | --- | --- | --- | --- |
-| Form.md | form.md | v0.48.0 | v0.47.7 | Apache-2.0 |
+| Form.md | form.md | v0.48.0 | none (v0.47.7 has the same skills) | Apache-2.0 |
 | formMCP | formMCP | v0.7.8 | none | GPL-3.0-only |
 | formcut | formcut | v2.12.1 | none | Apache-2.0 |
 | formdeck (FormSlide) | formdeck | v0.30.7 | none | Apache-2.0 |
 | formencoder | formencoder | v0.5.5 | none | Apache-2.0 |
 | formlit | formlit | v0.48.0 | none | Apache-2.0 |
 | formpdf | formpdf | v0.57.3 | none | Apache-2.0 |
-| formportal (FormPortal) | formportal | v0.60.0 | v0.59.0 | GPL-3.0-only |
+| formportal (FormPortal) | formportal | v0.60.0 | v0.54.3 | GPL-3.0-only |
 | formvfx | formvfx | v0.52.8 | none | Apache-2.0 |
 | formvis | formvis | v1.99.7 | none | Apache-2.0 |
 | formwav | formwav | v2.22.3 | none | Apache-2.0 |

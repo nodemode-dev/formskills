@@ -2,8 +2,31 @@
 
 Living log for the browser demo. Source files stay comment-free; what they would have said lives here.
 
-Current build version: v0.8.0
-Last updated: 2026-11-07 · the demo
+Current build version: v0.8.1
+Last updated: 2026-11-07 · real skills, icons and screenshots; the demo
+
+## v0.8.1 · real media {#v0-8-1}
+
+### demo/src/family.ts, shim.ts, ../frontend/vite.family-skills.ts · the apps' real skills
+- refers-to: src/family.ts :: shipped · src/shim.ts :: currentOf, library, pin · ../frontend/vite.family-skills.ts :: familySkills
+- kind: decision
+- logged: v0.8.1 · 2026-11-07
+
+The owner found generated samples dull, and the brief for this pass asks for the family's real released skills. CLAUDE.md says an app's skills are never copied into this repository, so no skill file is stored in the tree: a Vite plugin (the virtual module `virtual:family-skills`) runs `git show` on each sibling repository's release tags at build time and the bundle embeds the text read-only, which is the fallback the brief names. The released skills are the latest tag's, not the checkout's, because formskills never follows unreleased work (formpdf and formportal differ between their tag and main). The two newest tags whose skills differ become the two releases (a tag with the same skills as the one after it is skipped), so pinning is real: FormPortal v0.54.3 against v0.60.0 differs in eleven files and flags a copy as changed. The sibling folder is the parent of this repository, or `FORM_FAMILY_DIR`. Apps with no sibling repository are reported as `missing`, the window's own state, and show no skills; nothing is invented for them. `samples.ts` was deleted since nothing uses it.
+
+### demo/src/look.ts, ../media · icons, screenshots, the opening pane
+- refers-to: src/look.ts · media/media.css · index.html :: #detail-empty, #demo-shot
+- kind: decision
+- logged: v0.8.1 · 2026-11-07
+
+Icons are painted by CSS on `.card-head::before` and `#detail-app .detail-head::before`, keyed by the cards' existing `data-app`, so the window's nodes are not touched; apps without an icon keep a quiet square so every card has the same indentation. `media/media.css` is a plain stylesheet outside the Vite build, because Vite would hash and move the images it finds in bundled CSS and `emptyOutDir` would clear them. The screenshot sits in a figure with a fixed 16 by 10 box in the app pane, hidden for apps without one in the same task that shows the pane, so nothing is repainted. The opening pane is static markup: an icon wall whose buttons click the real cards, three screenshots, then the note and the try list.
+
+### demo/src/look.ts · the install line
+- refers-to: src/look.ts :: MutationObserver on #install-what
+- kind: decision
+- logged: v0.8.1 · 2026-11-07
+
+The window says a released skill is "signature and digest checked", which the demo does not do. The window is not edited; a MutationObserver rewrites that phrase in the same microtask as the window's write, before paint, so the false wording is never drawn. The `kept` reason and the catalogue line now say the same.
 
 ## v0.8.0 · the demo {#v0-8-0}
 
@@ -21,12 +44,12 @@ The window already talks to its engine through `window.__TAURI__.core.invoke`, s
 
 Front matter reading, the Check rules and limits, search scoring, the SKILL.md template and the path rule of `read_text` are ported from `core/src/skills.rs`, `check.rs`, `search.rs`, `own.rs` and `library.rs`. Digests use a small synchronous hash, not SHA-256: they only detect change in the demo's own copies, and `crypto.subtle` is not guaranteed on `file://`.
 
-### demo/src/samples.ts · sample skills
-- refers-to: src/samples.ts :: sampleTree, releases · core/data/apps.json
+### demo/src/samples.ts · sample skills (replaced in v0.8.1)
+- refers-to: src/family.ts · ../frontend/vite.family-skills.ts
 - kind: decision
 - logged: v0.8.0 · 2026-11-07
 
-Skills are generated, not copied: CLAUDE.md forbids carrying an app's skills in this repository, and the real ones are other apps' text. Two sample releases per app differ in one SKILL.md, one limits reference and one sub-skill, so pinning the earlier release shows the "original changed" flag on a copy and Mark as seen. formpdf and formvfx conventions carry one broken link so Check shows a note on a released skill.
+v0.8.0 generated its skills because CLAUDE.md forbids carrying an app's skills in this repository. v0.8.1 replaced them (see the v0.8.1 entry) and `samples.ts` is gone.
 
 ### demo/src/import.ts, zip.ts · opening your own files
 - refers-to: src/import.ts :: organise, fromDrop, fromFileList, openFirst · src/zip.ts :: writeZip, readZip

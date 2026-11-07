@@ -14,7 +14,7 @@ No backend, no Tauri, no network and no CDN: every script, style and sample is i
 
 ## What it shows
 
-- Read: 19 apps, 38 sample skills, SKILL.md as formatted text, sub-skills and references, links between them followed.
+- Read: 21 real skills from 11 of the 19 apps, SKILL.md as formatted text, sub-skills and references, links between them followed, with each app's real icon and window screenshot.
 - Search: every skill's text, ranked and matched the way the engine does it.
 - Check: the Agent Skills format check, run on a released skill and live while you edit a copy.
 - Edit a copy: live preview with the original beside it. Choose the earlier release in the Release row and your copy is flagged as changed in the original; Mark as seen follows it.
@@ -25,8 +25,9 @@ No backend, no Tauri, no network and no CDN: every script, style and sample is i
 ## What is sample and what is real
 
 - The window is the real one; only the engine behind it is replaced. The stand-in ports the engine's front matter reader, Check rules, search scoring and template from `core/src`.
-- The skills are generated in `demo/src/samples.ts` from the app list in `core/data/apps.json`. They are written for the demo, say so in their first paragraph, and are not the text any Form app ships. Each app has a latest and an earlier sample release.
-- The catalogue is not read and nothing is signed or digest checked; the source line says so.
+- The skills are the apps' own. At build time `frontend/vite.family-skills.ts` reads `.claude/skills` from each app repository's latest release tag (and the newest earlier tag whose skills differ) with `git show`, from the folder beside this repository or `FORM_FAMILY_DIR`, and embeds the text read-only in the bundle. Nothing is stored as a skill file in this tree. FormPortal has an earlier release to pin; apps with no repository there show no skills.
+- The icons and screenshots in `media/` are the apps' own art; `CREDITS.md` lists each file and its licence.
+- The catalogue is not read and nothing is signed or digest checked; the source line and the install pane say so.
 - Installs go to a virtual folder in this browser's storage, never to disk. Your edits, pins and installs are kept in `localStorage` when the browser allows it and the demo works without it.
 
 ## Rebuild
@@ -39,4 +40,4 @@ npm ci
 npm run build:demo
 ```
 
-This typechecks `demo/src` and writes `demo/assets/demo.js` and `demo/assets/demo.css` (about 95 KB together). The page loads them as a classic script because browsers refuse module scripts on `file://`.
+This typechecks `demo/src` and writes `demo/assets/demo.js` and `demo/assets/demo.css` (about 2.4 MB together, most of it the skills). The sibling app repositories must be checked out beside this one with their release tags. The page loads them as a classic script because browsers refuse module scripts on `file://`.

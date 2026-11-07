@@ -1,5 +1,9 @@
 # Changelog
 
+## v0.8.1 · 2026-11-07
+
+- The browser demo opens on the Form apps' real released skills (21 skills from 11 apps, read from their release tags at build time) with each app's real icon and window screenshot, instead of generated samples; the install pane no longer claims a signature and digest check the demo does not do. The app, the engine and the installers are unchanged.
+
 ## v0.8.0 · 2026-11-07
 
 - A browser demo in `demo/`: the real window runs from `file://` or any static server on generated sample skills, with a TypeScript stand-in for the engine. Read, search, check, edit a copy, install into a virtual agent folder and download zips, or open your own skill folder, SKILL.md or zip. `npm run build:demo` in `frontend/` rebuilds it. The app, the engine and the installers are unchanged.

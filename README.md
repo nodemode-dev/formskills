@@ -104,7 +104,7 @@ Every action in the window is also a `formskills-cli` command that prints JSON, 
 
 ## Demo
 
-Open [`demo/index.html`](demo/index.html) in a browser, from `file://` or any static server, to try the real window on sample skills: read, search, check, edit a copy, install into a virtual agent folder and download zips, or open your own skill folder or zip. It needs no backend or network. See [`demo/README.md`](demo/README.md).
+Open [`demo/index.html`](demo/index.html) in a browser, from `file://` or any static server, to try the real window on the family's real released skills, with each app's icon and screenshot: read, search, check, edit a copy, install into a virtual agent folder and download zips, or open your own skill folder or zip. It needs no backend or network. See [`demo/README.md`](demo/README.md).
 
 ## Download
 
