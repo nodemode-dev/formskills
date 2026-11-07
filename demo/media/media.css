@@ -43,6 +43,23 @@
 .card[data-app="formwav"] .card-head::before,
 #detail-app[data-app="formwav"] .detail-head::before { background-image: url("icons/formwav.webp"); }
 
+.card[data-app="format"] .card-head::before,
+#detail-app[data-app="format"] .detail-head::before { background-image: url("icons/format.webp"); }
+.card[data-app="formdesign"] .card-head::before,
+#detail-app[data-app="formdesign"] .detail-head::before { background-image: url("icons/formdesign.webp"); }
+.card[data-app="formpath"] .card-head::before,
+#detail-app[data-app="formpath"] .detail-head::before { background-image: url("icons/formpath.webp"); }
+.card[data-app="formpromo"] .card-head::before,
+#detail-app[data-app="formpromo"] .detail-head::before { background-image: url("icons/formpromo.webp"); }
+.card[data-app="formref"] .card-head::before,
+#detail-app[data-app="formref"] .detail-head::before { background-image: url("icons/formref.webp"); }
+.card[data-app="formsculpt"] .card-head::before,
+#detail-app[data-app="formsculpt"] .detail-head::before { background-image: url("icons/formsculpt.webp"); }
+.card[data-app="formsurface"] .card-head::before,
+#detail-app[data-app="formsurface"] .detail-head::before { background-image: url("icons/formsurface.webp"); }
+.card[data-app="formweb"] .card-head::before,
+#detail-app[data-app="formweb"] .detail-head::before { background-image: url("icons/formweb.webp"); }
+
 #detail-app .detail-head {
   align-items: center;
   justify-content: flex-start;
@@ -62,7 +79,7 @@
 }
 
 .demo-shot {
-  aspect-ratio: 16 / 10;
+  aspect-ratio: 16 / 9;
   margin: 0 0 var(--sp-5);
   overflow: hidden;
   border: 1px solid var(--edge);
@@ -151,7 +168,7 @@
 }
 
 .demo-strip .frame {
-  aspect-ratio: 16 / 10;
+  aspect-ratio: 16 / 9;
   overflow: hidden;
   border: 1px solid var(--edge);
   border-radius: var(--radius-m);

@@ -25,7 +25,7 @@ Every new dependency, binary, font or data file gets a row here before it is use
 
 ## Browser demo
 
-The demo in `demo/` adds no dependency: it is built with the Vite and TypeScript already listed above, bundles the window's own code, and reads zips with the browser's built-in `DecompressionStream`. The skills it lists are the Form apps' own, read at build time from each app repository's release tags and embedded read-only in the bundle (Apache-2.0 or GPL-3.0-only, each as its app's `LICENSE` states). Its app icons and screenshots (`demo/media/`) are the apps' own art from the sibling repositories. Every file, its source and its licence is in `demo/CREDITS.md`. `demo/formskills.png` is a copy of the owner's icon in `frontend/public/`.
+The demo in `demo/` adds no dependency: it is built with the Vite and TypeScript already listed above, bundles the window's own code, and reads zips with the browser's built-in `DecompressionStream`. The skills it lists are the Form apps' own, read at build time from each app repository's release tags and embedded read-only in the bundle (Apache-2.0 or GPL-3.0-only, each as its app's `LICENSE` states). Its app icons (`demo/media/icons/`) are the family's own artwork, and its app screenshots (`demo/media/shots/`) are demo captures of nine apps whose visible media is Pexels, NASA, Gutenberg, LibriVox or other public-domain or CC0 work, credited in `demo/CREDITS.md` and in each app's own credits. Every file, its source and its licence is in `demo/CREDITS.md`. `demo/formskills.png` is a copy of the owner's icon in `frontend/public/`.
 
 ## Desktop shell: crates under other licences
 

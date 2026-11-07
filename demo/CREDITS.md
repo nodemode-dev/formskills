@@ -1,6 +1,6 @@
 # Demo credits
 
-Everything the demo shows beyond formskills' own code comes from the Form family's own repositories, all by the same owner (NodeAgentc, Inc.). No third-party photo, video, audio or font is used. Each source repository states its own licence in its `LICENSE` file; that licence is the one given here.
+Everything the demo shows beyond formskills' own code comes from the Form family's own repositories, all by the same owner (NodeAgentc, Inc.). The demo adds no photo, video, audio or font of its own. The app screenshots show those apps' demos, whose Pexels, NASA, Project Gutenberg, LibriVox and other public-domain media are credited below and in each app's own `demo/CREDITS.md`. Each source repository states its own licence in its `LICENSE` file; that licence is the one given here.
 
 ## App icons (`media/icons/`)
 
@@ -22,9 +22,25 @@ Each is the app's icon from `assets/app-icon/<name>-256.png` in the app's reposi
 
 `formskills.png` in this folder is formskills' own icon (`frontend/public/formskills.png`).
 
+## Family icon pack (`media/icons/`, eight more)
+
+`format`, `formdesign`, `formpath`, `formpromo`, `formref`, `formsculpt`, `formsurface` and `formweb` are the dark icons from the family icon pack in `formtray/frontend/public/apps/` (commit 646846e), the owner's own artwork (NodeAgentc, Inc.; FormTray's NOTICE.md says so), resized to 128 by 128 and re-encoded as webp. FormTray is Apache-2.0.
+
 ## Screenshots (`media/shots/`)
 
-Each is the app's hero screenshot from `docs/images/<name>-hero.*` in the app's repository (the app's own window), resized to 1280 pixels wide and re-encoded as webp. The files are named like the icons above (`<repository>.webp`) and carry the same source and licence as the matching row.
+The docs hero captures of the apps are not used: they show photographs whose source and licence cannot be verified. Each file is instead a demo screenshot of the app from this release pass, taken from `/home/claude/sidecars/<repository>/demo-screenshot.png` (the app's real window running its own demo), resized to 1280 pixels wide and re-encoded as webp. The interface is the app's own work, under the licence in the table. Every photo, clip or recording visible in a capture is credited in that app's own `demo/CREDITS.md`, as Pexels, CC0 or public domain, and the visible ones are listed here. formMCP and formportal have no screenshot in this demo (icon only).
+
+| File in the demo | Source | App licence | Visible media, credited in |
+| --- | --- | --- | --- |
+| `shots/formcut.webp` | sidecar demo screenshot of formcut 2.13.1 | Apache-2.0 | formcut/demo/CREDITS.md: eight Pexels clips (Milky Way timelapse by Erhan Dayi, mountain sunrise by GIANG VU, Swiss peaks by Marek Piwnicki, misty forest by Julien Goettelmann, waterfall by Gylfi Gylfason, cloud sea by 小小 兵, campfire by yaman ozuduru, Southern Lights by Eclipse Chasers; all Pexels License) and the Goldberg Aria by Kimiko Ishizaka (CC0 1.0) |
+| `shots/formlit.webp` | sidecar demo screenshot of formlit 0.49.1 | Apache-2.0 | formlit/demo/CREDITS.md: Pexels photos (Pexels License) by Paolo Bici, Necip Duman, Markus Spiske, Sara Rubini, David Waschbüsch, Bob Krustev, Hristofor Stoyanov, Tiana, Laszlo Magyar, Glen Zi, Cyrill, Sandra, Denis Larose, Oleksiy, Melike B, Elsie Soto, Famitsay Tamayo, Mack Kamp, Johannes Plenio, Adrian Limani, David Bartus, Jason Thompson, Mikałaj Prakopčyk, Gabriel Grip, Christina & Peter |
+| `shots/formwav.webp` | sidecar demo screenshot of formwav 2.23.1 | Apache-2.0 | formwav/demo/CREDITS.md: Round the Moon by Jules Verne read by Leonie Rose and Esther (LibriVox, public domain), Gymnopedie No. 1 by Satie played by Robin Alciatore (Musopen, public domain), NASA launch and Saturn radio recordings (NASA, public domain) |
+| `shots/formpdf.webp` | sidecar demo screenshot of formpdf 0.58.1 | Apache-2.0 | formpdf/demo/CREDITS.md: Alice's Adventures in Wonderland by Lewis Carroll with Gordon Robinson's plates (Project Gutenberg, public domain), two excerpts of NASA's Apollo 11 Mission Report (NASA, public domain) |
+| `shots/formdeck.webp` | sidecar demo screenshot of formdeck 0.31.1 | Apache-2.0 | formdeck/demo/CREDITS.md: NASA images (Apollo 8 Earthrise by William Anders, Artemis II earthset, Curiosity, Perseverance, Cassini and Voyager images; public domain) and the NASA Exoplanet Archive's public data |
+| `shots/formvis.webp` | sidecar demo screenshot of formvis 2.0.0 | Apache-2.0 | formvis/demo/CREDITS.md: Pexels photos (Pexels License) by Edgar Rodrigo (sky), Matteo Milan (mountains), Gamze (balloon), Skyler Ewing (birds), Yetkin Agac (mist) |
+| `shots/formvfx.webp` | sidecar demo screenshot of formvfx 0.53.1 | Apache-2.0 | formvfx/demo/CREDITS.md: Pexels footage and photos (Pexels License) by Lachlan Ross, Taryn Elliott, Dahlia E. Akhaine, Miro Alt, James Collington |
+| `shots/formencoder.webp` | sidecar demo screenshot of formencoder 0.6.1 | Apache-2.0 | formencoder/demo/CREDITS.md: Pexels clips (Pexels License) by Nui MALAMA, Nadezhda Moryak, Cagri KANMAZ, and Bruce Kachuk's reading of On the Sea (LibriVox, public domain) |
+| `shots/form.md.webp` | sidecar demo screenshot of form.md | Apache-2.0 | form.md/demo/CREDITS.md: Pexels photos (Pexels License) by Horacio Lander, Daniel Torobekov, Lucas Pezeta, Yilin Mo, tommy picone, and NASA images (public domain) |
 
 ## Skills (built into `assets/demo.js`)
 
