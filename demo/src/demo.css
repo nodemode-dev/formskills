@@ -69,6 +69,24 @@
   display: none;
 }
 
+.demo-links {
+  display: flex;
+  gap: var(--sp-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.demo-links a {
+  color: var(--ink-faint);
+  text-decoration: none;
+}
+
+.demo-links a:hover,
+.demo-links a[aria-current="page"] {
+  color: var(--ink);
+}
+
 .demo-hidden-input {
   position: absolute;
   width: 1px;

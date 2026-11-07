@@ -104,7 +104,10 @@ Every action in the window is also a `formskills-cli` command that prints JSON, 
 
 ## Demo
 
-Open [`demo/index.html`](demo/index.html) in a browser, from `file://` or any static server, to try the real window on the family's real released skills, with each app's icon and screenshot: read, search, check, edit a copy, install into a virtual agent folder and download zips, or open your own skill folder or zip. It needs no backend or network. See [`demo/README.md`](demo/README.md).
+Open [`demo/index.html`](demo/index.html) in a browser, from `file://` or any static server, to try the real window on the family's real released skills, with each app's icon and screenshot: read, search, check, edit a copy, install into a virtual agent folder and download zips, or open your own skill folder or zip. It needs no backend or network. See [`demo/README.md`](demo/README.md). Two more demos, each on a different part of the app:
+
+- [`demos/author/index.html`](demos/author/index.html): write a skill, fix what Check reports as you type, edit a copy of a released skill beside its original, package it as a zip.
+- [`demos/install/index.html`](demos/install/index.html): install into Claude Code, Codex and Cursor, read what an update changes file by file, pin a release, read what Trust promises.
 
 ## Download
 
