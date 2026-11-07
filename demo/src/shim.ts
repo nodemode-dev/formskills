@@ -6,7 +6,7 @@ import { writeZip } from "./zip";
 
 const OWN = "yours";
 const OWN_BASE = "your own skill";
-const REASON = "this demo was built from the family's release tags and reads no network, so no signature or digest is checked";
+const REASON = "This demo reads no network, so no signature or digest is checked.";
 const ABSENT = "this app's repository was not beside formskills when the demo was built";
 const AGENTS: Record<string, [string, string]> = { claude: ["Claude Code", ".claude/skills"], codex: ["Codex", ".agents/skills"], cursor: ["Cursor", ".cursor/skills"] };
 
