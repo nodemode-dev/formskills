@@ -1,0 +1,274 @@
+<!doctype html>
+<html lang="en" class="booting">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="color-scheme" content="dark light" />
+    <title>FormSkills demo</title>
+    <link rel="icon" href="formskills.png" />
+    <link rel="stylesheet" href="assets/demo.css" />
+    <script defer src="assets/demo.js"></script>
+  </head>
+  <body>
+    <div class="shell">
+      <header class="bar">
+        <img class="mark" src="formskills.png" width="32" height="32" alt="" />
+        <div class="title">
+          <h1 translate="no">formskills</h1>
+          <p class="sub">The Form apps' released skills: read them, download them, keep your own edits</p>
+        </div>
+        <button class="btn btn-quiet" id="installed-open" type="button" aria-pressed="false">Installed</button>
+        <button class="btn btn-quiet" id="trust-open" type="button" aria-pressed="false">Trust</button>
+        <button class="btn btn-quiet" id="guide-open" type="button" aria-pressed="false">Skill format</button>
+        <span class="version" id="version" translate="no"></span>
+      </header>
+      <div class="status-row">
+        <p class="status" id="status" aria-live="polite"></p>
+        <button class="btn" id="refresh" type="button" disabled>Refresh</button>
+      </div>
+      <div class="tools">
+        <input class="search" id="search" type="search" placeholder="Search skills" aria-label="Search every app's skills" autocomplete="off" spellcheck="false" />
+        <div class="chips" id="chips" role="group" aria-label="Show skills from"></div>
+        <p class="count" id="count" aria-live="polite"></p>
+      </div>
+      <main class="split">
+        <ul class="cards" id="cards" aria-label="Apps that ship skills">
+          <li class="card card-own" data-app="yours">
+            <button class="card-hit" id="own-card" type="button" aria-pressed="false">
+              <span class="card-head"><span class="card-name">Your skills</span><span class="card-kind">yours</span></span>
+              <span class="card-summary">Write your own skill from the template, checked as you type.</span>
+              <span class="card-foot"><span class="card-where" id="own-count">Kept in formskills' folder</span></span>
+            </button>
+          </li>
+        </ul>
+        <section class="detail" id="detail" aria-live="polite">
+          <div class="detail-empty" id="detail-empty">
+            <p class="demo-note">Demo. This page runs the real FormSkills window against sample skills generated for it. Nothing is downloaded from a network, installs go to a virtual agent folder kept in this browser, and downloads are real zip files.</p>
+            <ol class="demo-try">
+              <li>Search for a word such as <code>timeline</code> or <code>limits</code>, then open a hit.</li>
+              <li>Open a skill, press Check, then Edit a copy and change the description to see Check run as you type.</li>
+              <li>With a copy made, choose its app and pick the earlier release to see the copy flagged as changed in the original.</li>
+              <li>Install a skill, open Installed, and save the virtual folders as a zip.</li>
+              <li>Open Your skills and add a folder, a SKILL.md or a zip of your own, or drop one anywhere on the page.</li>
+            </ol>
+            <p class="detail-lead">Choose an app to see where its skills come from.</p>
+            <p class="detail-note">Each Form app ships its skills with every release. formskills shows exactly what shipped, never unreleased work, and never changes an app's own copy.</p>
+            <p class="detail-note">A skill is instructions an agent follows, and some carry scripts it may run. formskills only reads signed family releases and never runs a skill; read one before you give it to an agent. Trust, in the header, says more.</p>
+          </div>
+          <article class="detail-app" id="detail-app" hidden>
+            <header class="detail-head">
+              <h2 class="detail-name" data-f="name" translate="no"></h2>
+              <span class="detail-kind" data-f="kind"></span>
+            </header>
+            <p class="detail-summary" data-f="summary"></p>
+            <dl class="facts">
+              <dt>Skills folder</dt>
+              <dd data-f="skills" translate="no"></dd>
+              <dt>Repository</dt>
+              <dd data-f="repository" translate="no"></dd>
+              <dt>Release state</dt>
+              <dd data-f="state"></dd>
+              <dt>Skills here</dt>
+              <dd data-f="here"></dd>
+              <dt>Release</dt>
+              <dd class="release-row">
+                <select id="release-pick" aria-label="Which release's skills" disabled></select>
+                <button class="btn btn-small" id="update-app" type="button" disabled>Update this app</button>
+                <span class="hint" id="release-note"></span>
+              </dd>
+            </dl>
+            <div class="app-actions">
+              <button class="btn" id="download-app" type="button" disabled>Download all</button>
+              <button class="btn" id="install-app" type="button" disabled>Install all</button>
+              <span class="hint">Every skill of this app as one zip, the way its release ships them</span>
+            </div>
+            <ul class="skill-list" id="skill-list" aria-label="Skills"></ul>
+          </article>
+          <article class="reader" id="reader" hidden>
+            <header class="reader-head">
+              <button class="btn btn-quiet" id="back" type="button">All skills</button>
+              <div class="reader-title">
+                <h2 class="reader-name" id="reader-name" translate="no"></h2>
+                <p class="reader-from" id="reader-from"></p>
+              </div>
+              <div class="reader-actions">
+                <button class="btn" id="check-skill" type="button" aria-pressed="false">Check</button>
+                <button class="btn" id="install-skill" type="button">Install</button>
+                <button class="btn" id="edit-toggle" type="button">Edit a copy</button>
+                <button class="btn" id="download-skill" type="button">Download skill</button>
+              </div>
+            </header>
+            <div class="findings" id="findings" hidden>
+              <p class="findings-sum" id="findings-sum" aria-live="polite"></p>
+              <p class="findings-fields" id="findings-fields"></p>
+              <ul class="findings-list" id="findings-list"></ul>
+            </div>
+            <div class="edit-bar" id="edit-bar" hidden>
+              <span class="save-state" id="save-state" aria-live="polite"></span>
+              <span class="flag" id="flag" hidden>
+                <span class="flag-text" id="flag-text"></span>
+                <button class="btn btn-small" id="seen" type="button">Mark as seen</button>
+              </span>
+              <button class="btn btn-small" id="download-copy" type="button">Download your copy</button>
+              <button class="btn btn-small btn-danger" id="discard" type="button">Discard copy</button>
+            </div>
+            <div class="reader-body">
+              <nav class="files" id="files" aria-label="Files in this skill"></nav>
+              <div class="doc" id="doc" tabindex="0"></div>
+              <div class="editor-wrap" id="editor-wrap" hidden>
+                <textarea class="editor" id="editor" spellcheck="false" aria-label="Your copy of this file"></textarea>
+              </div>
+              <div class="side" id="side" hidden>
+                <div class="tabs" role="tablist" aria-label="Beside the editor">
+                  <button class="tab" id="tab-preview" type="button" role="tab" aria-selected="true">Preview</button>
+                  <button class="tab" id="tab-original" type="button" role="tab" aria-selected="false">Original</button>
+                </div>
+                <div class="side-view" id="preview" role="tabpanel" aria-labelledby="tab-preview"></div>
+                <div class="side-view" id="original" role="tabpanel" aria-labelledby="tab-original" hidden></div>
+              </div>
+            </div>
+          </article>
+          <article class="detail-own" id="detail-own" hidden>
+            <header class="detail-head">
+              <h2 class="detail-name">Your skills</h2>
+              <span class="detail-kind">yours</span>
+            </header>
+            <p class="detail-summary">Skills you write yourself, started from the format's template and checked as you type. They stay in formskills' own folder until you download them.</p>
+            <form class="own-form" id="own-form" autocomplete="off">
+              <label class="own-field">
+                <span>Name</span>
+                <input id="own-name" type="text" placeholder="tidy-meeting-notes" spellcheck="false" maxlength="64" required />
+              </label>
+              <label class="own-field own-field-wide">
+                <span>What it does and when to use it</span>
+                <input id="own-description" type="text" placeholder="Turns meeting notes into decisions and actions. Use after a meeting." maxlength="1024" />
+              </label>
+              <button class="btn" id="own-create" type="submit" disabled>New skill</button>
+            </form>
+            <p class="hint own-note" id="own-note">Lowercase letters, digits and hyphens; the name becomes the skill's folder.</p>
+            <div class="demo-import">
+              <button class="btn" id="demo-open-folder" type="button">Open a skill folder</button>
+              <button class="btn" id="demo-open-files" type="button">Open SKILL.md or zip</button>
+              <span class="hint">Or drop them anywhere on this page. They open in the editor with Check running as you type; nothing leaves the page.</span>
+              <p class="demo-import-note" id="demo-import-note" aria-live="polite"></p>
+            </div>
+            <input class="demo-hidden-input" id="demo-folder-input" type="file" webkitdirectory multiple tabindex="-1" aria-hidden="true" />
+            <input class="demo-hidden-input" id="demo-file-input" type="file" accept=".md,.zip,text/markdown,application/zip" multiple tabindex="-1" aria-hidden="true" />
+            <ul class="skill-list" id="own-list" aria-label="Your skills"></ul>
+          </article>
+          <article class="results" id="results" hidden>
+            <header class="pane-head">
+              <h2 class="pane-title" id="results-title">Search</h2>
+              <button class="btn btn-quiet" id="results-clear" type="button">Clear search</button>
+            </header>
+            <p class="pane-note" id="results-note" aria-live="polite"></p>
+            <ul class="skill-list" id="hits" aria-label="Skills found"></ul>
+          </article>
+          <article class="guide install" id="install" hidden>
+            <header class="pane-head">
+              <h2 class="pane-title" id="install-title">Install</h2>
+              <button class="btn btn-quiet" id="install-back" type="button">Back</button>
+            </header>
+            <p class="pane-note" id="install-what"></p>
+            <fieldset class="install-group">
+              <legend>Into</legend>
+              <label class="install-option"><input type="checkbox" name="agent" value="claude" checked /> <span>Claude Code</span></label>
+              <label class="install-option"><input type="checkbox" name="agent" value="codex" /> <span>Codex</span></label>
+              <label class="install-option"><input type="checkbox" name="agent" value="cursor" /> <span>Cursor</span></label>
+            </fieldset>
+            <fieldset class="install-group">
+              <legend>For</legend>
+              <label class="install-option"><input type="radio" name="scope" value="user" checked /> <span>Just me, in every project</span></label>
+              <label class="install-option"><input type="radio" name="scope" value="project" /> <span>One project folder</span></label>
+              <input class="install-path" id="install-path" type="text" placeholder="/path/to/the/project" spellcheck="false" aria-label="The project folder" disabled />
+            </fieldset>
+            <p class="pane-note" id="install-where"></p>
+            <div class="install-actions">
+              <button class="btn" id="install-go" type="button">Install</button>
+              <span class="hint" id="install-hint">Cursor also reads Claude Code's and Codex's folders, so it already sees skills installed for them.</span>
+            </div>
+            <ul class="install-result" id="install-result" aria-live="polite"></ul>
+          </article>
+          <article class="guide" id="installed" hidden>
+            <header class="pane-head">
+              <h2 class="pane-title">Installed by formskills</h2>
+              <button class="btn btn-quiet" id="installed-close" type="button">Close</button>
+            </header>
+            <p class="pane-note" id="installed-note">Skills formskills put into an agent's folder. It never touches a folder it did not write, and keeps any change you made there unless you choose to lose it.</p>
+            <ul class="installed-list" id="installed-list"></ul>
+            <p class="demo-actions"><button class="btn" id="demo-installed-zip" type="button">Save the virtual agent folders as a zip</button><span class="hint">The demo's installs live in this browser; the zip shows where each skill would land.</span></p>
+          </article>
+          <article class="guide" id="trust" hidden>
+            <header class="pane-head">
+              <h2 class="pane-title">Trust and how far to rely on skills</h2>
+              <button class="btn btn-quiet" id="trust-close" type="button">Close</button>
+            </header>
+            <div class="fs-md guide-body">
+              <h3 class="fs-md-h fs-md-h3">What a skill can do</h3>
+              <p>A skill is instructions an agent reads and follows. A skill may tell the agent to run commands, edit files, or run the scripts it carries; the agent does that with the permissions you gave it. A card says "holds N scripts" when a skill carries code an agent may run.</p>
+              <h3 class="fs-md-h fs-md-h3">What formskills checks</h3>
+              <ul>
+                <li>It reads only the Form family's own releases, listed in the family catalogue, which must carry a signature from a key built into formskills; an unsigned or wrongly signed catalogue is refused.</li>
+                <li>Each skills download must match the catalogue's SHA-256, and unpacking refuses links, paths that leave the folder, and oversized archives.</li>
+                <li>formskills shows skills as text and never runs them. The format check reads the files; it does not judge what they ask an agent to do.</li>
+              </ul>
+              <p>A signature says where a skill came from and that it was not changed on the way. It does not say the skill is right for your task or safe on your computer.</p>
+              <h3 class="fs-md-h fs-md-h3">Sources that are not releases</h3>
+              <p>Dev mode reads app checkouts on this computer: unreleased work, not signed and not checked. A kept copy is the last release formskills checked, shown when the catalogue cannot be read now. Your own skills and edited copies are yours; formskills keeps them but did not write their instructions.</p>
+              <h3 class="fs-md-h fs-md-h3">How far to rely on them</h3>
+              <p>Skills are provided as they are, under each app's licence, without warranty. They describe how the Form apps work at their release and can be wrong, out of date or incomplete. Read a skill before you give it to an agent, keep the agent's own approvals on, and check what it changes. Pin an app to an earlier release when a newer skill does not suit you.</p>
+            </div>
+          </article>
+          <article class="guide" id="guide" hidden>
+            <header class="pane-head">
+              <h2 class="pane-title">The skill format</h2>
+              <button class="btn btn-quiet" id="guide-close" type="button">Close</button>
+            </header>
+            <div class="fs-md guide-body">
+              <p>A skill is a folder holding a <code>SKILL.md</code> file and any files it points to. The Form apps follow the open Agent Skills format, which Claude Code, Codex and Cursor read.</p>
+              <h3 class="fs-md-h fs-md-h3">The folder</h3>
+              <pre><code>skill-name/
+  SKILL.md                    the card: front matter, then instructions
+  sub-skills/x/SUB-SKILL.md   the family's routed parts (optional)
+  references/                 documents read when needed (optional)
+  scripts/                    code the agent can run (optional)
+  assets/                     templates and data (optional)</code></pre>
+              <h3 class="fs-md-h fs-md-h3">SKILL.md</h3>
+              <p>It opens with front matter between two lines of three hyphens, then Markdown instructions.</p>
+              <pre><code>---
+name: pdf-tools
+description: Fills, merges and redacts PDFs. Use when the person works with PDF files.
+license: GPL-3.0-only
+---</code></pre>
+              <div class="fs-md-table">
+                <table>
+                  <thead>
+                    <tr><th>Field</th><th>Needed</th><th>Rules</th></tr>
+                  </thead>
+                  <tbody>
+                    <tr><td><code>name</code></td><td>Required</td><td>1 to 64 characters: lowercase letters, digits and hyphens; no hyphen at either end or two in a row; the same as the folder's name. Claude also refuses XML tags and the words "anthropic" and "claude".</td></tr>
+                    <tr><td><code>description</code></td><td>Required</td><td>1 to 1024 characters saying what the skill does and when to use it; no XML tags. Agents choose skills by it.</td></tr>
+                    <tr><td><code>license</code></td><td>Optional</td><td>A licence name, or a licence file in the skill.</td></tr>
+                    <tr><td><code>compatibility</code></td><td>Optional</td><td>1 to 500 characters on what the skill needs: a product, packages, network access.</td></tr>
+                    <tr><td><code>metadata</code></td><td>Optional</td><td>Extra keys and values for other tools.</td></tr>
+                    <tr><td><code>allowed-tools</code></td><td>Optional</td><td>Tools the skill may use without asking; experimental, not read by every agent.</td></tr>
+                  </tbody>
+                </table>
+              </div>
+              <h3 class="fs-md-h fs-md-h3">How agents read it</h3>
+              <p>Every skill's name and description is read when the agent starts; the rest of <code>SKILL.md</code> when the skill is used; other files only when the instructions call for them. Keep <code>SKILL.md</code> under 500 lines and link other files by paths relative to the file that links them, inside the skill.</p>
+              <h3 class="fs-md-h fs-md-h3">What Check reports</h3>
+              <p>An error breaks a rule above, so an agent may refuse or misread the skill. A note is advice: a long <code>SKILL.md</code>, or a link to a file the skill does not hold. Check runs on every released skill and on your copies while you edit.</p>
+              <p class="pane-note">Sources: the Agent Skills specification (agentskills.io/specification) and Claude's Agent Skills overview (platform.claude.com).</p>
+            </div>
+          </article>
+        </section>
+      </main>
+      <footer class="foot">
+        <span translate="no">by nodemode.ai</span>
+        <span class="source" id="source"></span>
+      </footer>
+    </div>
+    <div class="demo-drop" id="demo-drop" hidden>Drop a skill folder, SKILL.md or zip to open it</div>
+  </body>
+</html>
