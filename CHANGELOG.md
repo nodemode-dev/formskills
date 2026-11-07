@@ -1,5 +1,9 @@
 # Changelog
 
+## v0.9.0 · 2026-11-07
+
+- Extensions, under the Form Extension Contract API 1: formskills loads the extensions FormPortal installs (`enabled.json`) and the ones form.ext runs from a folder (`dev.json`), checks each manifest and shows refusals with their reason, and serves each extension's files from `formext://` with the contract's headers, refusing traversal, symlinks and other file types. An Extensions menu in the header (each contributed command, Extensions Panel, Reload Extensions, Manage in FormPortal), the Extensions panel, dock panels in the detail pane and dialog panels, consent once per version before the extension's frame exists, and one Undo step for each change an extension makes to your copies. Extensions read the view, the library, the open skill and file, your copies and your own skills (`docs/EXTENSIONS.md`). Agents run contributed commands with `formskills-cli extensions list` and `extensions command`, which the open window answers. No extension ships with the app; the first one, Trigger Tester, installs from FormPortal.
+
 ## v0.8.3 · 2026-11-07
 
 - Two more browser demos, each on a different part of the app: `demos/author/` (write a skill, fix what Check reports as you type, edit a copy of a released skill beside its original, package it as a zip) and `demos/install/` (installs per agent, what an update changes file by file with SHA-256 digests, pinning a release, the Trust page). Each runs the real window against demo 1's engine stand-in with its own saved state, and all three demos link to one another. The app, the engine and the installers are unchanged.
