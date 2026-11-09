@@ -29,10 +29,20 @@ function unpack(packed: Packed): Files {
   );
 }
 
+let memory: string | null = null;
+
+function stored(): string | null {
+  try {
+    return window.localStorage.getItem(KEY);
+  } catch {
+    return memory;
+  }
+}
+
 export function load(): State {
   const empty: State = { pins: {}, edits: [], installs: [] };
   try {
-    const raw = window.localStorage.getItem(KEY);
+    const raw = stored();
     if (!raw) return empty;
     const data = JSON.parse(raw) as { pins: Record<string, string>; edits: (Omit<EditRec, "files"> & { files: Packed })[]; installs: (Omit<InstRec, "files"> & { files: Packed })[] };
     return {
@@ -52,7 +62,8 @@ export function save(state: State): void {
       edits: state.edits.map((e) => ({ ...e, files: pack(e.files) })),
       installs: state.installs.map((i) => ({ ...i, files: pack(i.files) })),
     };
-    window.localStorage.setItem(KEY, JSON.stringify(data));
+    memory = JSON.stringify(data);
+    window.localStorage.setItem(KEY, memory);
   } catch {
     return;
   }

@@ -2,8 +2,19 @@
 
 Living log for formskills' window. Source files stay comment-free; what they would have said lives here.
 
-Current build version: v0.7.0
+Current build version: v0.10.0
 Last updated: 2026-10-25 · the Install and Installed pages; Your skills, the Release row, Trust; search, topics, the format page and Check; editing your own copy; the reader and downloads; where each app's skills come from; chips, cards and the detail pane
+
+## v0.10.0 · the demos in the app {#v0-10-0}
+
+### index.html, demos.ts, demos.css, vite.demos.ts · Demos and Help
+- refers-to: index.html :: #help-menu, #help-open, #help-pop, .demos, .demo-card, #demo-stage, #demo-frame, #demo-exit · src/demos.ts :: DEMOS, openDemo, closeDemo · src/styles/demos.css · vite.demos.ts :: inAppDemos, DEMOS, SHIPPED · ../src-tauri/tauri.conf.json :: csp frame-src
+- kind: decision
+- logged: v0.10.0 · 2026-11-09
+
+The owner's rule is that every Form app opens all of its demos from inside the app. formskills' demos are not documents: each is the real window running against the TypeScript stand-in engine on the apps' released skills (and seeded copies or installs). Rebuilding that state in the real window would mean writing into the person's copies, own skills and installs, which CLAUDE.md and the brief forbid, so the app shows the demo's own page instead: a full-window stage on `--z-overlay` with a Demo badge, the demo's name, a line saying nothing reaches your skills, copies, installs or settings, and Exit Demo (also Escape when focus is in the window). The window underneath is left exactly as it was, so there is nothing unsaved to ask about. The frame is `sandbox="allow-scripts allow-downloads allow-forms"` without `allow-same-origin`: an opaque origin cannot use the app's storage or its engine, and the shim refuses to run unless its stand-in is the `__TAURI__` the page sees. Downloads stay allowed so Download skill still saves a zip.
+
+The pages are the committed browser demo builds, not a copy: `vite.demos.ts` serves them in `npm run dev` and copies only `index.html`, `formskills.png`, `assets/demo.*` and `media/` of `demo/`, `demos/author/` and `demos/install/` into `dist/` at the same paths, so the links between demos still work and the app needs no network. The CSP's `frame-src` gains `'self'`. formskills has no menu bar, so Help is a header button with the Extensions menu's popover (Demos, then Explore Demo, Author Demo, Install Demo); the opening pane gets a Demos section of three cards with inline currentColor SVG previews. `.detail-empty` went from `height` to `min-height: 100%` so the taller pane scrolls instead of centring off the top. Items are found by `data-demo`, never by text. The command catalogue gains `demo-open { demo }`, which `main.ts` passes to `demos.ts` as a `formskills:demo-open` event, since the demo bundles import `main.ts` without the stage.
 
 ## v0.9.0 · extensions {#v0-9-0}
 

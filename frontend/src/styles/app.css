@@ -328,7 +328,7 @@ html.booting body {
   display: grid;
   align-content: center;
   gap: var(--sp-2);
-  height: 100%;
+  min-height: 100%;
   max-width: 44ch;
   margin: 0 auto;
   text-align: center;

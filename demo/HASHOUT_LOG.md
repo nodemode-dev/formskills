@@ -2,8 +2,17 @@
 
 Living log for the browser demo. Source files stay comment-free; what they would have said lives here.
 
-Current build version: v0.8.1
+Current build version: v0.10.0
 Last updated: 2026-11-07 · real skills, icons and screenshots; the demo
+
+## v0.10.0 · opened inside the app {#v0-10-0}
+
+### src/shim.ts, src/store.ts · the stand-in only, storage optional
+- refers-to: src/shim.ts :: window.__TAURI__ · src/store.ts :: stored, memory, load, save · ../frontend/src/demos.ts
+- kind: decision
+- logged: v0.10.0 · 2026-11-09
+
+The app now opens all three demos in a sandboxed frame (see the frontend log, v0.10.0). The shim defines `__TAURI__` with `Object.defineProperty` and throws if the value the page sees is not its own, so a webview that injected a fixed global stops the demo instead of letting the window call the real engine. An opaque-origin frame throws on `localStorage` itself, so the author and install seeds were lost and those demos opened empty; `store.ts` now keeps the last saved state in memory and reads it back when storage throws. In a browser nothing changes.
 
 ## v0.8.1 · real media {#v0-8-1}
 

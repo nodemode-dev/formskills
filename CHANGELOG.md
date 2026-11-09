@@ -1,5 +1,9 @@
 # Changelog
 
+## v0.10.0 · 2026-11-09
+
+- The three demos open inside the app: the opening pane has a Demos section (Explore, Author, Install) and the header a Help menu with the same three. A demo opens over the window, labelled Demo with Exit Demo, and runs the browser demo's own page on sample skills in a sandbox: your skills, copies, installs and settings are not touched, and the window is as you left it when you exit. The demo pages and their credited media ship inside the app, so no network is needed. Extensions and agents open one with the new `demo-open` command. The browser demos refuse to run unless their stand-in engine is in place, keep their state in memory where the page has no storage, and are rebuilt for this version with the skills of the newest release tags.
+
 ## v0.9.1 · 2026-11-07
 
 - Merges Greg's pull request, docs(readme): updates come through FormPortal. The README's Download section now says FormPortal keeps formskills up to date, with a link, and that a new version can also be downloaded from the links above. Released together with the extension host from v0.9.0 below; the app is otherwise unchanged. The three demos are rebuilt for the version they show, and so also carry the skills of the newest release tags in the sibling repositories (FormCut 2.12.5, FormPortal 0.61.0, FormDeck 0.30.8, FormWav 2.22.4).

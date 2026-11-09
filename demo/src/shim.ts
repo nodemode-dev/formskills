@@ -337,4 +337,5 @@ async function handle(cmd: string, args: Record<string, unknown> = {}): Promise<
   }
 }
 
-(window as unknown as { __TAURI__: unknown }).__TAURI__ = { core: { invoke: handle } };
+Object.defineProperty(window, "__TAURI__", { value: { core: { invoke: handle } }, configurable: true, writable: true });
+if ((window as unknown as { __TAURI__?: { core?: { invoke?: unknown } } }).__TAURI__?.core?.invoke !== handle) throw new Error("the demo could not put its stand-in engine in place, so it does not run");
