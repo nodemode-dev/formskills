@@ -1,5 +1,9 @@
 # Changelog
 
+## v0.10.1 · 2026-11-09
+
+- The skill reader keeps its content inside its pane. With a long skill name, a long saved-to line or the "original changed" flag showing while you edit a copy, the reader's buttons (Install, Show original, Discard copy) and the Preview and Original tabs no longer run past the pane's right edge and get cut off; the title, the save line and the flag end in an ellipsis instead, and Mark as seen keeps its whole label. In a window between about 760 and 1000 px wide the reader's buttons wrap to a second line instead of running off the edge, and a long search no longer squeezes the Clear search button. The in-app demos keep the 0.10.0 build until they are rebuilt.
+
 ## v0.10.0 · 2026-11-09
 
 - The three demos open inside the app: the opening pane has a Demos section (Explore, Author, Install) and the header a Help menu with the same three. A demo opens over the window, labelled Demo with Exit Demo, and runs the browser demo's own page on sample skills in a sandbox: your skills, copies, installs and settings are not touched, and the window is as you left it when you exit. The demo pages and their credited media ship inside the app, so no network is needed. Extensions and agents open one with the new `demo-open` command. The browser demos refuse to run unless their stand-in engine is in place, keep their state in memory where the page has no storage, and are rebuilt for this version with the skills of the newest release tags.
