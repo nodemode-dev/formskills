@@ -10,7 +10,9 @@
     <link rel="stylesheet" href="/src/styles/layers.css" />
     <link rel="stylesheet" href="/src/styles/app.css" />
     <link rel="stylesheet" href="/src/styles/extensions.css" />
+    <link rel="stylesheet" href="/src/styles/demos.css" />
     <script type="module" src="/src/main.ts"></script>
+    <script type="module" src="/src/demos.ts"></script>
   </head>
   <body>
     <div class="shell">
@@ -31,6 +33,17 @@
             <button class="ext-pop-item" id="ext-pop-panel" type="button" role="menuitem">Extensions Panel</button>
             <button class="ext-pop-item" id="ext-pop-reload" type="button" role="menuitem">Reload Extensions</button>
             <button class="ext-pop-item" id="ext-pop-manage" type="button" role="menuitem">Manage in FormPortal</button>
+          </div>
+        </div>
+        <div class="help-menu" id="help-menu">
+          <button class="btn btn-quiet" id="help-open" type="button" aria-haspopup="menu" aria-expanded="false" aria-controls="help-pop">Help</button>
+          <div class="ext-pop" id="help-pop" role="menu" aria-label="Help" hidden>
+            <p class="help-pop-label" id="help-pop-demos">Demos</p>
+            <div class="help-pop-group" role="group" aria-labelledby="help-pop-demos">
+              <button class="ext-pop-item" type="button" role="menuitem" data-demo="explore">Explore Demo</button>
+              <button class="ext-pop-item" type="button" role="menuitem" data-demo="author">Author Demo</button>
+              <button class="ext-pop-item" type="button" role="menuitem" data-demo="install">Install Demo</button>
+            </div>
           </div>
         </div>
         <span class="version" id="version" translate="no"></span>
@@ -60,6 +73,30 @@
             <p class="detail-lead">Choose an app to see where its skills come from.</p>
             <p class="detail-note">Each Form app ships its skills with every release. formskills shows exactly what shipped, never unreleased work, and never changes an app's own copy.</p>
             <p class="detail-note">A skill is instructions an agent follows, and some carry scripts it may run. formskills only reads signed family releases and never runs a skill; read one before you give it to an agent. Trust, in the header, says more.</p>
+            <section class="demos" aria-labelledby="demos-title">
+              <h2 class="demos-title" id="demos-title">Demos</h2>
+              <p class="detail-note">Each demo runs formskills on sample skills in a sandbox. Your skills, copies, installs and settings are not touched.</p>
+              <ul class="demo-cards">
+                <li>
+                  <button class="demo-card" type="button" data-demo="explore">
+                    <svg class="demo-art" viewBox="0 0 64 40" aria-hidden="true"><rect x="1" y="1" width="62" height="38" rx="5" fill="none" stroke="currentColor" stroke-opacity="0.4" /><rect x="6" y="7" width="16" height="6" rx="2" fill="currentColor" fill-opacity="0.5" /><rect x="6" y="16" width="16" height="6" rx="2" fill="currentColor" fill-opacity="0.3" /><rect x="6" y="25" width="16" height="6" rx="2" fill="currentColor" fill-opacity="0.3" /><path d="M28 9h28M28 15h22M28 21h26M28 27h18" stroke="currentColor" stroke-opacity="0.6" stroke-width="2" stroke-linecap="round" /></svg>
+                    <span class="demo-text"><span class="demo-name">Explore</span><span class="demo-line">Read, search and check the Form apps' released skills.</span></span>
+                  </button>
+                </li>
+                <li>
+                  <button class="demo-card" type="button" data-demo="author">
+                    <svg class="demo-art" viewBox="0 0 64 40" aria-hidden="true"><rect x="1" y="1" width="62" height="38" rx="5" fill="none" stroke="currentColor" stroke-opacity="0.4" /><path d="M7 9h18M7 15h14M7 21h16M7 27h10" stroke="currentColor" stroke-opacity="0.6" stroke-width="2" stroke-linecap="round" /><path d="M32 5v30" stroke="currentColor" stroke-opacity="0.3" /><path d="M38 24l12-12 4 4-12 12h-4z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" /></svg>
+                    <span class="demo-text"><span class="demo-name">Author</span><span class="demo-line">Write a skill, fix what Check reports, package it as a zip.</span></span>
+                  </button>
+                </li>
+                <li>
+                  <button class="demo-card" type="button" data-demo="install">
+                    <svg class="demo-art" viewBox="0 0 64 40" aria-hidden="true"><rect x="1" y="1" width="62" height="38" rx="5" fill="none" stroke="currentColor" stroke-opacity="0.4" /><path d="M32 7v16M25 17l7 7 7-7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" /><path d="M14 28v4h36v-4" fill="none" stroke="currentColor" stroke-opacity="0.6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" /></svg>
+                    <span class="demo-text"><span class="demo-name">Install</span><span class="demo-line">Install per agent, see what an update changes, pin a release.</span></span>
+                  </button>
+                </li>
+              </ul>
+            </section>
           </div>
           <article class="detail-app" id="detail-app" hidden>
             <header class="detail-head">
@@ -284,6 +321,15 @@ license: GPL-3.0-only
       </footer>
     </div>
     <div class="ext-hidden" id="ext-hidden" aria-hidden="true"></div>
+    <div class="demo-stage" id="demo-stage" role="dialog" aria-modal="true" aria-labelledby="demo-stage-title" hidden>
+      <header class="demo-stage-bar">
+        <span class="demo-badge">Demo</span>
+        <h2 class="demo-stage-title" id="demo-stage-title"></h2>
+        <p class="demo-stage-note">Sample skills in a sandbox. Nothing here reaches your skills, copies, installs or settings.</p>
+        <button class="btn btn-accent" id="demo-exit" type="button">Exit Demo</button>
+      </header>
+      <iframe class="demo-frame" id="demo-frame" title="formskills demo" sandbox="allow-scripts allow-downloads allow-forms"></iframe>
+    </div>
     <dialog class="dialog" id="ext-consent" aria-labelledby="ext-consent-title">
       <h2 class="dialog-title" id="ext-consent-title">Allow this extension?</h2>
       <p class="dialog-note" id="ext-consent-from"></p>

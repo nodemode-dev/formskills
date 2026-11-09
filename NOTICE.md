@@ -30,6 +30,8 @@ The demo in `demo/` adds no dependency: it is built with the Vite and TypeScript
 
 The author demo in `demos/author/` and the install demo in `demos/install/` add no dependency either and import demo 1's code by path. Each carries a byte copy of `demo/media/` and `demo/formskills.png`, with every file, its source and its licence in `demos/author/CREDITS.md` and `demos/install/CREDITS.md`. The sample skills under the author demo's Your skills (`demos/author/src/seed.ts`) are written for it by the project (GPL-3.0-only); the released skills in both are the apps' own text, embedded at build time as in `demo/`.
 
+The app ships the three demos inside its interface (Help > Demos and the Demos section on the opening pane), so the installed app opens them with no network. `frontend/vite.demos.ts` copies, for each of `demo/`, `demos/author/` and `demos/install/`, only `index.html`, `formskills.png`, `assets/demo.js`, `assets/demo.css` and `media/` into the built window at the same paths. No new file is added: every shipped file is the demo's own, with its source and licence in that demo's `CREDITS.md` as above.
+
 ## Desktop shell: crates under other licences
 
 Tauri links these crates unedited (no `[patch]` and no vendored copy):

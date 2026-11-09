@@ -1,5 +1,6 @@
 import { readFileSync } from "node:fs";
 import { defineConfig } from "vite";
+import { inAppDemos } from "./vite.demos";
 import { engineBridge } from "./vite.engine";
 
 const FRONTEND_PORT = 5630;
@@ -10,7 +11,7 @@ export default defineConfig(({ command }) => ({
   root: ".",
   publicDir: "public",
   clearScreen: false,
-  plugins: ENGINE ? [engineBridge()] : [],
+  plugins: ENGINE ? [engineBridge(), inAppDemos()] : [inAppDemos()],
   define: {
     __APP_VERSION__: JSON.stringify(pkg.version),
     __ENGINE_BRIDGE__: JSON.stringify(ENGINE && command === "serve"),

@@ -1383,6 +1383,7 @@ const EXT_COMMANDS: { id: string; title: string; args?: Record<string, string> }
   { id: "own", title: "List your own skills" },
   { id: "download", title: "Download skills as a zip in Downloads", args: { app: "an app id", skill: "one skill's folder (optional)" } },
   { id: "refresh", title: "Check every app's latest release again" },
+  { id: "demo-open", title: "Open a demo on sample skills, in a sandbox", args: { demo: "explore, author or install" } },
 ];
 
 function appName(id: string): string {
@@ -1583,6 +1584,12 @@ async function runAppCommand(command: string, raw: unknown, step: Step): Promise
     case "refresh":
       await load("refresh");
       return librarySnapshot();
+    case "demo-open": {
+      const demo = str("demo");
+      if (!["explore", "author", "install"].includes(demo) || !document.getElementById("demo-stage")) throw new HostError(ERR.REFUSED, `formskills has no demo ${demo}; use explore, author or install`);
+      document.dispatchEvent(new CustomEvent("formskills:demo-open", { detail: demo }));
+      return { demo, opened: true };
+    }
   }
   throw new HostError(ERR.REFUSED, `formskills has no command ${command}; app.commands lists them`);
 }
