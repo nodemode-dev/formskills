@@ -2,8 +2,17 @@
 
 Living log for formskills' window. Source files stay comment-free; what they would have said lives here.
 
-Current build version: v0.10.0
+Current build version: v0.10.1
 Last updated: 2026-10-25 · the Install and Installed pages; Your skills, the Release row, Trust; search, topics, the format page and Check; editing your own copy; the reader and downloads; where each app's skills come from; chips, cards and the detail pane
+
+## v0.10.1 · the reader keeps its content inside the pane {#v0-10-1}
+
+### styles/app.css · the reader's one column, the head's buttons wrap, long titles give way
+- refers-to: src/styles/app.css :: .reader, .reader-actions, .flag-text, .pane-title
+- kind: fix
+- logged: v0.10.1 · 2026-11-09
+
+Found in the family sweep after FormMCP's app cards spilled their Tools button and Live pill (FormMCP v0.10.1). `.reader` is a grid with rows but no column template, so its one implicit column grew to the widest line that cannot wrap: the edit bar (save state, the "original changed" flag, Mark as seen, Download your copy, Discard copy) and the reader head's buttons. Every row of the reader then ran past the pane's right edge, where `.detail.is-reading` clips it, so Discard copy, Show original and the Preview and Original tabs were cut off. Measured in Chromium on the demo build with the real window (`vite.demo.config.ts`), in edit mode with the flag showing: with a real flag line ("The original changed in 2.16.1: SKILL.md, references/install.md, references/rollback.md") 24 px at a 900 px window; with a long skill folder name and a long saved-to path 744 px at 900, 544 at 1100 and 464 at 1440 and 1920, in both themes; out of edit mode 7 px at 900. The column is now `minmax(0, 1fr)`, so the head's title and the flag shrink to their ellipsis instead. Inside the flag, the text and Mark as seen shrank together, so the button's label ran 9 to 12 px past its own border at 900 px; the text now takes `flex: 1` (a zero basis), so it alone gives way and the button keeps its width. Out of edit mode the head holds All skills and four buttons (Check, Install, Edit a copy, Download skill), which do not fit on one line in a two-pane window between 761 and 999 px: Download skill ran past the head by 75 px at 761, 51 at 800 and 21 at 850, and the All skills label ran 14 to 37 px past its own border from 761 to 950. The buttons now wrap to a second line, right-aligned, and nothing is cut. The same shrink-together happened in the pane heads: with a long search ("Search: " and the query) the Clear search label ran past its border, so `.pane-title` takes `flex: 1` like the flag's text. Not changed here: in that same range the skill's name and source line get no width at all (the title column is `minmax(0, 1fr)` beside two auto columns), before and after this fix; giving the title a share is a layout decision for the owner. Re-measured at 600, 760, 900, 1100, 1440 and 1920 px in dark and light over the cards, the detail pane, the reader, Check, edit mode with the flag, Install, Installed, search and Your skills: nothing outside any pane, card or bar. Left as is: a long inline code token in a skill's Markdown can be wider than its list item; it stays inside `.doc`, which scrolls.
 
 ## v0.10.0 · the demos in the app {#v0-10-0}
 

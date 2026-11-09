@@ -451,6 +451,7 @@ html.booting body {
 
 .reader {
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
   grid-template-rows: auto auto auto minmax(0, 1fr);
   height: 100%;
 }
@@ -795,6 +796,7 @@ html.booting body {
 }
 
 .pane-title {
+  flex: 1;
   margin: 0;
   overflow: hidden;
   font-size: var(--fs-l);
@@ -906,6 +908,8 @@ html.booting body {
 
 .reader-actions {
   display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
   gap: var(--sp-2);
 }
 
@@ -971,6 +975,7 @@ html.booting body {
 }
 
 .flag-text {
+  flex: 1;
   overflow: hidden;
   color: var(--accent);
   font-size: var(--fs-s);
