@@ -2,7 +2,7 @@
 
 Living log for the browser demo. Source files stay comment-free; what they would have said lives here.
 
-Current build version: v0.8.1
+Current build version: v0.10.0
 Last updated: 2026-11-07 · real skills, icons and screenshots; the demo
 
 ## v0.10.0 · opened inside the app {#v0-10-0}

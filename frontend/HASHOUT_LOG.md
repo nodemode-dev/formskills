@@ -2,7 +2,7 @@
 
 Living log for formskills' window. Source files stay comment-free; what they would have said lives here.
 
-Current build version: v0.7.0
+Current build version: v0.10.0
 Last updated: 2026-10-25 · the Install and Installed pages; Your skills, the Release row, Trust; search, topics, the format page and Check; editing your own copy; the reader and downloads; where each app's skills come from; chips, cards and the detail pane
 
 ## v0.10.0 · the demos in the app {#v0-10-0}
