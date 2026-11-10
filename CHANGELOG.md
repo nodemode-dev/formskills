@@ -1,5 +1,9 @@
 # Changelog
 
+## v0.10.2 · 2026-11-10
+
+- A skill whose front matter value runs over several plain lines (for example a description continued on indented lines without a `>` or `|`) is now read whole: the card, the search and the format check used to see only the first line, so a long description past 1024 characters or a tag on a later line went unflagged. `formskills.bat cli ...` and `formskills.bat apps ...` on Windows now pass their arguments to the command line and return its exit code; before, the first word (`cli` or `apps`) was passed along and the exit code was stale. A quoted value that runs over several lines also loses its quotes once joined, instead of keeping a stray closing quote.
+
 ## v0.10.1 · 2026-11-09
 
 - The skill reader keeps its content inside its pane. With a long skill name, a long saved-to line or the "original changed" flag showing while you edit a copy, the reader's buttons (Install, Show original, Discard copy) and the Preview and Original tabs no longer run past the pane's right edge and get cut off; the title, the save line and the flag end in an ellipsis instead, and Mark as seen keeps its whole label. In a window between about 760 and 1000 px wide the reader's buttons wrap to a second line instead of running off the edge, and a long search no longer squeezes the Clear search button. The in-app demos keep the 0.10.0 build until they are rebuilt.
