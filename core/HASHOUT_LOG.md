@@ -14,6 +14,13 @@ Last updated: 2026-11-02 · the catalogue from the public download store; 2026-1
 
 Continuation lines were only joined while the key had used a `>` or `|` indicator, so a plain multi-line value (`description: first line` then an indented `second line`) was cut to its first line. The reader's `splitFrontMatter` in `frontend/src/markdown.ts` already joined them, so the card, the Check report (description length, XML tags) and the reader disagreed. A plain value now keeps its key as the open one, so indented lines that follow append with a space; a following top-level key still starts a new value, and the `>` and `|` behaviour is unchanged.
 
+### formskills.bat · cli and apps run outside any parenthesised block
+- refers-to: formskills.bat :: cli, apps
+- kind: bugfix
+- logged: v0.10.2 · 2026-11-10
+
+cmd expands `%1` to `%9` and `%errorlevel%` when it parses a whole parenthesised block, before the `shift` inside the block runs. In the old `cli` and `apps` blocks `formskills.bat cli list` therefore passed `cli list` to the command line, and `exit /b %errorlevel%` returned the errorlevel from before the block ran. Those two `if` lines now `goto cli` and `goto apps`, and the bodies sit below the main flow as labels, whose lines are parsed one at a time after `shift`. The main flow ends with `exit /b %errorlevel%` so it cannot fall into the labels. The `dev` block keeps its `shift`: the next `if` line is parsed after the block ends. Found by reading the file against cmd's parsing rules; not run on Windows (traced).
+
 ## v0.9.0 · the extension host's resolver, the request queue and the command line {#v0-9-0}
 
 ### extensions.rs · a line-for-line port of formext_host.py
