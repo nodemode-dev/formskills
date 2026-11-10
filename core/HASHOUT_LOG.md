@@ -14,6 +14,13 @@ Last updated: 2026-11-02 · the catalogue from the public download store; 2026-1
 
 Continuation lines were only joined while the key had used a `>` or `|` indicator, so a plain multi-line value (`description: first line` then an indented `second line`) was cut to its first line. The reader's `splitFrontMatter` in `frontend/src/markdown.ts` already joined them, so the card, the Check report (description length, XML tags) and the reader disagreed. A plain value now keeps its key as the open one, so indented lines that follow append with a space; a following top-level key still starts a new value, and the `>` and `|` behaviour is unchanged.
 
+### skills.rs · quotes come off the joined plain value
+- refers-to: core/src/skills.rs :: front_matter
+- kind: bugfix
+- logged: v0.10.2 · 2026-11-10
+
+Quotes were trimmed from the first line before continuation lines were joined, so `description: "first` then `  second"` gave `first second"`. A plain value now keeps its raw text as it accumulates and the stored value is that raw text with the surrounding quotes trimmed after each join, giving `first second`. Folded and literal blocks (`>` and `|`) keep their content untouched. Note: `splitFrontMatter` in `frontend/src/markdown.ts` strips quotes from the first line only, so for a quoted two-line value it still shows `first second"`; the engine is now the one that is right, and the reader is left for a later frontend change.
+
 ### formskills.bat · cli and apps run outside any parenthesised block
 - refers-to: formskills.bat :: cli, apps
 - kind: bugfix

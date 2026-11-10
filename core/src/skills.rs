@@ -40,6 +40,7 @@ pub fn front_matter(text: &str) -> BTreeMap<String, String> {
         return found;
     }
     let mut block: Option<String> = None;
+    let mut raw: Option<String> = None;
     for line in lines {
         if line.trim() == "---" {
             break;
@@ -51,14 +52,22 @@ pub fn front_matter(text: &str) -> BTreeMap<String, String> {
             if matches!(value, ">" | "|" | ">-" | "|-" | ">+" | "|+") {
                 found.insert(key.to_string(), String::new());
                 block = Some(key.to_string());
+                raw = None;
             } else {
                 found.insert(key.to_string(), value.trim_matches(|c| c == '"' || c == '\'').to_string());
                 block = Some(key.to_string());
+                raw = Some(value.to_string());
             }
         } else if let Some(key) = &block {
             if !line.trim().is_empty() {
                 let entry = found.entry(key.clone()).or_default();
-                *entry = format!("{entry} {}", line.trim()).trim().to_string();
+                match raw.as_mut() {
+                    Some(joined) => {
+                        *joined = format!("{joined} {}", line.trim());
+                        *entry = joined.trim_matches(|c| c == '"' || c == '\'' || c == ' ').to_string();
+                    }
+                    None => *entry = format!("{entry} {}", line.trim()).trim().to_string(),
+                }
             }
         }
     }
