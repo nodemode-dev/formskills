@@ -53,7 +53,7 @@ pub fn front_matter(text: &str) -> BTreeMap<String, String> {
                 block = Some(key.to_string());
             } else {
                 found.insert(key.to_string(), value.trim_matches(|c| c == '"' || c == '\'').to_string());
-                block = None;
+                block = Some(key.to_string());
             }
         } else if let Some(key) = &block {
             if !line.trim().is_empty() {

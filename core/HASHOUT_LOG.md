@@ -5,6 +5,15 @@ Living log for `formskills-core`, `formskills-cli` and `setup/apps.py`. Source f
 Current build version: v0.10.1
 Last updated: 2026-11-02 · the catalogue from the public download store; 2026-10-26 · the test suite; installing into Claude Code, Codex and Cursor; pins, one-app update, your own skills, script counts; search, the format check, licences and topics; registered in formcompiler; personal edited copies; no partial download; reading one file and packing downloads; released skills fetched, checked and kept, and the dev mode; the generated list of apps that ship skills
 
+## v0.10.2 · plain multi-line front matter values {#v0-10-2}
+
+### skills.rs · front_matter joins continuation lines of every key
+- refers-to: core/src/skills.rs :: front_matter
+- kind: bugfix
+- logged: v0.10.2 · 2026-11-10
+
+Continuation lines were only joined while the key had used a `>` or `|` indicator, so a plain multi-line value (`description: first line` then an indented `second line`) was cut to its first line. The reader's `splitFrontMatter` in `frontend/src/markdown.ts` already joined them, so the card, the Check report (description length, XML tags) and the reader disagreed. A plain value now keeps its key as the open one, so indented lines that follow append with a space; a following top-level key still starts a new value, and the `>` and `|` behaviour is unchanged.
+
 ## v0.9.0 · the extension host's resolver, the request queue and the command line {#v0-9-0}
 
 ### extensions.rs · a line-for-line port of formext_host.py
