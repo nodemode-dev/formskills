@@ -3,7 +3,16 @@
 Living log for `formskills-core`, `formskills-cli` and `setup/apps.py`. Source files stay comment-free; what they would have said lives here.
 
 Current build version: v0.10.2
-Last updated: 2026-11-10 · plain multi-line front matter values, quotes off the joined value, formskills.bat cli and apps; 2026-11-02 · the catalogue from the public download store; 2026-10-26 · the test suite; installing into Claude Code, Codex and Cursor; pins, one-app update, your own skills, script counts; search, the format check, licences and topics; registered in formcompiler; personal edited copies; no partial download; reading one file and packing downloads; released skills fetched, checked and kept, and the dev mode; the generated list of apps that ship skills
+Last updated: 2026-11-10 · a changed install without SKILL.md or with extra entries needs force; plain multi-line front matter values, quotes off the joined value, formskills.bat cli and apps; 2026-11-02 · the catalogue from the public download store; 2026-10-26 · the test suite; installing into Claude Code, Codex and Cursor; pins, one-app update, your own skills, script counts; search, the format check, licences and topics; registered in formcompiler; personal edited copies; no partial download; reading one file and packing downloads; released skills fetched, checked and kept, and the dev mode; the generated list of apps that ship skills
+
+## v0.10.3 · review fixes {#v0-10-3}
+
+### install.rs · a changed install is never removed or replaced without force
+- refers-to: core/src/install.rs :: extras_of, state_of, install, uninstall
+- kind: fix
+- logged: v0.10.3 · 2026-11-10
+
+`state_of` called an install "missing" whenever its SKILL.md was gone, so a folder whose SKILL.md was deleted or moved but which still held the person's files was removed by `uninstall` (and the window's Remove) without force, and "Install again" moved it aside and deleted it. The change check also compared only what the skill walker lists, so a `.git`, `node_modules` or a link made in the folder read "ok" and went with it. An install is now "missing" only when nothing is at its path; otherwise the digests are compared (a gone SKILL.md shows as changed), and `extras_of` walks the folder raw and adds every entry that the record does not hold and is not a folder of recorded files (directories such as `.git` are named once, links are never followed). `__pycache__`, `.pyc`, `.DS_Store` and `Thumbs.db` are left out, as the walker leaves them out, so running a skill's Python or opening it in Finder does not lock the install. Both cases now read "modified", which `install` and `uninstall` already refuse without force. Checked with formskills-cli in a temporary HOME: SKILL.md removed plus notes.txt refused without --force (notes.txt kept); `.git` and a link refused for uninstall and install; a `__pycache__` alone still "ok" and removed.
 
 ## v0.10.2 · plain multi-line front matter values {#v0-10-2}
 
