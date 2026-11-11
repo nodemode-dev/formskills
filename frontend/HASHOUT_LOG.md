@@ -3,7 +3,7 @@
 Living log for formskills' window. Source files stay comment-free; what they would have said lives here.
 
 Current build version: v0.10.2
-Last updated: 2026-11-10 · the dev engine bridge refuses foreign pages; v0.10.2 version bump only; 2026-10-25 · the Install and Installed pages; Your skills, the Release row, Trust; search, topics, the format page and Check; editing your own copy; the reader and downloads; where each app's skills come from; chips, cards and the detail pane
+Last updated: 2026-11-10 · the reader's front matter quotes and comments; the dev engine bridge refuses foreign pages; v0.10.2 version bump only; 2026-10-25 · the Install and Installed pages; Your skills, the Release row, Trust; search, topics, the format page and Check; editing your own copy; the reader and downloads; where each app's skills come from; chips, cards and the detail pane
 
 ## v0.10.3 · review fixes {#v0-10-3}
 
@@ -13,6 +13,13 @@ Last updated: 2026-11-10 · the dev engine bridge refuses foreign pages; v0.10.2
 - logged: v0.10.3 · 2026-11-10
 
 With `FORMSKILLS_ENGINE=1` the dev server ran `formskills-cli` for any POST to `/api/engine/<command>`, and `body()` parsed any content type as JSON. Any web page open in the same browser could send a `text/plain` POST (no preflight) and discard copies and own skills, write copy files or create skills; the answer was unreadable cross-origin but the side effects happened, and `server.host: false` does not help because the browser itself is on localhost. The POST branch now replies 403 unless the Content-Type starts with `application/json` (which makes a cross-site request preflight first, and Vite does not grant it) and the Origin header is absent or is `http://localhost:<server port>`. The window's own `engine-bridge.ts` already sends JSON from that origin. Checked with the dev server up and curl: a foreign Origin with text/plain or JSON and a text/plain POST with no Origin got 403; the own Origin with JSON got the result.
+
+### markdown.ts · the reader's front matter table reads values as the engine does
+- refers-to: frontend/src/markdown.ts :: scalar, splitFrontMatter
+- kind: fix
+- logged: v0.10.3 · 2026-11-10
+
+`splitFrontMatter` stripped one quote from each end of the first line only, so a quoted two-line description showed `first second"`; it also glued any later non-key line (a `# comment` included) onto the value above and kept a trailing `# comment`. It now keeps each value raw while joining, joins a line to a plain value only when the line is indented and not a comment (a `>` or `|` block joins every non-blank line, as before), and reads the joined plain value with `scalar`, the same rule as `skills::scalar` in core: one matching double-quoted pair with `\"` and `\\` unescaped, one matching single-quoted pair with `''` as `'`, and a plain value cut at its first ` #`. One difference is kept on purpose: a key followed by an indented map or list (`metadata:` then `  author: me`) still shows that text in the table, because the table is there to show the file, while the engine leaves such a key empty since it never uses it. Checked by running the function under node on the reviewers' cases (quoted two-line value, comment line, trailing comment, the quote cases, folded block) and `tsc --noEmit`.
 
 ## v0.10.1 · the reader keeps its content inside the pane {#v0-10-1}
 

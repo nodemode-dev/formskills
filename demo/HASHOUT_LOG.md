@@ -3,7 +3,16 @@
 Living log for the browser demo. Source files stay comment-free; what they would have said lives here.
 
 Current build version: v0.10.0
-Last updated: 2026-11-07 · real skills, icons and screenshots; the demo
+Last updated: 2026-11-10 · front matter and the new-skill template follow core 0.10.3 (source only); 2026-11-07 · real skills, icons and screenshots; the demo
+
+## v0.10.3 · the parser port follows core {#v0-10-3}
+
+### src/model.ts · frontMatter and template match core's skills.rs and own.rs
+- refers-to: src/model.ts :: scalar, frontMatter, template · ../core/src/skills.rs :: scalar, front_matter · ../core/src/own.rs :: one_line
+- kind: fix
+- logged: v0.10.3 · 2026-11-10
+
+`frontMatter` mirrors core, but it was not updated with core 0.10.2: a plain value still closed its key, so the explore, author and install demos cut a plain multi-line description to its first line and their Check missed length and tag errors past it, and quotes were trimmed greedily from each end. It is now a port of core 0.10.3's `front_matter` and `scalar`: a plain value joins indented, non-comment lines; an empty value followed by a `- ` item or a `key:` pair is a nested collection and stays empty; one matching quote pair is dropped with the same unescaping; a plain value is cut at its first ` #`; `>` and `|` blocks are unchanged. `template` doubles backslashes before swapping `"` for `'`, as `own::one_line` now does. Checked under node on the same cases as the core change, with output identical to the Rust function, and `tsc --noEmit` for demo, demos/author and demos/install. The built bundles (`assets/demo.js` here and in demos/author and demos/install) were not rebuilt: a rebuild embeds the sibling repositories' tagged skills, which this pass could not check, so the in-app demos keep their current build until the next demo build.
 
 ## v0.10.0 · opened inside the app {#v0-10-0}
 

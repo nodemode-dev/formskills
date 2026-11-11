@@ -33,6 +33,15 @@ function cells(line: string): string[] {
   return line.trim().replace(/^\||\|$/g, '').split('|').map((c) => c.trim());
 }
 
+function scalar(raw: string): string {
+  const v = raw.trim();
+  if (v.length >= 2 && v.startsWith('"') && v.endsWith('"') && (/\\*$/.exec(v.slice(1, -1))?.[0].length ?? 0) % 2 === 0) return v.slice(1, -1).replace(/\\(["\\])/g, '$1');
+  if (v.length >= 2 && v.startsWith("'") && v.endsWith("'")) return v.slice(1, -1).replace(/''/g, "'");
+  if (v.startsWith('#')) return '';
+  const at = v.search(/[ \t]#/);
+  return at < 0 ? v : scalar(v.slice(0, at));
+}
+
 export function splitFrontMatter(text: string): { meta: [string, string][]; body: string } {
   const lines = text.replace(/\r/g, '').split('\n');
   if (lines[0]?.trim() !== '---') return { meta: [], body: text };
@@ -42,10 +51,10 @@ export function splitFrontMatter(text: string): { meta: [string, string][]; body
   const meta: [string, string][] = [];
   for (const line of lines.slice(1, close)) {
     const m = /^([A-Za-z_][A-Za-z0-9_-]*):\s*(.*)$/.exec(line);
-    if (m) meta.push([m[1], m[2].replace(/^["']|["']$/g, '')]);
-    else if (meta.length && line.trim()) meta[meta.length - 1][1] = `${meta[meta.length - 1][1]} ${line.trim()}`.trim();
+    if (m) meta.push([m[1], m[2].trim()]);
+    else if (meta.length && line.trim() && (/^[>|][-+]?(\s|$)/.test(meta[meta.length - 1][1]) || (/^[ \t]/.test(line) && !line.trim().startsWith('#')))) meta[meta.length - 1][1] = `${meta[meta.length - 1][1]} ${line.trim()}`.trim();
   }
-  return { meta: meta.map(([k, v]) => [k, /^[>|][-+]?$/.test(v) ? '' : v.replace(/^[>|][-+]?\s+/, '')]), body: lines.slice(close + 1).join('\n') };
+  return { meta: meta.map(([k, v]) => [k, /^[>|][-+]?$/.test(v) ? '' : /^[>|][-+]?\s/.test(v) ? v.replace(/^[>|][-+]?\s+/, '') : scalar(v)]), body: lines.slice(close + 1).join('\n') };
 }
 
 export function renderMarkdown(text: string): HTMLElement[] {
