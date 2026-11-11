@@ -3,7 +3,16 @@
 Living log for formskills' desktop shell. Source files stay comment-free; what they would have said lives here.
 
 Current build version: v0.7.5
-Last updated: 2026-11-03 · v0.7.5 the bundle names the publisher and the licence; 2026-10-25 · the install commands; one app at a time, pins, your own skills; search and the check commands; the edit commands; read_file and download; library and refresh; the shell
+Last updated: 2026-11-10 · install_remove for a project folder that is gone; 2026-11-03 · v0.7.5 the bundle names the publisher and the licence; 2026-10-25 · the install commands; one app at a time, pins, your own skills; search and the check commands; the edit commands; read_file and download; library and refresh; the shell
+
+## v0.10.3 · review fixes {#v0-10-3}
+
+### src/lib.rs · install_remove finds the record of a project that is gone
+- refers-to: src-tauri/src/lib.rs :: install_remove · core/src/install.rs :: Target::recorded
+- kind: fix
+- logged: v0.10.3 · 2026-11-10
+
+`install_remove` built its target with `Target::new`, which canonicalizes the project path and fails once the project folder is deleted or moved, so Remove on a "No longer in the folder" row could never clear it. It now uses `Target::recorded`, which falls back to the exact recorded project string (see the core log, v0.10.3). `install_update` keeps `Target::new`, so "Install again" on such a row reports the missing folder instead of recreating it. Not compiled here (the shell needs system WebKit, which this machine lacks); the call has the same signature as `Target::new` and was read twice.
 
 ## v0.9.0 · the formext:// protocol and the extension commands {#v0-9-0}
 

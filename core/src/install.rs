@@ -57,6 +57,13 @@ impl Target {
         Ok(Target { agent: agent.to_string(), project })
     }
 
+    pub fn recorded(agent: &str, project: Option<&str>) -> Result<Target, String> {
+        Target::new(agent, project).or_else(|e| {
+            let gone = Target { agent: agent.to_string(), project: project.map(str::trim).filter(|p| !p.is_empty()).map(str::to_string) };
+            if load().unwrap_or_default().iter().any(|r| r.target == gone) { Ok(gone) } else { Err(e) }
+        })
+    }
+
     pub fn root(&self) -> Result<PathBuf, String> {
         let sub = agent_dir(&self.agent).ok_or_else(|| format!("there is no agent {:?}", self.agent))?;
         let base = match &self.project {

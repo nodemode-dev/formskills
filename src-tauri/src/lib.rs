@@ -148,7 +148,7 @@ async fn install_update(agent: String, project: Option<String>, skill: String, s
 
 #[tauri::command]
 async fn install_remove(agent: String, project: Option<String>, skill: String, force: bool) -> Result<(), String> {
-    tauri::async_runtime::spawn_blocking(move || install::uninstall(&install::Target::new(&agent, project.as_deref())?, &skill, force)).await.map_err(|e| e.to_string())?
+    tauri::async_runtime::spawn_blocking(move || install::uninstall(&install::Target::recorded(&agent, project.as_deref())?, &skill, force)).await.map_err(|e| e.to_string())?
 }
 
 #[tauri::command]

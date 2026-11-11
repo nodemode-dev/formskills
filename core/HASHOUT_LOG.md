@@ -3,7 +3,7 @@
 Living log for `formskills-core`, `formskills-cli` and `setup/apps.py`. Source files stay comment-free; what they would have said lives here.
 
 Current build version: v0.10.2
-Last updated: 2026-11-10 · formskills.bat forwards every argument; backslashes in a new skill's description; FormPortal's macOS folder for the kept catalogue; front matter comments, nested maps and lists, and quotes as YAML reads them; a changed install without SKILL.md or with extra entries needs force; plain multi-line front matter values, quotes off the joined value, formskills.bat cli and apps; 2026-11-02 · the catalogue from the public download store; 2026-10-26 · the test suite; installing into Claude Code, Codex and Cursor; pins, one-app update, your own skills, script counts; search, the format check, licences and topics; registered in formcompiler; personal edited copies; no partial download; reading one file and packing downloads; released skills fetched, checked and kept, and the dev mode; the generated list of apps that ship skills
+Last updated: 2026-11-10 · removing a project install whose folder is gone; formskills.bat forwards every argument; backslashes in a new skill's description; FormPortal's macOS folder for the kept catalogue; front matter comments, nested maps and lists, and quotes as YAML reads them; a changed install without SKILL.md or with extra entries needs force; plain multi-line front matter values, quotes off the joined value, formskills.bat cli and apps; 2026-11-02 · the catalogue from the public download store; 2026-10-26 · the test suite; installing into Claude Code, Codex and Cursor; pins, one-app update, your own skills, script counts; search, the format check, licences and topics; registered in formcompiler; personal edited copies; no partial download; reading one file and packing downloads; released skills fetched, checked and kept, and the dev mode; the generated list of apps that ship skills
 
 ## v0.10.3 · review fixes {#v0-10-3}
 
@@ -41,6 +41,13 @@ FormPortal's data folder on macOS is `studio.formai.portal` (its tauri.conf.json
 - logged: v0.10.3 · 2026-11-10
 
 `%*` ignores `shift`, so the 0.10.2 labels forwarded a fixed `%1` to `%9`, and `formskills.bat cli new tidy-notes` with a long description, or a long `cli search`, silently lost every word past the ninth. Each label now sets `RUN` to its program and jumps to one shared loop that appends `%1` to `ARGS` and shifts until `%~1` is empty, then runs `%RUN%%ARGS%` and returns its errorlevel. The loop lines sit outside any parenthesised block, so each `%1` and `%errorlevel%` is expanded after the line before it ran; `set ARGS=%ARGS% %1` is unquoted so a quoted argument holding `&` stays inside its quotes. Limits: an empty quoted argument (`""`) ends the list, and cmd itself splits unquoted `=`, `,` and `;` (as it did for `%1` to `%9`). CRLF line endings kept (checked with `git ls-files --eol`). Not run on Windows (traced against cmd's parsing rules).
+
+### install.rs, cli/src/main.rs · a project install can be removed after its folder is gone
+- refers-to: core/src/install.rs :: Target::recorded, Target::new · cli/src/main.rs :: uninstall · src-tauri/src/lib.rs :: install_remove
+- kind: fix
+- logged: v0.10.3 · 2026-11-10
+
+`Target::new` canonicalizes a project path, which fails once the folder is deleted or moved, so the record in `installed.json` could never be removed and Installed kept a "No longer in the folder" row for good. `Target::recorded` tries `Target::new` first and, when that fails, accepts the project string exactly as given if a record holds that agent and project (records store the canonical path, which is what the window passes back). Only removal uses it (`uninstall` in the command line, `install_remove` in the shell); update and install keep `Target::new`, so they never recreate a project folder the person deleted, and a path no record holds still fails as before. Checked with formskills-cli in a temporary HOME: install into a project, delete the project, `installed` shows missing, `update` fails without creating the folder, `uninstall --project <path>` removes the record, and an unrecorded missing path still fails.
 
 ## v0.10.2 · plain multi-line front matter values {#v0-10-2}
 

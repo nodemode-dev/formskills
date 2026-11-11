@@ -294,7 +294,7 @@ fn main() -> ExitCode {
             _ => (|| {
                 let folder = plain.first().copied().ok_or_else(|| format!("{command} needs the skill's folder name"))?;
                 let agent = value(if command == "update" { "--for" } else { "--from" }).ok_or_else(|| format!("{command} needs {} claude, codex or cursor", if command == "update" { "--for" } else { "--from" }))?;
-                let target = install::Target::new(&agent, project.as_deref())?;
+                let target = if command == "update" { install::Target::new(&agent, project.as_deref())? } else { install::Target::recorded(&agent, project.as_deref())? };
                 if command == "update" {
                     install::update(&lib.apps, &target, folder).map(|s| json!(s))
                 } else {
