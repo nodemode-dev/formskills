@@ -2,8 +2,23 @@
 
 Living log for formskills' desktop shell. Source files stay comment-free; what they would have said lives here.
 
-Current build version: v0.10.3
-Last updated: 2026-11-10 · install_remove for a project folder that is gone; 2026-11-03 · v0.7.5 the bundle names the publisher and the licence; 2026-10-25 · the install commands; one app at a time, pins, your own skills; search and the check commands; the edit commands; read_file and download; library and refresh; the shell
+Current build version: v0.10.4
+Last updated: 2026-11-11 · the unused BACKGROUND colour removed; 2026-11-10 · install_remove for a project folder that is gone; 2026-11-03 · v0.7.5 the bundle names the publisher and the licence; 2026-10-25 · the install commands; one app at a time, pins, your own skills; search and the check commands; the edit commands; read_file and download; library and refresh; the shell
+
+## v0.10.4 · QA fixes {#v0-10-4}
+
+### src/reveal.rs · BACKGROUND removed
+- refers-to: src-tauri/src/reveal.rs :: BACKGROUND
+- kind: removed-code
+- logged: v0.10.4 · 2026-11-11
+
+Nothing read `BACKGROUND`, so the shell build warned that it was never used. The window's background colour is set in tauri.conf.json, so the constant is removed rather than kept behind a cfg. Its value was:
+
+```rust
+pub const BACKGROUND: tauri::window::Color = tauri::window::Color(10, 10, 10, 255);
+```
+
+`cargo check --locked -p formskills` builds with no warning on macOS.
 
 ## v0.10.3 · review fixes {#v0-10-3}
 
