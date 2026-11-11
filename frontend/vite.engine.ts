@@ -138,6 +138,11 @@ export function engineBridge(): Plugin {
           return;
         }
         if (req.method === "POST" && url.startsWith("/api/engine/")) {
+          const origin = req.headers.origin;
+          if (!s(req.headers["content-type"]).startsWith("application/json") || (origin !== undefined && origin !== `http://localhost:${server.config.server.port}`)) {
+            send(res, 403, { error: "the engine bridge answers only formskills' own page" });
+            return;
+          }
           const handler = HANDLERS[url.slice("/api/engine/".length)];
           if (!handler) {
             send(res, 400, { error: `the browser build does not offer ${url.slice("/api/engine/".length)}` });
