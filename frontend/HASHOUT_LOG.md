@@ -3,7 +3,7 @@
 Living log for formskills' window. Source files stay comment-free; what they would have said lives here.
 
 Current build version: v0.10.2
-Last updated: 2026-11-10 · FORM_FAMILY_DIR without a trailing slash; the reader's front matter quotes and comments; the dev engine bridge refuses foreign pages; v0.10.2 version bump only; 2026-10-25 · the Install and Installed pages; Your skills, the Release row, Trust; search, topics, the format page and Check; editing your own copy; the reader and downloads; where each app's skills come from; chips, cards and the detail pane
+Last updated: 2026-11-10 · the extension check command for your own skills; FORM_FAMILY_DIR without a trailing slash; the reader's front matter quotes and comments; the dev engine bridge refuses foreign pages; v0.10.2 version bump only; 2026-10-25 · the Install and Installed pages; Your skills, the Release row, Trust; search, topics, the format page and Check; editing your own copy; the reader and downloads; where each app's skills come from; chips, cards and the detail pane
 
 ## v0.10.3 · review fixes {#v0-10-3}
 
@@ -27,6 +27,13 @@ With `FORMSKILLS_ENGINE=1` the dev server ran `formskills-cli` for any POST to `
 - logged: v0.10.3 · 2026-11-10
 
 Each sibling repository's path was `${family}${name}`, and only the default root ends in a slash, so `FORM_FAMILY_DIR=/home/me/repos` (as the demo READMEs write it) looked in `/home/me/reposformcut` and so on, and the demos were built with no skills and no error. The path is now `join(family, name)` and the check `join(repo, ".git")`, from `node:path`. Checked by calling the plugin's `load` under node with `FORM_FAMILY_DIR` set to the repositories' parent with and without the slash: both found the same eight apps. No demo bundle was rebuilt.
+
+### main.ts · the extension command check works for your own skills
+- refers-to: frontend/src/main.ts :: runAppCommand (check), EXT_COMMANDS
+- kind: fix
+- logged: v0.10.3 · 2026-11-10
+
+`EXT_COMMANDS` advertises `check` with `app` as "an app id, or yours", but `runAppCommand` sent `check_skill` unless `copy` was true, and `check_skill` looks the app up in the library, so `{ app: "yours", skill: "tidy-notes" }` failed with "yours is not in the library". Your own skills are edit records, so `app: "yours"` now goes to `edit_check`, as the window's own Check does for them. Checked with `tsc --noEmit` and, for the engine side, `formskills-cli check yours <skill>` (the browser build's `edit_check` path), which reports; not run from a live extension.
 
 ## v0.10.1 · the reader keeps its content inside the pane {#v0-10-1}
 

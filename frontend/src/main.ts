@@ -1510,7 +1510,7 @@ async function runAppCommand(command: string, raw: unknown, step: Step): Promise
     case "read-file":
       return engine("read_file", { app: str("app"), path: str("path") });
     case "check":
-      return engine(a.copy === true ? "edit_check" : "check_skill", { app: str("app"), skill: str("skill") });
+      return engine(a.copy === true || a.app === OWN ? "edit_check" : "check_skill", { app: str("app"), skill: str("skill") });
     case "edit-start": {
       const app = str("app");
       const skill = str("skill");
