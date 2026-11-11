@@ -32,7 +32,8 @@ pub fn portal_root() -> PathBuf {
     }
     let home = home();
     if cfg!(target_os = "macos") {
-        home.join("Library/Application Support/dev.formai.portal")
+        let (new, old) = (home.join("Library/Application Support/studio.formai.portal"), home.join("Library/Application Support/dev.formai.portal"));
+        if old.is_dir() && !new.exists() { old } else { new }
     } else if cfg!(target_os = "windows") {
         std::env::var_os("LOCALAPPDATA").map(PathBuf::from).unwrap_or_else(|| home.join("AppData/Local")).join("FormPortal")
     } else {

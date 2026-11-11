@@ -3,7 +3,7 @@
 Living log for `formskills-core`, `formskills-cli` and `setup/apps.py`. Source files stay comment-free; what they would have said lives here.
 
 Current build version: v0.10.2
-Last updated: 2026-11-10 · front matter comments, nested maps and lists, and quotes as YAML reads them; a changed install without SKILL.md or with extra entries needs force; plain multi-line front matter values, quotes off the joined value, formskills.bat cli and apps; 2026-11-02 · the catalogue from the public download store; 2026-10-26 · the test suite; installing into Claude Code, Codex and Cursor; pins, one-app update, your own skills, script counts; search, the format check, licences and topics; registered in formcompiler; personal edited copies; no partial download; reading one file and packing downloads; released skills fetched, checked and kept, and the dev mode; the generated list of apps that ship skills
+Last updated: 2026-11-10 · FormPortal's macOS folder for the kept catalogue; front matter comments, nested maps and lists, and quotes as YAML reads them; a changed install without SKILL.md or with extra entries needs force; plain multi-line front matter values, quotes off the joined value, formskills.bat cli and apps; 2026-11-02 · the catalogue from the public download store; 2026-10-26 · the test suite; installing into Claude Code, Codex and Cursor; pins, one-app update, your own skills, script counts; search, the format check, licences and topics; registered in formcompiler; personal edited copies; no partial download; reading one file and packing downloads; released skills fetched, checked and kept, and the dev mode; the generated list of apps that ship skills
 
 ## v0.10.3 · review fixes {#v0-10-3}
 
@@ -20,6 +20,13 @@ Last updated: 2026-11-10 · front matter comments, nested maps and lists, and qu
 - logged: v0.10.3 · 2026-11-10
 
 Since 0.10.2 a plain value kept its key open and every later line that was not a key was glued on, so `name: my-skill` then `# a note` gave the name `my-skill # a note` (Check then reported name errors on a valid card), and `metadata:` or `allowed-tools:` followed by an indented map or list became one string. Quotes were also cut with `trim_matches`, which stripped unpaired and repeated quotes (`Explains the "why"` lost its closing quote), kept `\"` and `''` and kept a trailing `# comment`. A continuation line now joins a plain value only when it is indented and is not a comment, and a key with no value whose next line is a `- ` item or a `key:` pair is a nested collection, so its key is closed and stays empty. `scalar` reads the joined value: a matching double-quoted pair is dropped and `\"` and `\\` unescaped, a matching single-quoted pair is dropped and `''` becomes `'`, and a plain value is cut at its first ` #`. It is not a YAML parser: other escapes and flow collections stay as written, and `>` and `|` blocks are unchanged. Checked with a scratch crate outside the repo on the reviewers' cases (comment after a name, nested metadata and allowed-tools, the four quote cases, a quoted name with a comment, quoted and plain two-line values, a folded block, a value starting on the next line, a non-ASCII value starting with a quote) and the existing tests.
+
+### places.rs · FormPortal's kept catalogue on macOS is read from studio.formai.portal
+- refers-to: core/src/places.rs :: portal_root · core/src/catalog.rs :: read_source
+- kind: fix
+- logged: v0.10.3 · 2026-11-10
+
+FormPortal's data folder on macOS is `studio.formai.portal` (its tauri.conf.json identifier; its `moved_root` moves the old `dev.formai.portal` there), but `places::portal_root` still named the old folder, so with the catalogue address unreachable or `FORMSKILLS_OFFLINE=1` a fresh FormPortal's signed copy was not found and no release could be shown, while `extensions::portal_root` already read the new folder. The macOS branch now follows the same rule as `extensions::portal_root`: `studio.formai.portal`, or `dev.formai.portal` only when that is a folder and the new one does not exist. Windows and Linux are unchanged. `cfg!` is a runtime test, so the branch is compiled on Linux; it was not run on macOS.
 
 ## v0.10.2 · plain multi-line front matter values {#v0-10-2}
 
