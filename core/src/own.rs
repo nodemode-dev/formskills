@@ -30,7 +30,7 @@ fn title(name: &str) -> String {
 }
 
 fn one_line(text: &str) -> String {
-    text.split_whitespace().collect::<Vec<_>>().join(" ").replace('"', "'")
+    text.split_whitespace().collect::<Vec<_>>().join(" ").replace('\\', "\\\\").replace('"', "'")
 }
 
 pub fn template(name: &str, description: &str) -> String {

@@ -3,7 +3,7 @@
 Living log for `formskills-core`, `formskills-cli` and `setup/apps.py`. Source files stay comment-free; what they would have said lives here.
 
 Current build version: v0.10.2
-Last updated: 2026-11-10 · FormPortal's macOS folder for the kept catalogue; front matter comments, nested maps and lists, and quotes as YAML reads them; a changed install without SKILL.md or with extra entries needs force; plain multi-line front matter values, quotes off the joined value, formskills.bat cli and apps; 2026-11-02 · the catalogue from the public download store; 2026-10-26 · the test suite; installing into Claude Code, Codex and Cursor; pins, one-app update, your own skills, script counts; search, the format check, licences and topics; registered in formcompiler; personal edited copies; no partial download; reading one file and packing downloads; released skills fetched, checked and kept, and the dev mode; the generated list of apps that ship skills
+Last updated: 2026-11-10 · backslashes in a new skill's description; FormPortal's macOS folder for the kept catalogue; front matter comments, nested maps and lists, and quotes as YAML reads them; a changed install without SKILL.md or with extra entries needs force; plain multi-line front matter values, quotes off the joined value, formskills.bat cli and apps; 2026-11-02 · the catalogue from the public download store; 2026-10-26 · the test suite; installing into Claude Code, Codex and Cursor; pins, one-app update, your own skills, script counts; search, the format check, licences and topics; registered in formcompiler; personal edited copies; no partial download; reading one file and packing downloads; released skills fetched, checked and kept, and the dev mode; the generated list of apps that ship skills
 
 ## v0.10.3 · review fixes {#v0-10-3}
 
@@ -27,6 +27,13 @@ Since 0.10.2 a plain value kept its key open and every later line that was not a
 - logged: v0.10.3 · 2026-11-10
 
 FormPortal's data folder on macOS is `studio.formai.portal` (its tauri.conf.json identifier; its `moved_root` moves the old `dev.formai.portal` there), but `places::portal_root` still named the old folder, so with the catalogue address unreachable or `FORMSKILLS_OFFLINE=1` a fresh FormPortal's signed copy was not found and no release could be shown, while `extensions::portal_root` already read the new folder. The macOS branch now follows the same rule as `extensions::portal_root`: `studio.formai.portal`, or `dev.formai.portal` only when that is a folder and the new one does not exist. Windows and Linux are unchanged. `cfg!` is a runtime test, so the branch is compiled on Linux; it was not run on macOS.
+
+### own.rs · a new skill's description is valid YAML with backslashes in it
+- refers-to: core/src/own.rs :: one_line, template
+- kind: fix
+- logged: v0.10.3 · 2026-11-10
+
+`template` writes the description as a double-quoted YAML scalar, and `one_line` only swapped `"` for `'`, so `new paths Fixes C:\docs and \Users paths` wrote `\d` and `\U`, which are not valid YAML escapes: the agents' YAML readers refused the card while formskills' own Check passed it. `one_line` now doubles every backslash before the quote swap, and `skills::scalar` turns `\\` back into one, so formskills and the agents read the same text. Checked with formskills-cli `new` in a temporary data folder: SKILL.md holds `"Fixes C:\\docs and \\Users paths"`, PyYAML reads `Fixes C:\docs and \Users paths`, and `own` lists the same text.
 
 ## v0.10.2 · plain multi-line front matter values {#v0-10-2}
 
