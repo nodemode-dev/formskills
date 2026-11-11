@@ -3,7 +3,7 @@
 Living log for formskills' window. Source files stay comment-free; what they would have said lives here.
 
 Current build version: v0.10.2
-Last updated: 2026-11-10 · the reader's front matter quotes and comments; the dev engine bridge refuses foreign pages; v0.10.2 version bump only; 2026-10-25 · the Install and Installed pages; Your skills, the Release row, Trust; search, topics, the format page and Check; editing your own copy; the reader and downloads; where each app's skills come from; chips, cards and the detail pane
+Last updated: 2026-11-10 · FORM_FAMILY_DIR without a trailing slash; the reader's front matter quotes and comments; the dev engine bridge refuses foreign pages; v0.10.2 version bump only; 2026-10-25 · the Install and Installed pages; Your skills, the Release row, Trust; search, topics, the format page and Check; editing your own copy; the reader and downloads; where each app's skills come from; chips, cards and the detail pane
 
 ## v0.10.3 · review fixes {#v0-10-3}
 
@@ -20,6 +20,13 @@ With `FORMSKILLS_ENGINE=1` the dev server ran `formskills-cli` for any POST to `
 - logged: v0.10.3 · 2026-11-10
 
 `splitFrontMatter` stripped one quote from each end of the first line only, so a quoted two-line description showed `first second"`; it also glued any later non-key line (a `# comment` included) onto the value above and kept a trailing `# comment`. It now keeps each value raw while joining, joins a line to a plain value only when the line is indented and not a comment (a `>` or `|` block joins every non-blank line, as before), and reads the joined plain value with `scalar`, the same rule as `skills::scalar` in core: one matching double-quoted pair with `\"` and `\\` unescaped, one matching single-quoted pair with `''` as `'`, and a plain value cut at its first ` #`. One difference is kept on purpose: a key followed by an indented map or list (`metadata:` then `  author: me`) still shows that text in the table, because the table is there to show the file, while the engine leaves such a key empty since it never uses it. Checked by running the function under node on the reviewers' cases (quoted two-line value, comment line, trailing comment, the quote cases, folded block) and `tsc --noEmit`.
+
+### vite.family-skills.ts · FORM_FAMILY_DIR without a trailing slash
+- refers-to: frontend/vite.family-skills.ts :: familySkills
+- kind: fix
+- logged: v0.10.3 · 2026-11-10
+
+Each sibling repository's path was `${family}${name}`, and only the default root ends in a slash, so `FORM_FAMILY_DIR=/home/me/repos` (as the demo READMEs write it) looked in `/home/me/reposformcut` and so on, and the demos were built with no skills and no error. The path is now `join(family, name)` and the check `join(repo, ".git")`, from `node:path`. Checked by calling the plugin's `load` under node with `FORM_FAMILY_DIR` set to the repositories' parent with and without the slash: both found the same eight apps. No demo bundle was rebuilt.
 
 ## v0.10.1 · the reader keeps its content inside the pane {#v0-10-1}
 
