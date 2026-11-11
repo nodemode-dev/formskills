@@ -2,7 +2,7 @@
 
 Living log for formskills' desktop shell. Source files stay comment-free; what they would have said lives here.
 
-Current build version: v0.7.5
+Current build version: v0.10.3
 Last updated: 2026-11-10 · install_remove for a project folder that is gone; 2026-11-03 · v0.7.5 the bundle names the publisher and the licence; 2026-10-25 · the install commands; one app at a time, pins, your own skills; search and the check commands; the edit commands; read_file and download; library and refresh; the shell
 
 ## v0.10.3 · review fixes {#v0-10-3}

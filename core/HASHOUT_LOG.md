@@ -2,7 +2,7 @@
 
 Living log for `formskills-core`, `formskills-cli` and `setup/apps.py`. Source files stay comment-free; what they would have said lives here.
 
-Current build version: v0.10.2
+Current build version: v0.10.3
 Last updated: 2026-11-10 · edit read notes a non-text file; removing a project install whose folder is gone; formskills.bat forwards every argument; backslashes in a new skill's description; FormPortal's macOS folder for the kept catalogue; front matter comments, nested maps and lists, and quotes as YAML reads them; a changed install without SKILL.md or with extra entries needs force; plain multi-line front matter values, quotes off the joined value, formskills.bat cli and apps; 2026-11-02 · the catalogue from the public download store; 2026-10-26 · the test suite; installing into Claude Code, Codex and Cursor; pins, one-app update, your own skills, script counts; search, the format check, licences and topics; registered in formcompiler; personal edited copies; no partial download; reading one file and packing downloads; released skills fetched, checked and kept, and the dev mode; the generated list of apps that ship skills
 
 ## v0.10.3 · review fixes {#v0-10-3}

@@ -2,7 +2,7 @@
 
 Living log for formskills' window. Source files stay comment-free; what they would have said lives here.
 
-Current build version: v0.10.2
+Current build version: v0.10.3
 Last updated: 2026-11-10 · skill lists notice a changed name or description; the extension check command for your own skills; FORM_FAMILY_DIR without a trailing slash; the reader's front matter quotes and comments; the dev engine bridge refuses foreign pages; v0.10.2 version bump only; 2026-10-25 · the Install and Installed pages; Your skills, the Release row, Trust; search, topics, the format page and Check; editing your own copy; the reader and downloads; where each app's skills come from; chips, cards and the detail pane
 
 ## v0.10.3 · review fixes {#v0-10-3}

@@ -1,5 +1,21 @@
 # Changelog
 
+## v0.10.3 · 2026-11-10
+
+- Removing or reinstalling a skill no longer deletes your work without asking. An installed skill folder whose SKILL.md you deleted or moved, or in which you added files, a `.git` repository, `node_modules` or a link, now counts as changed, so Remove and Install again ask for force (Remove, losing changes) instead of deleting it. Python caches and Finder files are still ignored.
+- A comment line in a skill's front matter (for example `# about the description` under `name:`) is no longer added to the value above it, and `metadata:` or `allowed-tools:` with an indented map or list no longer turns into one long string. Check no longer reports name errors on such valid cards.
+- Quoted front matter values are read the way YAML reads them: only a matching pair of quotes comes off, `\"` and `''` become plain quotes, a value such as `Explains the "why"` keeps its closing quote, and a trailing `# comment` after a value is left out.
+- The browser build's dev server (`FORMSKILLS_ENGINE=1`) now refuses requests from other web pages, which could otherwise discard, write or create your own skills and copies while it ran.
+- On macOS, when the catalogue address cannot be reached, formskills now finds the copy FormPortal keeps in its current folder (`studio.formai.portal`), so releases can still be shown offline.
+- A new skill whose description holds backslashes (such as `C:\docs`) is written as valid YAML, so Claude Code, Codex and Cursor accept it.
+- The reader's front matter table shows a quoted two-line description without a stray closing quote and leaves comments out, and the in-app demos' source reads front matter the same way as the app (the demos keep their current build until they are rebuilt).
+- `formskills.bat cli ...` and `formskills.bat apps ...` on Windows pass every argument along; a description or search longer than nine words was cut short.
+- A skill installed into a project folder that was later deleted or moved can now be removed from the Installed list and with `uninstall --project`.
+- In the browser build, opening a file that is not text in your copy now says so instead of showing an empty editor where typing could overwrite the file, and `edit read` on the command line prints the reason instead of nothing.
+- Building the demos with `FORM_FAMILY_DIR` set without a trailing slash now finds the family's skills.
+- An extension's `check` command now works for your own skills (`app: "yours"`).
+- Your skills now shows a renamed skill or a description change of the same length right away.
+
 ## v0.10.2 · 2026-11-10
 
 - A skill whose front matter value runs over several plain lines (for example a description continued on indented lines without a `>` or `|`) is now read whole: the card, the search and the format check used to see only the first line, so a long description past 1024 characters or a tag on a later line went unflagged. `formskills.bat cli ...` and `formskills.bat apps ...` on Windows now pass their arguments to the command line and return its exit code; before, the first word (`cli` or `apps`) was passed along and the exit code was stale. A quoted value that runs over several lines also loses its quotes once joined, instead of keeping a stray closing quote.
