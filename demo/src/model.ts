@@ -70,11 +70,21 @@ export function lines(text: string): string[] {
   return parts.map((l) => (l.endsWith("\r") ? l.slice(0, -1) : l));
 }
 
+function scalar(raw: string): string {
+  const v = raw.trim();
+  if (v.length >= 2 && v.startsWith('"') && v.endsWith('"') && (/\\*$/.exec(v.slice(1, -1))?.[0].length ?? 0) % 2 === 0) return v.slice(1, -1).replace(/\\(["\\])/g, "$1");
+  if (v.length >= 2 && v.startsWith("'") && v.endsWith("'")) return v.slice(1, -1).replace(/''/g, "'");
+  if (v.startsWith("#")) return "";
+  const at = v.search(/[ \t]#/);
+  return at < 0 ? v : scalar(v.slice(0, at));
+}
+
 export function frontMatter(text: string): Map<string, string> {
   const found = new Map<string, string>();
   const all = lines(text);
   if (all.length === 0 || all[0].trim() !== "---") return found;
   let block: string | null = null;
+  let raw: string | null = null;
   for (const line of all.slice(1)) {
     if (line.trim() === "---") break;
     const colon = line.indexOf(":");
@@ -85,12 +95,21 @@ export function frontMatter(text: string): Map<string, string> {
       if ([">", "|", ">-", "|-", ">+", "|+"].includes(value)) {
         found.set(key, "");
         block = key;
+        raw = null;
       } else {
-        found.set(key, value.replace(/^["']+|["']+$/g, ""));
-        block = null;
+        found.set(key, scalar(value));
+        block = key;
+        raw = value;
       }
     } else if (block !== null && line.trim()) {
-      found.set(block, `${found.get(block) ?? ""} ${line.trim()}`.trim());
+      const t = line.trim();
+      if (raw === null) found.set(block, `${found.get(block) ?? ""} ${t}`.trim());
+      else if (t.startsWith("#") || !/^[ \t]/.test(line)) continue;
+      else if (raw === "" && (t === "-" || t.startsWith("- ") || /^[A-Za-z0-9_-]+:( |$)/.test(t))) block = null;
+      else {
+        raw = `${raw} ${t}`.trim();
+        found.set(block, scalar(raw));
+      }
     }
   }
   return found;
@@ -408,6 +427,6 @@ function title(name: string): string {
 }
 
 export function template(name: string, description: string): string {
-  const said = description.split(/\s+/).filter(Boolean).join(" ").replace(/"/g, "'") || "Says what this skill does and when an agent should use it, with the words a person would use.";
+  const said = description.split(/\s+/).filter(Boolean).join(" ").replace(/\\/g, "\\\\").replace(/"/g, "'") || "Says what this skill does and when an agent should use it, with the words a person would use.";
   return `---\nname: ${name}\ndescription: "${said}"\n---\n\n# ${title(name)}\n\nOne paragraph: what this skill is for, and what it is not for.\n\n## When to use\n\n- The person asks for ...\n- The task involves ...\n\n## Steps\n\n1. First ...\n2. Then ...\n3. Check the result by ...\n\n## Examples\n\nInput: ...\n\nOutput: ...\n\n## Notes\n\n- Edge cases and what to do about them.\n- Keep this file under 500 lines; put long reference material in a \`references/\` file and link it.\n`;
 }

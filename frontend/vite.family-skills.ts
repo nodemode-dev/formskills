@@ -1,5 +1,6 @@
 import { execFileSync } from "node:child_process";
 import { existsSync, readFileSync } from "node:fs";
+import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 import type { Plugin } from "vite";
 
@@ -43,8 +44,8 @@ export function familySkills(): Plugin {
       const out: Record<string, Release[]> = {};
       for (const app of apps.apps) {
         const name = app.repository.split("/").pop() as string;
-        const repo = `${family}${name}`;
-        if (out[name] || !existsSync(`${repo}/.git`)) continue;
+        const repo = join(family, name);
+        if (out[name] || !existsSync(join(repo, ".git"))) continue;
         const releases: Release[] = [];
         for (const tag of git(repo, ["tag", "--sort=-v:refname"]).split("\n").filter(Boolean)) {
           const found = releaseAt(repo, tag);

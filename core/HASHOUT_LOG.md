@@ -2,8 +2,82 @@
 
 Living log for `formskills-core`, `formskills-cli` and `setup/apps.py`. Source files stay comment-free; what they would have said lives here.
 
-Current build version: v0.10.1
-Last updated: 2026-11-02 · the catalogue from the public download store; 2026-10-26 · the test suite; installing into Claude Code, Codex and Cursor; pins, one-app update, your own skills, script counts; search, the format check, licences and topics; registered in formcompiler; personal edited copies; no partial download; reading one file and packing downloads; released skills fetched, checked and kept, and the dev mode; the generated list of apps that ship skills
+Current build version: v0.10.3
+Last updated: 2026-11-10 · edit read notes a non-text file; removing a project install whose folder is gone; formskills.bat forwards every argument; backslashes in a new skill's description; FormPortal's macOS folder for the kept catalogue; front matter comments, nested maps and lists, and quotes as YAML reads them; a changed install without SKILL.md or with extra entries needs force; plain multi-line front matter values, quotes off the joined value, formskills.bat cli and apps; 2026-11-02 · the catalogue from the public download store; 2026-10-26 · the test suite; installing into Claude Code, Codex and Cursor; pins, one-app update, your own skills, script counts; search, the format check, licences and topics; registered in formcompiler; personal edited copies; no partial download; reading one file and packing downloads; released skills fetched, checked and kept, and the dev mode; the generated list of apps that ship skills
+
+## v0.10.3 · review fixes {#v0-10-3}
+
+### install.rs · a changed install is never removed or replaced without force
+- refers-to: core/src/install.rs :: extras_of, state_of, install, uninstall
+- kind: fix
+- logged: v0.10.3 · 2026-11-10
+
+`state_of` called an install "missing" whenever its SKILL.md was gone, so a folder whose SKILL.md was deleted or moved but which still held the person's files was removed by `uninstall` (and the window's Remove) without force, and "Install again" moved it aside and deleted it. The change check also compared only what the skill walker lists, so a `.git`, `node_modules` or a link made in the folder read "ok" and went with it. An install is now "missing" only when nothing is at its path; otherwise the digests are compared (a gone SKILL.md shows as changed), and `extras_of` walks the folder raw and adds every entry that the record does not hold and is not a folder of recorded files (directories such as `.git` are named once, links are never followed). `__pycache__`, `.pyc`, `.DS_Store` and `Thumbs.db` are left out, as the walker leaves them out, so running a skill's Python or opening it in Finder does not lock the install. Both cases now read "modified", which `install` and `uninstall` already refuse without force. Checked with formskills-cli in a temporary HOME: SKILL.md removed plus notes.txt refused without --force (notes.txt kept); `.git` and a link refused for uninstall and install; a `__pycache__` alone still "ok" and removed.
+
+### skills.rs · front_matter leaves comments and nested collections out of a plain value and reads quotes as YAML does
+- refers-to: core/src/skills.rs :: scalar, front_matter
+- kind: fix
+- logged: v0.10.3 · 2026-11-10
+
+Since 0.10.2 a plain value kept its key open and every later line that was not a key was glued on, so `name: my-skill` then `# a note` gave the name `my-skill # a note` (Check then reported name errors on a valid card), and `metadata:` or `allowed-tools:` followed by an indented map or list became one string. Quotes were also cut with `trim_matches`, which stripped unpaired and repeated quotes (`Explains the "why"` lost its closing quote), kept `\"` and `''` and kept a trailing `# comment`. A continuation line now joins a plain value only when it is indented and is not a comment, and a key with no value whose next line is a `- ` item or a `key:` pair is a nested collection, so its key is closed and stays empty. `scalar` reads the joined value: a matching double-quoted pair is dropped and `\"` and `\\` unescaped, a matching single-quoted pair is dropped and `''` becomes `'`, and a plain value is cut at its first ` #`. It is not a YAML parser: other escapes and flow collections stay as written, and `>` and `|` blocks are unchanged. Checked with a scratch crate outside the repo on the reviewers' cases (comment after a name, nested metadata and allowed-tools, the four quote cases, a quoted name with a comment, quoted and plain two-line values, a folded block, a value starting on the next line, a non-ASCII value starting with a quote) and the existing tests.
+
+### places.rs · FormPortal's kept catalogue on macOS is read from studio.formai.portal
+- refers-to: core/src/places.rs :: portal_root · core/src/catalog.rs :: read_source
+- kind: fix
+- logged: v0.10.3 · 2026-11-10
+
+FormPortal's data folder on macOS is `studio.formai.portal` (its tauri.conf.json identifier; its `moved_root` moves the old `dev.formai.portal` there), but `places::portal_root` still named the old folder, so with the catalogue address unreachable or `FORMSKILLS_OFFLINE=1` a fresh FormPortal's signed copy was not found and no release could be shown, while `extensions::portal_root` already read the new folder. The macOS branch now follows the same rule as `extensions::portal_root`: `studio.formai.portal`, or `dev.formai.portal` only when that is a folder and the new one does not exist. Windows and Linux are unchanged. `cfg!` is a runtime test, so the branch is compiled on Linux; it was not run on macOS.
+
+### own.rs · a new skill's description is valid YAML with backslashes in it
+- refers-to: core/src/own.rs :: one_line, template
+- kind: fix
+- logged: v0.10.3 · 2026-11-10
+
+`template` writes the description as a double-quoted YAML scalar, and `one_line` only swapped `"` for `'`, so `new paths Fixes C:\docs and \Users paths` wrote `\d` and `\U`, which are not valid YAML escapes: the agents' YAML readers refused the card while formskills' own Check passed it. `one_line` now doubles every backslash before the quote swap, and `skills::scalar` turns `\\` back into one, so formskills and the agents read the same text. Checked with formskills-cli `new` in a temporary data folder: SKILL.md holds `"Fixes C:\\docs and \\Users paths"`, PyYAML reads `Fixes C:\docs and \Users paths`, and `own` lists the same text.
+
+### formskills.bat · cli and apps forward every argument
+- refers-to: formskills.bat :: cli, apps, collect, more, run
+- kind: fix
+- logged: v0.10.3 · 2026-11-10
+
+`%*` ignores `shift`, so the 0.10.2 labels forwarded a fixed `%1` to `%9`, and `formskills.bat cli new tidy-notes` with a long description, or a long `cli search`, silently lost every word past the ninth. Each label now sets `RUN` to its program and jumps to one shared loop that appends `%1` to `ARGS` and shifts until `%~1` is empty, then runs `%RUN%%ARGS%` and returns its errorlevel. The loop lines sit outside any parenthesised block, so each `%1` and `%errorlevel%` is expanded after the line before it ran; `set ARGS=%ARGS% %1` is unquoted so a quoted argument holding `&` stays inside its quotes. Limits: an empty quoted argument (`""`) ends the list, and cmd itself splits unquoted `=`, `,` and `;` (as it did for `%1` to `%9`). CRLF line endings kept (checked with `git ls-files --eol`). Not run on Windows (traced against cmd's parsing rules).
+
+### install.rs, cli/src/main.rs · a project install can be removed after its folder is gone
+- refers-to: core/src/install.rs :: Target::recorded, Target::new · cli/src/main.rs :: uninstall · src-tauri/src/lib.rs :: install_remove
+- kind: fix
+- logged: v0.10.3 · 2026-11-10
+
+`Target::new` canonicalizes a project path, which fails once the folder is deleted or moved, so the record in `installed.json` could never be removed and Installed kept a "No longer in the folder" row for good. `Target::recorded` tries `Target::new` first and, when that fails, accepts the project string exactly as given if a record holds that agent and project (records store the canonical path, which is what the window passes back). Only removal uses it (`uninstall` in the command line, `install_remove` in the shell); update and install keep `Target::new`, so they never recreate a project folder the person deleted, and a path no record holds still fails as before. Checked with formskills-cli in a temporary HOME: install into a project, delete the project, `installed` shows missing, `update` fails without creating the folder, `uninstall --project <path>` removes the record, and an unrecorded missing path still fails.
+
+### cli/src/main.rs · edit read says when a file is not text
+- refers-to: cli/src/main.rs :: edit read (yours and copies) · frontend/vite.engine.ts :: text
+- kind: fix
+- logged: v0.10.3 · 2026-11-10
+
+Both `edit read` branches printed the text when there was some and nothing at all otherwise, so a binary file in a copy (an image in `assets/`) gave empty output and exit 0. The browser build's bridge took that as an empty text file, the editor opened on an empty buffer, and the first keystroke's autosave wrote text over the binary file. Both branches now print `formskills: <path>: <note>` on stderr when the file is not text, as `read` does; the bridge's `text()` already turns that into `text: null` with the note, and the window then disables the editor. Exit code stays 0, as for `read`. Checked with formskills-cli: `edit read yours <skill> assets/a.png` on an 8-byte binary printed the note on stderr, and SKILL.md still printed its text.
+
+## v0.10.2 · plain multi-line front matter values {#v0-10-2}
+
+### skills.rs · front_matter joins continuation lines of every key
+- refers-to: core/src/skills.rs :: front_matter
+- kind: bugfix
+- logged: v0.10.2 · 2026-11-10
+
+Continuation lines were only joined while the key had used a `>` or `|` indicator, so a plain multi-line value (`description: first line` then an indented `second line`) was cut to its first line. The reader's `splitFrontMatter` in `frontend/src/markdown.ts` already joined them, so the card, the Check report (description length, XML tags) and the reader disagreed. A plain value now keeps its key as the open one, so indented lines that follow append with a space; a following top-level key still starts a new value, and the `>` and `|` behaviour is unchanged.
+
+### skills.rs · quotes come off the joined plain value
+- refers-to: core/src/skills.rs :: front_matter
+- kind: bugfix
+- logged: v0.10.2 · 2026-11-10
+
+Quotes were trimmed from the first line before continuation lines were joined, so `description: "first` then `  second"` gave `first second"`. A plain value now keeps its raw text as it accumulates and the stored value is that raw text with the surrounding quotes trimmed after each join, giving `first second`. Folded and literal blocks (`>` and `|`) keep their content untouched. Note: `splitFrontMatter` in `frontend/src/markdown.ts` strips quotes from the first line only, so for a quoted two-line value it still shows `first second"`; the engine is now the one that is right, and the reader is left for a later frontend change.
+
+### formskills.bat · cli and apps run outside any parenthesised block
+- refers-to: formskills.bat :: cli, apps
+- kind: bugfix
+- logged: v0.10.2 · 2026-11-10
+
+cmd expands `%1` to `%9` and `%errorlevel%` when it parses a whole parenthesised block, before the `shift` inside the block runs. In the old `cli` and `apps` blocks `formskills.bat cli list` therefore passed `cli list` to the command line, and `exit /b %errorlevel%` returned the errorlevel from before the block ran. Those two `if` lines now `goto cli` and `goto apps`, and the bodies sit below the main flow as labels, whose lines are parsed one at a time after `shift`. The main flow ends with `exit /b %errorlevel%` so it cannot fall into the labels. The `dev` block keeps its `shift`: the next `if` line is parsed after the block ends. Found by reading the file against cmd's parsing rules; not run on Windows (traced).
 
 ## v0.9.0 · the extension host's resolver, the request queue and the command line {#v0-9-0}
 

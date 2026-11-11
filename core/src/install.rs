@@ -57,6 +57,13 @@ impl Target {
         Ok(Target { agent: agent.to_string(), project })
     }
 
+    pub fn recorded(agent: &str, project: Option<&str>) -> Result<Target, String> {
+        Target::new(agent, project).or_else(|e| {
+            let gone = Target { agent: agent.to_string(), project: project.map(str::trim).filter(|p| !p.is_empty()).map(str::to_string) };
+            if load().unwrap_or_default().iter().any(|r| r.target == gone) { Ok(gone) } else { Err(e) }
+        })
+    }
+
     pub fn root(&self) -> Result<PathBuf, String> {
         let sub = agent_dir(&self.agent).ok_or_else(|| format!("there is no agent {:?}", self.agent))?;
         let base = match &self.project {
@@ -142,14 +149,33 @@ fn digests_of(dir: &Path) -> BTreeMap<String, String> {
     files_of(dir).into_iter().filter_map(|f| std::fs::read(dir.join(&f.path)).ok().map(|b| (f.path, hex_sha256(&b)))).collect()
 }
 
+fn extras_of(dir: &Path, prefix: &str, known: &BTreeMap<String, String>, found: &mut Vec<String>) {
+    let Ok(read) = std::fs::read_dir(dir) else { return };
+    for entry in read.flatten() {
+        let name = entry.file_name().to_string_lossy().to_string();
+        let rel = if prefix.is_empty() { name.clone() } else { format!("{prefix}/{name}") };
+        if known.contains_key(&rel) || name == "__pycache__" || name.ends_with(".pyc") || name == ".DS_Store" || name == "Thumbs.db" {
+            continue;
+        }
+        let inner = format!("{rel}/");
+        let real_dir = entry.file_type().is_ok_and(|t| t.is_dir());
+        if real_dir && known.keys().any(|k| k.starts_with(&inner)) {
+            extras_of(&entry.path(), &rel, known, found);
+        } else {
+            found.push(rel);
+        }
+    }
+}
+
 fn state_of(record: &Record) -> State {
     let path = record.target.root().map(|r| r.join(&record.folder)).unwrap_or_default();
-    let (state, changed) = if !path.join("SKILL.md").is_file() {
+    let (state, changed) = if std::fs::symlink_metadata(&path).is_err() {
         ("missing", Vec::new())
     } else {
         let now = digests_of(&path);
         let mut changed: Vec<String> = now.iter().filter(|(p, d)| record.digests.get(*p) != Some(*d)).map(|(p, _)| p.clone()).collect();
         changed.extend(record.digests.keys().filter(|p| !now.contains_key(*p)).cloned());
+        extras_of(&path, "", &record.digests, &mut changed);
         changed.sort();
         changed.dedup();
         (if changed.is_empty() { "ok" } else { "modified" }, changed)
