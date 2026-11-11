@@ -3,7 +3,7 @@
 Living log for formskills' window. Source files stay comment-free; what they would have said lives here.
 
 Current build version: v0.10.2
-Last updated: 2026-11-10 · the extension check command for your own skills; FORM_FAMILY_DIR without a trailing slash; the reader's front matter quotes and comments; the dev engine bridge refuses foreign pages; v0.10.2 version bump only; 2026-10-25 · the Install and Installed pages; Your skills, the Release row, Trust; search, topics, the format page and Check; editing your own copy; the reader and downloads; where each app's skills come from; chips, cards and the detail pane
+Last updated: 2026-11-10 · skill lists notice a changed name or description; the extension check command for your own skills; FORM_FAMILY_DIR without a trailing slash; the reader's front matter quotes and comments; the dev engine bridge refuses foreign pages; v0.10.2 version bump only; 2026-10-25 · the Install and Installed pages; Your skills, the Release row, Trust; search, topics, the format page and Check; editing your own copy; the reader and downloads; where each app's skills come from; chips, cards and the detail pane
 
 ## v0.10.3 · review fixes {#v0-10-3}
 
@@ -34,6 +34,13 @@ Each sibling repository's path was `${family}${name}`, and only the default root
 - logged: v0.10.3 · 2026-11-10
 
 `EXT_COMMANDS` advertises `check` with `app` as "an app id, or yours", but `runAppCommand` sent `check_skill` unless `copy` was true, and `check_skill` looks the app up in the library, so `{ app: "yours", skill: "tidy-notes" }` failed with "yours is not in the library". Your own skills are edit records, so `app: "yours"` now goes to `edit_check`, as the window's own Check does for them. Checked with `tsc --noEmit` and, for the engine side, `formskills-cli check yours <skill>` (the browser build's `edit_check` path), which reports; not run from a live extension.
+
+### main.ts · the skill lists notice a changed name or description
+- refers-to: frontend/src/main.ts :: showSkills (marks), showOwn (key)
+- kind: fix
+- logged: v0.10.3 · 2026-11-10
+
+`showSkills` and `showOwn` rebuild their list only when a key built from each skill changes, and the key held the description's length but neither the description nor the name. Changing one word of your own skill's description for another of the same length, or changing its name, left Your skills (and the app list) showing the old text after `loadOwn` had fetched the new one. Both keys now hold `s.name` and `s.description`. The lists are still rebuilt only when the key changes, so nothing else repaints. Checked with `tsc --noEmit`; not run in the window.
 
 ## v0.10.1 · the reader keeps its content inside the pane {#v0-10-1}
 

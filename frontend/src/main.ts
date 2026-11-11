@@ -142,7 +142,7 @@ function showSkills(id: string): void {
   const found = library.get(id);
   setText(field("here"), found ? longText(found) : invoke ? HERE : "Open the formskills app to read the released skills.");
   const version = found?.source.kind === "release" || found?.source.kind === "kept" ? found.source.version : "";
-  const marks = version + "|" + (found?.skills ?? []).map((s) => `${s.folder}:${editMark(id, s.folder)}:${s.check.errors}.${s.check.warnings}:${s.license}:${s.scripts}:${s.description.length}`).join("|");
+  const marks = version + "|" + (found?.skills ?? []).map((s) => `${s.folder}:${editMark(id, s.folder)}:${s.check.errors}.${s.check.warnings}:${s.license}:${s.scripts}:${s.name}:${s.description}`).join("|");
   const shown = skillList.dataset.app === id && skillList.dataset.count === String(found?.skills.length ?? -1) && skillList.dataset.marks === marks;
   if (shown) return;
   skillList.dataset.app = id;
@@ -837,7 +837,7 @@ function nameProblem(name: string): string {
 }
 
 function showOwn(): void {
-  const key = ownSkills.map((s) => `${s.folder}:${s.check.errors}.${s.check.warnings}:${s.description.length}`).join("|");
+  const key = ownSkills.map((s) => `${s.folder}:${s.check.errors}.${s.check.warnings}:${s.name}:${s.description}`).join("|");
   if (ownList.dataset.key === key) return;
   ownList.dataset.key = key;
   const items = ownSkills.map((s) => {
