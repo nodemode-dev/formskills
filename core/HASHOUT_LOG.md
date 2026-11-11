@@ -2,8 +2,24 @@
 
 Living log for `formskills-core`, `formskills-cli` and `setup/apps.py`. Source files stay comment-free; what they would have said lives here.
 
-Current build version: v0.10.3
-Last updated: 2026-11-10 · edit read notes a non-text file; removing a project install whose folder is gone; formskills.bat forwards every argument; backslashes in a new skill's description; FormPortal's macOS folder for the kept catalogue; front matter comments, nested maps and lists, and quotes as YAML reads them; a changed install without SKILL.md or with extra entries needs force; plain multi-line front matter values, quotes off the joined value, formskills.bat cli and apps; 2026-11-02 · the catalogue from the public download store; 2026-10-26 · the test suite; installing into Claude Code, Codex and Cursor; pins, one-app update, your own skills, script counts; search, the format check, licences and topics; registered in formcompiler; personal edited copies; no partial download; reading one file and packing downloads; released skills fetched, checked and kept, and the dev mode; the generated list of apps that ship skills
+Current build version: v0.10.4
+Last updated: 2026-11-11 · read and edit read fail on a file that is not text; setup/apps.py's bytecode cache is ignored; 2026-11-10 · edit read notes a non-text file; removing a project install whose folder is gone; formskills.bat forwards every argument; backslashes in a new skill's description; FormPortal's macOS folder for the kept catalogue; front matter comments, nested maps and lists, and quotes as YAML reads them; a changed install without SKILL.md or with extra entries needs force; plain multi-line front matter values, quotes off the joined value, formskills.bat cli and apps; 2026-11-02 · the catalogue from the public download store; 2026-10-26 · the test suite; installing into Claude Code, Codex and Cursor; pins, one-app update, your own skills, script counts; search, the format check, licences and topics; registered in formcompiler; personal edited copies; no partial download; reading one file and packing downloads; released skills fetched, checked and kept, and the dev mode; the generated list of apps that ship skills
+
+## v0.10.4 · QA fixes {#v0-10-4}
+
+### cli/src/main.rs · reading a file that is not text exits non-zero
+- refers-to: cli/src/main.rs :: main (edit read yours, edit read, read)
+- kind: fix
+- logged: v0.10.4 · 2026-11-11
+
+Since 0.10.3 `edit read yours <skill> <file>` printed the reason a file is not shown ("not text" or "too large") on stderr, but exited 0, so a script could not tell it from an empty file. The same was true of `edit read <app> <skill> <file>` and `read <app> <path>`. All three now return the reason as the command's error: it is printed as `formskills: <path>: <reason>` and the exit code is 1. Text files print as before. Tested in `cli/tests/resilience.rs :: reading_a_file_that_is_not_text_fails`, which fails on 0.10.3 at each of the three commands.
+
+### .gitignore · __pycache__
+- refers-to: .gitignore
+- kind: fix
+- logged: v0.10.4 · 2026-11-11
+
+CI's `python3 -m py_compile setup/apps.py` leaves `setup/__pycache__/` beside the script, which showed as untracked after a local CI run. Every `__pycache__/` is ignored.
 
 ## v0.10.3 · review fixes {#v0-10-3}
 

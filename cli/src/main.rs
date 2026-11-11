@@ -191,12 +191,12 @@ fn main() -> ExitCode {
             return ExitCode::FAILURE;
         };
         let result: Result<serde_json::Value, String> = match (action, args.get(4), args.get(5)) {
-            ("read", Some(path), _) => edits::read(own::OWN, &folder, path).map(|f| {
-                match f.text {
-                    Some(text) => print!("{text}"),
-                    None => eprintln!("formskills: {}: {}", f.path, f.note.unwrap_or_default()),
+            ("read", Some(path), _) => edits::read(own::OWN, &folder, path).and_then(|f| match f.text {
+                Some(text) => {
+                    print!("{text}");
+                    Ok(serde_json::Value::Null)
                 }
-                serde_json::Value::Null
+                None => Err(format!("{}: {}", f.path, f.note.unwrap_or_default())),
             }),
             ("write", Some(path), Some(from)) => {
                 let text = if from == "-" {
@@ -429,12 +429,12 @@ fn main() -> ExitCode {
             let result: Result<serde_json::Value, String> = match action {
                 "start" => original.as_ref().ok_or_else(|| format!("{} was not read", app.name)).and_then(|o| edits::start(o, &folder)).map(|e| json!(e)),
                 "read" => match args.get(4) {
-                    Some(path) => edits::read(&app.id, &folder, path).map(|f| {
-                        match f.text {
-                            Some(text) => print!("{text}"),
-                            None => eprintln!("formskills: {}: {}", f.path, f.note.unwrap_or_default()),
+                    Some(path) => edits::read(&app.id, &folder, path).and_then(|f| match f.text {
+                        Some(text) => {
+                            print!("{text}");
+                            Ok(serde_json::Value::Null)
                         }
-                        serde_json::Value::Null
+                        None => Err(format!("{}: {}", f.path, f.note.unwrap_or_default())),
                     }),
                     None => Err("edit read needs a path in the skill, for example SKILL.md".to_string()),
                 },
@@ -482,11 +482,12 @@ fn main() -> ExitCode {
             };
             let result = if command == "read" {
                 match (args.get(2), entry.root.as_deref()) {
-                    (Some(path), Some(root)) => library::read_text(root, path).map(|f| {
-                        match f.text {
-                            Some(text) => print!("{text}"),
-                            None => eprintln!("formskills: {}: {}", f.path, f.note.unwrap_or_default()),
+                    (Some(path), Some(root)) => library::read_text(root, path).and_then(|f| match f.text {
+                        Some(text) => {
+                            print!("{text}");
+                            Ok(())
                         }
+                        None => Err(format!("{}: {}", f.path, f.note.unwrap_or_default())),
                     }),
                     (None, _) => Err("read needs a path, for example formvis-harness/SKILL.md".to_string()),
                     (_, None) => Err(format!("{} has no skills here", app.name)),

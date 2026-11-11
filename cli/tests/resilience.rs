@@ -70,3 +70,29 @@ fn fetching_a_kept_release_again_leaves_one_folder() {
     assert_eq!(names, vec!["2.10.6".to_string()]);
     assert!(s.path("formskills/released/formcut/2.10.6/skills/cut-video/SKILL.md").is_file());
 }
+
+#[test]
+fn reading_a_file_that_is_not_text_fails() {
+    let s = Sandbox::new("binary");
+    let server = Server::start();
+    let set = zip_of(&[("cut-video/SKILL.md", &skill_card("cut-video", "Body.")), ("cut-video/blob.bin", "a\0b")]);
+    let a = asset(&server, "formcut-skills.zip", &set);
+    let k = key(7);
+    write_catalogue(&s, &[product("formcut", "2.10.6", Some(a), vec![])], Some(&k));
+    let e = vec![("FORMAI_CATALOG_PUBKEY", public(&k))];
+    let (ok, out, err) = s.run(&["read", "formcut", "cut-video/blob.bin"], &env(&e));
+    assert!(!ok, "{out}");
+    assert!(err.contains("not text"), "{err}");
+    s.json(&["edit", "start", "formcut", "cut-video"], &env(&e));
+    let (ok, out, err) = s.run(&["edit", "read", "formcut", "cut-video", "blob.bin"], &env(&e));
+    assert!(!ok, "{out}");
+    assert!(err.contains("not text"), "{err}");
+    s.json(&["new", "tidy-notes", "Tidies", "notes"], &[]);
+    std::fs::write(s.path("formskills/edits/yours/tidy-notes/blob.bin"), b"\xff\x00\xfe").unwrap();
+    let (ok, out, err) = s.run(&["edit", "read", "yours", "tidy-notes", "blob.bin"], &[]);
+    assert!(!ok, "{out}");
+    assert!(err.contains("not text"), "{err}");
+    let (ok, out, _) = s.run(&["edit", "read", "yours", "tidy-notes", "SKILL.md"], &[]);
+    assert!(ok);
+    assert!(out.contains("name: tidy-notes"), "{out}");
+}
