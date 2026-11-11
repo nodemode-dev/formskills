@@ -33,6 +33,34 @@ pub fn is_script(path: &str) -> bool {
     SCRIPT_ENDINGS.iter().any(|e| lower.ends_with(e))
 }
 
+fn scalar(raw: &str) -> String {
+    let raw = raw.trim();
+    if raw.len() >= 2 && raw.starts_with('"') && raw.ends_with('"') && raw[1..raw.len() - 1].chars().rev().take_while(|c| *c == '\\').count() % 2 == 0 {
+        let mut out = String::new();
+        let mut chars = raw[1..raw.len() - 1].chars();
+        while let Some(c) = chars.next() {
+            match (c, chars.clone().next()) {
+                ('\\', Some(next @ ('"' | '\\'))) => {
+                    out.push(next);
+                    chars.next();
+                }
+                _ => out.push(c),
+            }
+        }
+        return out;
+    }
+    if raw.len() >= 2 && raw.starts_with('\'') && raw.ends_with('\'') {
+        return raw[1..raw.len() - 1].replace("''", "'");
+    }
+    if raw.starts_with('#') {
+        return String::new();
+    }
+    match raw.find(" #").or_else(|| raw.find("\t#")) {
+        Some(at) => scalar(&raw[..at]),
+        None => raw.to_string(),
+    }
+}
+
 pub fn front_matter(text: &str) -> BTreeMap<String, String> {
     let mut found = BTreeMap::new();
     let mut lines = text.lines();
@@ -54,19 +82,22 @@ pub fn front_matter(text: &str) -> BTreeMap<String, String> {
                 block = Some(key.to_string());
                 raw = None;
             } else {
-                found.insert(key.to_string(), value.trim_matches(|c| c == '"' || c == '\'').to_string());
+                found.insert(key.to_string(), scalar(value));
                 block = Some(key.to_string());
                 raw = Some(value.to_string());
             }
         } else if let Some(key) = &block {
-            if !line.trim().is_empty() {
+            let text = line.trim();
+            if !text.is_empty() {
                 let entry = found.entry(key.clone()).or_default();
                 match raw.as_mut() {
+                    Some(_) if text.starts_with('#') || !line.starts_with([' ', '\t']) => {}
+                    Some(joined) if joined.is_empty() && (text == "-" || text.starts_with("- ") || text.split_once(':').is_some_and(|(k, v)| !k.is_empty() && k.chars().all(|c| c.is_ascii_alphanumeric() || c == '_' || c == '-') && (v.is_empty() || v.starts_with(' ')))) => block = None,
                     Some(joined) => {
-                        *joined = format!("{joined} {}", line.trim());
-                        *entry = joined.trim_matches(|c| c == '"' || c == '\'' || c == ' ').to_string();
+                        *joined = format!("{joined} {text}").trim().to_string();
+                        *entry = scalar(joined);
                     }
-                    None => *entry = format!("{entry} {}", line.trim()).trim().to_string(),
+                    None => *entry = format!("{entry} {text}").trim().to_string(),
                 }
             }
         }
