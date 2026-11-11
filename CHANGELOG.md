@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.10.4 · 2026-11-11
+
+- `edit read yours <skill> <file>`, `edit read <app> <skill> <file>` and `read <app> <path>` on the command line now exit with an error when the file is not text or too large to show, instead of printing the reason and exiting as if it had worked.
+- The shell builds without the warning about an unused background colour (no change to the window).
+- Python's `__pycache__` folders are ignored by git, so running the checks leaves nothing untracked.
+
 ## v0.10.3 · 2026-11-10
 
 - Removing or reinstalling a skill no longer deletes your work without asking. An installed skill folder whose SKILL.md you deleted or moved, or in which you added files, a `.git` repository, `node_modules` or a link, now counts as changed, so Remove and Install again ask for force (Remove, losing changes) instead of deleting it. Python caches and Finder files are still ignored.
