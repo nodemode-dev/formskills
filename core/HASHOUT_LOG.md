@@ -3,7 +3,7 @@
 Living log for `formskills-core`, `formskills-cli` and `setup/apps.py`. Source files stay comment-free; what they would have said lives here.
 
 Current build version: v0.10.2
-Last updated: 2026-11-10 · removing a project install whose folder is gone; formskills.bat forwards every argument; backslashes in a new skill's description; FormPortal's macOS folder for the kept catalogue; front matter comments, nested maps and lists, and quotes as YAML reads them; a changed install without SKILL.md or with extra entries needs force; plain multi-line front matter values, quotes off the joined value, formskills.bat cli and apps; 2026-11-02 · the catalogue from the public download store; 2026-10-26 · the test suite; installing into Claude Code, Codex and Cursor; pins, one-app update, your own skills, script counts; search, the format check, licences and topics; registered in formcompiler; personal edited copies; no partial download; reading one file and packing downloads; released skills fetched, checked and kept, and the dev mode; the generated list of apps that ship skills
+Last updated: 2026-11-10 · edit read notes a non-text file; removing a project install whose folder is gone; formskills.bat forwards every argument; backslashes in a new skill's description; FormPortal's macOS folder for the kept catalogue; front matter comments, nested maps and lists, and quotes as YAML reads them; a changed install without SKILL.md or with extra entries needs force; plain multi-line front matter values, quotes off the joined value, formskills.bat cli and apps; 2026-11-02 · the catalogue from the public download store; 2026-10-26 · the test suite; installing into Claude Code, Codex and Cursor; pins, one-app update, your own skills, script counts; search, the format check, licences and topics; registered in formcompiler; personal edited copies; no partial download; reading one file and packing downloads; released skills fetched, checked and kept, and the dev mode; the generated list of apps that ship skills
 
 ## v0.10.3 · review fixes {#v0-10-3}
 
@@ -48,6 +48,13 @@ FormPortal's data folder on macOS is `studio.formai.portal` (its tauri.conf.json
 - logged: v0.10.3 · 2026-11-10
 
 `Target::new` canonicalizes a project path, which fails once the folder is deleted or moved, so the record in `installed.json` could never be removed and Installed kept a "No longer in the folder" row for good. `Target::recorded` tries `Target::new` first and, when that fails, accepts the project string exactly as given if a record holds that agent and project (records store the canonical path, which is what the window passes back). Only removal uses it (`uninstall` in the command line, `install_remove` in the shell); update and install keep `Target::new`, so they never recreate a project folder the person deleted, and a path no record holds still fails as before. Checked with formskills-cli in a temporary HOME: install into a project, delete the project, `installed` shows missing, `update` fails without creating the folder, `uninstall --project <path>` removes the record, and an unrecorded missing path still fails.
+
+### cli/src/main.rs · edit read says when a file is not text
+- refers-to: cli/src/main.rs :: edit read (yours and copies) · frontend/vite.engine.ts :: text
+- kind: fix
+- logged: v0.10.3 · 2026-11-10
+
+Both `edit read` branches printed the text when there was some and nothing at all otherwise, so a binary file in a copy (an image in `assets/`) gave empty output and exit 0. The browser build's bridge took that as an empty text file, the editor opened on an empty buffer, and the first keystroke's autosave wrote text over the binary file. Both branches now print `formskills: <path>: <note>` on stderr when the file is not text, as `read` does; the bridge's `text()` already turns that into `text: null` with the note, and the window then disables the editor. Exit code stays 0, as for `read`. Checked with formskills-cli: `edit read yours <skill> assets/a.png` on an 8-byte binary printed the note on stderr, and SKILL.md still printed its text.
 
 ## v0.10.2 · plain multi-line front matter values {#v0-10-2}
 

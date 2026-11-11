@@ -192,7 +192,10 @@ fn main() -> ExitCode {
         };
         let result: Result<serde_json::Value, String> = match (action, args.get(4), args.get(5)) {
             ("read", Some(path), _) => edits::read(own::OWN, &folder, path).map(|f| {
-                print!("{}", f.text.unwrap_or_default());
+                match f.text {
+                    Some(text) => print!("{text}"),
+                    None => eprintln!("formskills: {}: {}", f.path, f.note.unwrap_or_default()),
+                }
                 serde_json::Value::Null
             }),
             ("write", Some(path), Some(from)) => {
@@ -427,8 +430,9 @@ fn main() -> ExitCode {
                 "start" => original.as_ref().ok_or_else(|| format!("{} was not read", app.name)).and_then(|o| edits::start(o, &folder)).map(|e| json!(e)),
                 "read" => match args.get(4) {
                     Some(path) => edits::read(&app.id, &folder, path).map(|f| {
-                        if let Some(text) = &f.text {
-                            print!("{text}");
+                        match f.text {
+                            Some(text) => print!("{text}"),
+                            None => eprintln!("formskills: {}: {}", f.path, f.note.unwrap_or_default()),
                         }
                         serde_json::Value::Null
                     }),
