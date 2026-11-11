@@ -21,10 +21,22 @@ exit /b %errorlevel%
 :cli
 shift
 cargo build -q --release --locked -p formskills-cli 1>&2 || exit /b 1
-target\release\formskills-cli.exe %1 %2 %3 %4 %5 %6 %7 %8 %9
-exit /b %errorlevel%
+set "RUN=target\release\formskills-cli.exe"
+goto collect
 
 :apps
 shift
-python setup\apps.py %1 %2 %3 %4 %5 %6 %7 %8 %9
+set "RUN=python setup\apps.py"
+goto collect
+
+:collect
+set "ARGS="
+:more
+if "%~1"=="" goto run
+set ARGS=%ARGS% %1
+shift
+goto more
+
+:run
+%RUN%%ARGS%
 exit /b %errorlevel%

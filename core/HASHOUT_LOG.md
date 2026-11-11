@@ -3,7 +3,7 @@
 Living log for `formskills-core`, `formskills-cli` and `setup/apps.py`. Source files stay comment-free; what they would have said lives here.
 
 Current build version: v0.10.2
-Last updated: 2026-11-10 · backslashes in a new skill's description; FormPortal's macOS folder for the kept catalogue; front matter comments, nested maps and lists, and quotes as YAML reads them; a changed install without SKILL.md or with extra entries needs force; plain multi-line front matter values, quotes off the joined value, formskills.bat cli and apps; 2026-11-02 · the catalogue from the public download store; 2026-10-26 · the test suite; installing into Claude Code, Codex and Cursor; pins, one-app update, your own skills, script counts; search, the format check, licences and topics; registered in formcompiler; personal edited copies; no partial download; reading one file and packing downloads; released skills fetched, checked and kept, and the dev mode; the generated list of apps that ship skills
+Last updated: 2026-11-10 · formskills.bat forwards every argument; backslashes in a new skill's description; FormPortal's macOS folder for the kept catalogue; front matter comments, nested maps and lists, and quotes as YAML reads them; a changed install without SKILL.md or with extra entries needs force; plain multi-line front matter values, quotes off the joined value, formskills.bat cli and apps; 2026-11-02 · the catalogue from the public download store; 2026-10-26 · the test suite; installing into Claude Code, Codex and Cursor; pins, one-app update, your own skills, script counts; search, the format check, licences and topics; registered in formcompiler; personal edited copies; no partial download; reading one file and packing downloads; released skills fetched, checked and kept, and the dev mode; the generated list of apps that ship skills
 
 ## v0.10.3 · review fixes {#v0-10-3}
 
@@ -34,6 +34,13 @@ FormPortal's data folder on macOS is `studio.formai.portal` (its tauri.conf.json
 - logged: v0.10.3 · 2026-11-10
 
 `template` writes the description as a double-quoted YAML scalar, and `one_line` only swapped `"` for `'`, so `new paths Fixes C:\docs and \Users paths` wrote `\d` and `\U`, which are not valid YAML escapes: the agents' YAML readers refused the card while formskills' own Check passed it. `one_line` now doubles every backslash before the quote swap, and `skills::scalar` turns `\\` back into one, so formskills and the agents read the same text. Checked with formskills-cli `new` in a temporary data folder: SKILL.md holds `"Fixes C:\\docs and \\Users paths"`, PyYAML reads `Fixes C:\docs and \Users paths`, and `own` lists the same text.
+
+### formskills.bat · cli and apps forward every argument
+- refers-to: formskills.bat :: cli, apps, collect, more, run
+- kind: fix
+- logged: v0.10.3 · 2026-11-10
+
+`%*` ignores `shift`, so the 0.10.2 labels forwarded a fixed `%1` to `%9`, and `formskills.bat cli new tidy-notes` with a long description, or a long `cli search`, silently lost every word past the ninth. Each label now sets `RUN` to its program and jumps to one shared loop that appends `%1` to `ARGS` and shifts until `%~1` is empty, then runs `%RUN%%ARGS%` and returns its errorlevel. The loop lines sit outside any parenthesised block, so each `%1` and `%errorlevel%` is expanded after the line before it ran; `set ARGS=%ARGS% %1` is unquoted so a quoted argument holding `&` stays inside its quotes. Limits: an empty quoted argument (`""`) ends the list, and cmd itself splits unquoted `=`, `,` and `;` (as it did for `%1` to `%9`). CRLF line endings kept (checked with `git ls-files --eol`). Not run on Windows (traced against cmd's parsing rules).
 
 ## v0.10.2 · plain multi-line front matter values {#v0-10-2}
 
