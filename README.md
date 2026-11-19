@@ -104,7 +104,7 @@ formskills loads extensions under the Form Extension Contract, API 1: FormPortal
 - **Trust:** the catalogue is verified with the same key model as FormPortal and formMCP, and reads never leave the skills folder.
 - **Shell and window:** a Tauri 2 shell around a vanilla TypeScript and Vite window with zero runtime dependencies.
 - **Generated list:** the public apps that ship skills come from the family spec that formadaptor builds from formcompiler's registry (`./formskills apps --family PATH`).
-- **Tested:** 34 Rust tests (catalogue trust, digests, safe unpacking, the format checks, link resolution).
+- **Tested:** 36 Rust tests (catalogue trust, digests, safe unpacking, the format checks, link resolution).
 
 ## Demo
 

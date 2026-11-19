@@ -102,11 +102,11 @@ A checkout counts when `<folder>/<app repository name>/<skills folder>` exists (
 The list is generated from the family spec, `family.json` on formadaptor's `spec` branch (public apps only; an app is listed when its `agents.skills` names a folder, and apps without one are left out):
 
 ```bash
-./formskills apps --family PATH          # writes core/data/apps.json
+./formskills apps --family PATH          # writes core/data/apps.json, and setup/family.spec.json when the list changed
 ./formskills apps --family PATH --check  # writes nothing; exits 1 naming the file while it drifts
 ```
 
-`setup/family.spec.json` is the copy of the spec the committed list was built from; CI runs `--check` against it, so a list edited by hand, or a generator change that moves the output, fails the build.
+`setup/family.spec.json` is the copy of the spec the committed list was built from. The generator writes it itself, and only when the spec it was given changes the list: the same spec again, or one that differs only in fields the list does not use (such as `generated`), leaves both files as they are. CI runs `--check` against the copy, so a list edited by hand, or a generator change that moves the output, fails the build.
 
 The file records the formcompiler registry version the spec was built from; the window's footer shows it.
 

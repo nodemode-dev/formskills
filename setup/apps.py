@@ -1,11 +1,14 @@
 import argparse
 import json
+import shutil
 import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 OUT = ROOT / "core" / "data" / "apps.json"
 OUT_NAME = "core/data/apps.json"
+KEPT = ROOT / "setup" / "family.spec.json"
+KEPT_NAME = "setup/family.spec.json"
 FORMAT = "formskills-apps"
 SPEC_FORMAT = "formai-family"
 SPEC_VERSION = 1
@@ -88,7 +91,7 @@ def build(family):
 
 def main():
     parser = argparse.ArgumentParser(description="core/data/apps.json from the family spec: the public Form apps that ship skills")
-    parser.add_argument("--family", required=True, help="family.json from formadaptor's spec branch")
+    parser.add_argument("--family", required=True, help="family.json from formadaptor's spec branch; copied to setup/family.spec.json when it changes the list")
     parser.add_argument("--check", action="store_true", help="write nothing; exit 1 naming core/data/apps.json when it differs")
     args = parser.parse_args()
     text = json.dumps(build(load_family(args.family)), indent=2, ensure_ascii=False) + "\n"
@@ -99,7 +102,14 @@ def main():
     OUT.parent.mkdir(parents=True, exist_ok=True)
     OUT.write_text(text, encoding="utf-8")
     count = len(json.loads(text)["apps"])
-    print(f"apps: {OUT.relative_to(ROOT)} {'unchanged' if current == text else 'written'}, {count} apps")
+    print(f"apps: {OUT_NAME} {'unchanged' if current == text else 'written'}, {count} apps")
+    if current != text:
+        given = Path(args.family)
+        if KEPT.is_file() and given.resolve() == KEPT.resolve():
+            print(f"apps: {KEPT_NAME} is the spec given, kept as it is")
+        else:
+            shutil.copyfile(given, KEPT)
+            print(f"apps: {KEPT_NAME} written")
 
 
 if __name__ == "__main__":
