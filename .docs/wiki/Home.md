@@ -12,7 +12,7 @@ formskills is where the Form family's skills are found: every Form app's release
 
 ## What it does
 
-- The list of Form apps that ship skills, generated from formcompiler's registry, with where each app keeps them (v0.1.0).
+- The list of Form apps that ship skills, generated from the family spec, with where each app keeps them (v0.1.0).
 - A window with All and one chip per app, a card per app and a detail pane (v0.1.0).
 - Each app's latest released skills, read from the signed family catalogue, digest checked and kept on this computer, with the kept copy shown when the network fails; a dev mode for local checkouts; each app's skill count and source in the window (v0.2.0).
 - Skill cards and a reader: SKILL.md as formatted text, its sub-skills, references and other files beside it, links between them followed; download of one skill or an app's set as a zip shaped like the release asset (v0.3.0).

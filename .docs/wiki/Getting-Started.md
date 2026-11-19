@@ -99,14 +99,14 @@ A checkout counts when `<folder>/<app repository name>/<skills folder>` exists (
 
 ## Refreshing the list
 
-The list is generated from formcompiler's registry (`apps/<app>.json`: its `catalog` block, and `agents.skills`, the folder an app keeps its skills in; apps without one are left out):
+The list is generated from the family spec, `family.json` on formadaptor's `spec` branch (public apps only; an app is listed when its `agents.skills` names a folder, and apps without one are left out):
 
 ```bash
-./formskills apps --compiler ../formcompiler          # writes core/data/apps.json
-./formskills apps --compiler ../formcompiler --check  # fails while it drifts
+./formskills apps --family PATH          # writes core/data/apps.json
+./formskills apps --family PATH --check  # writes nothing; exits 1 naming the file while it drifts
 ```
 
-The file records the formcompiler version and commit it came from; the window's footer shows it.
+The file records the formcompiler registry version the spec was built from; the window's footer shows it.
 
 ## Building the app
 

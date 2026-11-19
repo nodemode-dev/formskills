@@ -1,78 +1,100 @@
 import argparse
 import json
-import subprocess
 import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 OUT = ROOT / "core" / "data" / "apps.json"
+OUT_NAME = "core/data/apps.json"
 FORMAT = "formskills-apps"
+SPEC_FORMAT = "formai-family"
+SPEC_VERSION = 1
 TOPICS = {
     "Media": ["audio", "encoder", "image", "motion", "photo", "promo", "video"],
     "Design": ["layout", "sculpt", "slides", "texture", "vector", "web"],
     "Documents": ["chat", "document", "notes", "pdf", "reference", "spreadsheet"],
-    "Family": ["connect", "launcher", "library", "portal", "skill"],
+    "Family": ["connect", "extensions", "launcher", "library", "portal", "skill", "utility"],
 }
+FALLBACK_TOPIC = "Family"
+REQUIRED = ("id", "app", "name", "kind", "summary", "licence", "repository", "state", "agents", "release")
 
 
-def topic_of(kind):
+def fail(message):
+    print(f"apps: {message}", file=sys.stderr)
+    sys.exit(2)
+
+
+def topic_of(kind, fallen):
     for topic, kinds in TOPICS.items():
         if kind in kinds:
             return topic
-    sys.exit(f"apps: kind {kind!r} has no topic; add it to TOPICS in setup/apps.py")
+    fallen.add(kind)
+    return FALLBACK_TOPIC
 
 
-def git(repo, *args):
+def load_family(path):
     try:
-        return subprocess.check_output(["git", "-C", str(repo), *args], text=True, stderr=subprocess.DEVNULL).strip()
-    except (OSError, subprocess.CalledProcessError):
-        return ""
+        family = json.loads(Path(path).read_text(encoding="utf-8"))
+    except (OSError, ValueError) as error:
+        fail(f"cannot read the family spec {path}: {error}")
+    if not isinstance(family, dict) or family.get("format") != SPEC_FORMAT or family.get("format_version") != SPEC_VERSION:
+        fail(f"{path} is not a {SPEC_FORMAT} version {SPEC_VERSION} file")
+    source = family.get("source")
+    if not isinstance(source, dict) or not isinstance(source.get("registry_version"), str) or not isinstance(family.get("apps"), list):
+        fail(f"{path} has no source.registry_version or no apps list")
+    return family
 
 
-def build(compiler):
-    apps_dir = compiler / "apps"
-    if not apps_dir.is_dir():
-        sys.exit(f"apps: {apps_dir} is not formcompiler's registry folder")
-    version = (compiler / "VERSION").read_text(encoding="utf-8").strip() if (compiler / "VERSION").is_file() else ""
+def build(family):
     apps = []
-    for path in sorted(apps_dir.glob("*.json")):
-        entry = json.loads(path.read_text(encoding="utf-8"))
-        skills = (entry.get("agents") or {}).get("skills") or ""
+    fallen = set()
+    seen = set()
+    for entry in family["apps"]:
+        if not isinstance(entry, dict) or entry.get("public") is not True:
+            continue
+        missing = [key for key in REQUIRED if key not in entry]
+        if missing:
+            fail(f"public entry {entry.get('id')!r} lacks {', '.join(missing)}")
+        skills = (entry["agents"] or {}).get("skills") or ""
         if not skills:
             continue
-        catalog = entry["catalog"]
+        if entry["id"] in seen:
+            fail(f"the family spec lists {entry['id']!r} twice")
+        seen.add(entry["id"])
         apps.append({
-            "id": catalog["id"],
+            "id": entry["id"],
             "app": entry["app"],
-            "name": catalog["name"],
-            "kind": catalog["kind"],
-            "topic": topic_of(catalog["kind"]),
-            "licence": catalog.get("licence") or "",
-            "summary": catalog["summary"],
+            "name": entry["name"],
+            "kind": entry["kind"],
+            "topic": topic_of(entry["kind"], fallen),
+            "licence": entry["licence"] or "",
+            "summary": entry["summary"],
             "repository": f"https://github.com/{entry['repository']}",
             "skills": skills,
-            "state": catalog["state"],
-            "released": bool(entry.get("enabled")),
+            "state": entry["state"],
+            "released": entry["release"] is not None,
         })
-    apps.sort(key=lambda a: a["name"].lower())
+    for kind in sorted(fallen):
+        print(f"apps: kind {kind!r} is not in TOPICS, listed under {FALLBACK_TOPIC}", file=sys.stderr)
+    apps.sort(key=lambda a: (a["name"].lower(), a["id"]))
     return {
         "format": FORMAT,
         "format_version": 2,
-        "source": {"repository": "nodemode-dev/formcompiler", "version": version, "commit": git(compiler, "rev-parse", "HEAD")},
+        "source": {"repository": family["source"].get("repository") or "nodemode-dev/formcompiler", "version": family["source"]["registry_version"]},
         "topics": list(TOPICS),
         "apps": apps,
     }
 
 
 def main():
-    parser = argparse.ArgumentParser(description="core/data/apps.json from formcompiler's registry: the Form apps that ship skills")
-    parser.add_argument("--compiler", required=True, help="a checkout of nodemode-dev/formcompiler")
-    parser.add_argument("--check", action="store_true", help="fail when core/data/apps.json differs")
+    parser = argparse.ArgumentParser(description="core/data/apps.json from the family spec: the public Form apps that ship skills")
+    parser.add_argument("--family", required=True, help="family.json from formadaptor's spec branch")
+    parser.add_argument("--check", action="store_true", help="write nothing; exit 1 naming core/data/apps.json when it differs")
     args = parser.parse_args()
-    text = json.dumps(build(Path(args.compiler).resolve()), indent=2, ensure_ascii=False) + "\n"
+    text = json.dumps(build(load_family(args.family)), indent=2, ensure_ascii=False) + "\n"
     current = OUT.read_text(encoding="utf-8") if OUT.is_file() else ""
     if args.check:
-        print("apps: in step" if current == text else "apps: drifted (run python3 setup/apps.py --compiler PATH)")
+        print("apps: in step" if current == text else f"apps: drifted: {OUT_NAME}")
         sys.exit(0 if current == text else 1)
     OUT.parent.mkdir(parents=True, exist_ok=True)
     OUT.write_text(text, encoding="utf-8")

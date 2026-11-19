@@ -103,7 +103,7 @@ formskills loads extensions under the Form Extension Contract, API 1: FormPortal
 - **Engine:** `formskills-core` fetches the signed family catalogue, checks each skills asset's SHA-256, unpacks it safely and keeps it until a newer release.
 - **Trust:** the catalogue is verified with the same key model as FormPortal and formMCP, and reads never leave the skills folder.
 - **Shell and window:** a Tauri 2 shell around a vanilla TypeScript and Vite window with zero runtime dependencies.
-- **Generated list:** the apps that ship skills come from formcompiler's registry (`./formskills apps`).
+- **Generated list:** the public apps that ship skills come from the family spec that formadaptor builds from formcompiler's registry (`./formskills apps --family PATH`).
 - **Tested:** 31 Rust tests (catalogue trust, digests, safe unpacking, the format checks, link resolution).
 
 ## Demo
@@ -155,7 +155,7 @@ On Windows run `formskills_oc_install.bat`, then `formskills.bat`. Ports: 5630 (
 | `cli/` | `formskills-cli`, the JSON command line |
 | `src-tauri/` | The Tauri shell that opens the window |
 | `frontend/` | The window: chips, cards, detail pane and reader |
-| `setup/apps.py` | Generates `core/data/apps.json` from formcompiler's registry |
+| `setup/apps.py` | Generates `core/data/apps.json` from the family spec |
 
 Docs: [`.docs/wiki`](.docs/wiki) · Agents: [`CLAUDE.md`](CLAUDE.md), [`AGENTS.md`](AGENTS.md) · Contributing: [`.docs/BRANCHING.md`](.docs/BRANCHING.md)
 

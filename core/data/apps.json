@@ -3,8 +3,7 @@
   "format_version": 2,
   "source": {
     "repository": "nodemode-dev/formcompiler",
-    "version": "0.6.1",
-    "commit": "f0e3201aa8da152a21a464a9b62551ef032cc17d"
+    "version": "0.16.0"
   },
   "topics": [
     "Media",
@@ -13,6 +12,19 @@
     "Family"
   ],
   "apps": [
+    {
+      "id": "formext",
+      "app": "form.ext",
+      "name": "form.ext",
+      "kind": "extensions",
+      "topic": "Family",
+      "licence": "GPL-3.0-only",
+      "summary": "The extension studio: make, preview, check, package and publish extensions for every Form app.",
+      "repository": "https://github.com/nodemode-dev/form.ext",
+      "skills": ".claude/skills",
+      "state": "live",
+      "released": true
+    },
     {
       "id": "formmd",
       "app": "form.md",
@@ -40,6 +52,19 @@
       "released": true
     },
     {
+      "id": "formcel",
+      "app": "formcel",
+      "name": "FormCel",
+      "kind": "spreadsheet",
+      "topic": "Documents",
+      "licence": "Apache-2.0",
+      "summary": "Spreadsheets on your own machine, with Excel files in and out.",
+      "repository": "https://github.com/nodemode-dev/formcel",
+      "skills": ".claude/skills",
+      "state": "prelaunch",
+      "released": true
+    },
+    {
       "id": "formcut",
       "app": "formcut",
       "name": "FormCut",
@@ -48,6 +73,19 @@
       "licence": "Apache-2.0",
       "summary": "Video editing on your own machine: cut, grade, caption and export.",
       "repository": "https://github.com/nodemode-dev/formcut",
+      "skills": ".claude/skills",
+      "state": "live",
+      "released": true
+    },
+    {
+      "id": "formslide",
+      "app": "formdeck",
+      "name": "FormDeck",
+      "kind": "slides",
+      "topic": "Design",
+      "licence": "Apache-2.0",
+      "summary": "Presentations: build slides, present and export.",
+      "repository": "https://github.com/nodemode-dev/formdeck",
       "skills": ".claude/skills",
       "state": "live",
       "released": true
@@ -183,19 +221,6 @@
       "released": true
     },
     {
-      "id": "formslide",
-      "app": "formdeck",
-      "name": "FormSlide",
-      "kind": "slides",
-      "topic": "Design",
-      "licence": "Apache-2.0",
-      "summary": "Presentations: build slides, present and export.",
-      "repository": "https://github.com/nodemode-dev/formdeck",
-      "skills": ".claude/skills",
-      "state": "live",
-      "released": true
-    },
-    {
       "id": "formsurface",
       "app": "formsurface",
       "name": "FormSurface",
@@ -204,6 +229,32 @@
       "licence": "Apache-2.0",
       "summary": "Paint textures and materials straight onto 3D models.",
       "repository": "https://github.com/nodemode-dev/formsurface",
+      "skills": ".claude/skills",
+      "state": "prelaunch",
+      "released": true
+    },
+    {
+      "id": "formtools",
+      "app": "formtools",
+      "name": "FormTools",
+      "kind": "utility",
+      "topic": "Family",
+      "licence": "Apache-2.0",
+      "summary": "Viewers for almost any file, batch image tools, 3D viewing and desktop utilities in one window.",
+      "repository": "https://github.com/nodemode-dev/formtools",
+      "skills": ".claude/skills",
+      "state": "prelaunch",
+      "released": true
+    },
+    {
+      "id": "formtxt",
+      "app": "formtxt",
+      "name": "FormTxt",
+      "kind": "document",
+      "topic": "Documents",
+      "licence": "Apache-2.0",
+      "summary": "Documents on your own machine: paginated and pageless, with .docx and .odt round trips.",
+      "repository": "https://github.com/nodemode-dev/formtxt",
       "skills": ".claude/skills",
       "state": "prelaunch",
       "released": true
