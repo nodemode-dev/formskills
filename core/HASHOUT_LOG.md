@@ -18,6 +18,14 @@ Every kind has a topic. `TOPICS` gained `extensions` and `utility` under Family;
 
 Regenerated from the 0.16.0 sample spec, with the three entries the spec marks non-public held back so the change that removes them is its own commit: added FormCel, FormTxt, FormTools and form.ext (their registry entries now name a skills folder); FormDeck's catalogue name is FormDeck, no longer FormSlide (id `formslide` unchanged); source is registry 0.16.0 without a commit. Run only through setup/apps.py. Tests (added after the list and the loader were run: `formskills-cli apps` under a fresh HOME printed "bundled list from nodemode-dev/formcompiler 0.16.0" and 23 apps): `core/tests/bundled_apps.rs` checks the source has a version and no commit, ids are unique, every app has a skills folder and a topic from the topic list.
 
+### apps.json, setup/family.spec.json · three non-public apps are no longer listed
+- refers-to: core/data/apps.json · setup/family.spec.json
+- kind: change
+- logged: v0.11.0 · 2026-11-19
+
+The spec marks FormPromo, FormSculpt and FormSurface `public: false` (it carries only their id), so the list stops naming them: their names, summaries and repositories were in a public file. Nothing else in the list changed in this commit. `demo/`, `demos/` and the media icons still carry these three apps from before; they are built assets and were not touched. `setup/family.spec.json` is a byte copy (made with `cp`, sha256 3c1781c6...82ce3, content_sha256 2553862c... checked) of the 0.16.0 sample spec the list is now generated from. It is input, never edited by hand: it changes only when a newer `family.json` is copied over it and `setup/apps.py` is run. The generator reads neither `generated` nor `content_sha256` from it.
+
+
 ## v0.10.4 · QA fixes {#v0-10-4}
 
 ### cli/src/main.rs · reading a file that is not text exits non-zero
