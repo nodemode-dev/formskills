@@ -14,7 +14,7 @@ No backend, no Tauri, no network and no CDN: every script, style and sample is i
 
 ## What it shows
 
-- Read: 21 real skills from 11 of the 19 apps, SKILL.md as formatted text, sub-skills and references, links between them followed, with each app's real icon and window screenshot.
+- Read: the real skills of the 11 apps the demo was built with, SKILL.md as formatted text, sub-skills and references, links between them followed, with each app's real icon and window screenshot.
 - Search: every skill's text, ranked and matched the way the engine does it.
 - Check: the Agent Skills format check, run on a released skill and live while you edit a copy.
 - Edit a copy: live preview with the original beside it. Choose the earlier release in the Release row and your copy is flagged as changed in the original; Mark as seen follows it.

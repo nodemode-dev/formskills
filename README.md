@@ -75,7 +75,7 @@
 
 <table>
   <tr>
-    <td width="33%" valign="top"><h4>19 Form apps</h4>Every Form app that ships skills, listed from formcompiler's registry</td>
+    <td width="33%" valign="top"><h4>Every public Form app</h4>Each one that ships skills, listed from the family spec that formadaptor builds from formcompiler's registry</td>
     <td width="33%" valign="top"><h4>Actions</h4>Read · Search · Check · Download one or a whole set · Pin a release · Edit a copy · Write your own · Install · Update · Remove</td>
     <td width="33%" valign="top"><h4>Agents</h4>Claude Code (<code>~/.claude/skills</code>) · Codex (<code>~/.agents/skills</code>) · Cursor (<code>~/.cursor/skills</code>), for you or for one project</td>
   </tr>
@@ -104,7 +104,7 @@ formskills loads extensions under the Form Extension Contract, API 1: FormPortal
 - **Trust:** the catalogue is verified with the same key model as FormPortal and formMCP, and reads never leave the skills folder.
 - **Shell and window:** a Tauri 2 shell around a vanilla TypeScript and Vite window with zero runtime dependencies.
 - **Generated list:** the public apps that ship skills come from the family spec that formadaptor builds from formcompiler's registry (`./formskills apps --family PATH`).
-- **Tested:** 31 Rust tests (catalogue trust, digests, safe unpacking, the format checks, link resolution).
+- **Tested:** 34 Rust tests (catalogue trust, digests, safe unpacking, the format checks, link resolution).
 
 ## Demo
 

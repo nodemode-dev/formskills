@@ -33,6 +33,13 @@ The spec marks FormPromo, FormSculpt and FormSurface `public: false` (it carries
 
 The `scripts` job runs `python3 -I setup/apps.py --family setup/family.spec.json --check` beside the compile check, with no network and no new action (the job's only actions stay as pinned in the file). Run here against the committed copy: exit 0, "apps: in step"; with one value of apps.json changed: exit 1, "apps: drifted: core/data/apps.json". Known gap: formadaptor's pull request for this target changes only the files `targets.json` lists for it (`core/data/apps.json`), so on that pull request the copy is older than the list and this check fails until the copy is updated too; formadaptor's `files` for formskills needs this path, or the step has to fetch the spec instead.
 
+### README.md, demo/README.md · stated counts
+- refers-to: README.md ("Everything in the box", "Tested") · demo/README.md ("What it shows")
+- kind: fix
+- logged: v0.11.0 · 2026-11-19
+
+README said "19 Form apps", which was the stale list (the registry had 24 apps with skills when the survey was made; today's list is 20 public ones). The box now says "Every public Form app" and no number, so the next spec cannot make it wrong; the demo README no longer says "of the 19 apps" either. "31 Rust tests" is now 34, counted with `git grep -c '#\[test\]' -- core cli` (8 + 5 + 2 + 1 + 2 + 4 + 3 + 9 across eight test files, the two new ones in `core/tests/bundled_apps.rs`) and confirmed by `cargo test` (34 passed). "Three agents" was checked against `agent_dir` in `core/src/install.rs` (claude, codex, cursor). The demo README's "21 real skills" was left out: the built demo cannot be re-counted without the sibling checkouts it was built from. No skills, CLAUDE.md or AGENTS.md line states a count. Not changed: the screenshot alt text in README that says "four released skills", which describes the image, and the "18 kinds for 18 apps" line in this log's history.
+
 ## v0.10.4 · QA fixes {#v0-10-4}
 
 ### cli/src/main.rs · reading a file that is not text exits non-zero
