@@ -2,13 +2,12 @@ use formskills_core::Apps;
 use std::collections::HashSet;
 
 #[test]
-fn the_bundled_list_names_a_registry_version_and_no_commit() {
+fn the_bundled_list_names_its_repository_and_no_commit() {
     let apps = Apps::bundled().expect("the bundled list loads");
     assert_eq!(apps.source.repository, "nodemode-dev/formcompiler");
-    assert!(!apps.source.version.is_empty());
     let raw: serde_json::Value = serde_json::from_str(include_str!("../data/apps.json")).expect("valid json");
     assert!(raw["source"].get("commit").is_none(), "formcompiler's HEAD must not be recorded");
-    assert!(apps.describe_source().contains(&apps.source.version));
+    assert_eq!(apps.describe_source(), "bundled list from nodemode-dev/formcompiler");
 }
 
 #[test]
