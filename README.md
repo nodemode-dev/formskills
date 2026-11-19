@@ -20,7 +20,7 @@
 </p>
 
 <p align="center">
-  <a href="https://formskill.formai.studio/"><b>Download FormSkills on formai.studio</b></a> ·
+  <a href="https://formskills.formai.studio/"><b>Download FormSkills on formai.studio</b></a> ·
   <a href="#run-it-from-source">Run it from source</a>
 </p>
 
@@ -117,9 +117,9 @@ Open [`demo/index.html`](demo/index.html) in a browser, from `file://` or any st
 
 | Platform | Download | Release |
 |---|---|---|
-| macOS | [Download FormSkills for macOS](https://formai.studio/get/formskill/macos) | [FormSkills releases on FormCompiler](https://github.com/nodemode-dev/formcompiler/releases?q=formskills-v&expanded=true) |
-| Windows | [Download FormSkills for Windows](https://formai.studio/get/formskill/windows) | [FormSkills releases on FormCompiler](https://github.com/nodemode-dev/formcompiler/releases?q=formskills-v&expanded=true) |
-| Linux | [Download FormSkills for Linux](https://formai.studio/get/formskill/linux) | [FormSkills releases on FormCompiler](https://github.com/nodemode-dev/formcompiler/releases?q=formskills-v&expanded=true) |
+| macOS | [Download FormSkills for macOS](https://formai.studio/get/formskills/macos) | [FormSkills releases on FormCompiler](https://github.com/nodemode-dev/formcompiler/releases?q=formskills-v&expanded=true) |
+| Windows | [Download FormSkills for Windows](https://formai.studio/get/formskills/windows) | [FormSkills releases on FormCompiler](https://github.com/nodemode-dev/formcompiler/releases?q=formskills-v&expanded=true) |
+| Linux | [Download FormSkills for Linux](https://formai.studio/get/formskills/linux) | [FormSkills releases on FormCompiler](https://github.com/nodemode-dev/formcompiler/releases?q=formskills-v&expanded=true) |
 
 All FormSkills builds are compiled and released from [FormCompiler](https://github.com/nodemode-dev/formcompiler); this repo holds the source.
 
