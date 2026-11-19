@@ -106,6 +106,8 @@ The list is generated from the family spec, `family.json` on formadaptor's `spec
 ./formskills apps --family PATH --check  # writes nothing; exits 1 naming the file while it drifts
 ```
 
+`setup/family.spec.json` is the copy of the spec the committed list was built from; CI runs `--check` against it, so a list edited by hand, or a generator change that moves the output, fails the build.
+
 The file records the formcompiler registry version the spec was built from; the window's footer shows it.
 
 ## Building the app

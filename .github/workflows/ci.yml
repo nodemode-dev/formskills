@@ -65,6 +65,8 @@ jobs:
           done
       - name: Python compiles
         run: python3 -m py_compile setup/apps.py
+      - name: App list in step with the committed family spec
+        run: python3 -I setup/apps.py --family setup/family.spec.json --check
       - name: No em dash in tracked markdown, no emoji in tracked text
         run: |
           python3 - <<'PY'

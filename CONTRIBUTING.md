@@ -41,6 +41,7 @@ Run the same checks CI runs:
 cargo check --locked -p formskills-core -p formskills-cli
 cargo test --locked -p formskills-core -p formskills-cli
 python3 -m py_compile setup/apps.py
+python3 -I setup/apps.py --family setup/family.spec.json --check
 ```
 
 CI also checks the shell scripts with `bash -n` and refuses an em dash in tracked

@@ -26,6 +26,13 @@ Regenerated from the 0.16.0 sample spec, with the three entries the spec marks n
 The spec marks FormPromo, FormSculpt and FormSurface `public: false` (it carries only their id), so the list stops naming them: their names, summaries and repositories were in a public file. Nothing else in the list changed in this commit. `demo/`, `demos/` and the media icons still carry these three apps from before; they are built assets and were not touched. `setup/family.spec.json` is a byte copy (made with `cp`, sha256 3c1781c6...82ce3, content_sha256 2553862c... checked) of the 0.16.0 sample spec the list is now generated from. It is input, never edited by hand: it changes only when a newer `family.json` is copied over it and `setup/apps.py` is run. The generator reads neither `generated` nor `content_sha256` from it.
 
 
+### ci.yml · the list is checked against the committed spec
+- refers-to: .github/workflows/ci.yml (scripts job) · setup/family.spec.json
+- kind: change
+- logged: v0.11.0 · 2026-11-19
+
+The `scripts` job runs `python3 -I setup/apps.py --family setup/family.spec.json --check` beside the compile check, with no network and no new action (the job's only actions stay as pinned in the file). Run here against the committed copy: exit 0, "apps: in step"; with one value of apps.json changed: exit 1, "apps: drifted: core/data/apps.json". Known gap: formadaptor's pull request for this target changes only the files `targets.json` lists for it (`core/data/apps.json`), so on that pull request the copy is older than the list and this check fails until the copy is updated too; formadaptor's `files` for formskills needs this path, or the step has to fetch the spec instead.
+
 ## v0.10.4 · QA fixes {#v0-10-4}
 
 ### cli/src/main.rs · reading a file that is not text exits non-zero
