@@ -11,7 +11,7 @@
 </p>
 
 <p align="center">
-  <img alt="version 0.10.4" src="https://img.shields.io/badge/version-0.10.4-eef0f4?style=flat-square">
+  <img alt="version 0.11.0" src="https://img.shields.io/badge/version-0.11.0-eef0f4?style=flat-square">
   <img alt="Rust" src="https://img.shields.io/badge/Rust-stable-B7410E?style=flat-square&logo=rust&logoColor=white">
   <img alt="Tauri 2" src="https://img.shields.io/badge/Tauri-2-24C8DB?style=flat-square">
   <img alt="macOS, Windows, Linux" src="https://img.shields.io/badge/macOS%20%C2%B7%20Windows%20%C2%B7%20Linux-native-2f7bf5?style=flat-square">
@@ -20,7 +20,7 @@
 </p>
 
 <p align="center">
-  <a href="https://formskill.formai.studio/"><b>Download FormSkills on formai.studio</b></a> ·
+  <a href="https://formskills.formai.studio/"><b>Download FormSkills on formai.studio</b></a> ·
   <a href="#run-it-from-source">Run it from source</a>
 </p>
 
@@ -75,7 +75,7 @@
 
 <table>
   <tr>
-    <td width="33%" valign="top"><h4>19 Form apps</h4>Every Form app that ships skills, listed from formcompiler's registry</td>
+    <td width="33%" valign="top"><h4>Every public Form app</h4>Each one that ships skills, listed from the family spec that formadaptor builds from formcompiler's registry</td>
     <td width="33%" valign="top"><h4>Actions</h4>Read · Search · Check · Download one or a whole set · Pin a release · Edit a copy · Write your own · Install · Update · Remove</td>
     <td width="33%" valign="top"><h4>Agents</h4>Claude Code (<code>~/.claude/skills</code>) · Codex (<code>~/.agents/skills</code>) · Cursor (<code>~/.cursor/skills</code>), for you or for one project</td>
   </tr>
@@ -103,8 +103,8 @@ formskills loads extensions under the Form Extension Contract, API 1: FormPortal
 - **Engine:** `formskills-core` fetches the signed family catalogue, checks each skills asset's SHA-256, unpacks it safely and keeps it until a newer release.
 - **Trust:** the catalogue is verified with the same key model as FormPortal and formMCP, and reads never leave the skills folder.
 - **Shell and window:** a Tauri 2 shell around a vanilla TypeScript and Vite window with zero runtime dependencies.
-- **Generated list:** the apps that ship skills come from formcompiler's registry (`./formskills apps`).
-- **Tested:** 31 Rust tests (catalogue trust, digests, safe unpacking, the format checks, link resolution).
+- **Generated list:** the public apps that ship skills come from the family spec that formadaptor builds from formcompiler's registry (`./formskills apps --family PATH`).
+- **Tested:** 36 Rust tests (catalogue trust, digests, safe unpacking, the format checks, link resolution).
 
 ## Demo
 
@@ -117,9 +117,9 @@ Open [`demo/index.html`](demo/index.html) in a browser, from `file://` or any st
 
 | Platform | Download | Release |
 |---|---|---|
-| macOS | [Download FormSkills for macOS](https://formai.studio/get/formskill/macos) | [FormSkills releases on FormCompiler](https://github.com/nodemode-dev/formcompiler/releases?q=formskills-v&expanded=true) |
-| Windows | [Download FormSkills for Windows](https://formai.studio/get/formskill/windows) | [FormSkills releases on FormCompiler](https://github.com/nodemode-dev/formcompiler/releases?q=formskills-v&expanded=true) |
-| Linux | [Download FormSkills for Linux](https://formai.studio/get/formskill/linux) | [FormSkills releases on FormCompiler](https://github.com/nodemode-dev/formcompiler/releases?q=formskills-v&expanded=true) |
+| macOS | [Download FormSkills for macOS](https://formai.studio/get/formskills/macos) | [FormSkills releases on FormCompiler](https://github.com/nodemode-dev/formcompiler/releases?q=formskills-v&expanded=true) |
+| Windows | [Download FormSkills for Windows](https://formai.studio/get/formskills/windows) | [FormSkills releases on FormCompiler](https://github.com/nodemode-dev/formcompiler/releases?q=formskills-v&expanded=true) |
+| Linux | [Download FormSkills for Linux](https://formai.studio/get/formskills/linux) | [FormSkills releases on FormCompiler](https://github.com/nodemode-dev/formcompiler/releases?q=formskills-v&expanded=true) |
 
 All FormSkills builds are compiled and released from [FormCompiler](https://github.com/nodemode-dev/formcompiler); this repo holds the source.
 
@@ -155,7 +155,7 @@ On Windows run `formskills_oc_install.bat`, then `formskills.bat`. Ports: 5630 (
 | `cli/` | `formskills-cli`, the JSON command line |
 | `src-tauri/` | The Tauri shell that opens the window |
 | `frontend/` | The window: chips, cards, detail pane and reader |
-| `setup/apps.py` | Generates `core/data/apps.json` from formcompiler's registry |
+| `setup/apps.py` | Generates `core/data/apps.json` from the family spec |
 
 Docs: [`.docs/wiki`](.docs/wiki) · Agents: [`CLAUDE.md`](CLAUDE.md), [`AGENTS.md`](AGENTS.md) · Contributing: [`.docs/BRANCHING.md`](.docs/BRANCHING.md)
 

@@ -129,7 +129,7 @@ const cards = list.apps.map((app) => ({ app, node: card(app) }));
 cardsBox.append(...cards.map((c) => c.node));
 
 (document.getElementById("version") as HTMLElement).textContent = `v${__APP_VERSION__}`;
-(document.getElementById("source") as HTMLElement).textContent = `List from ${list.source.repository} ${list.source.version} (${list.source.commit.slice(0, 7)})`;
+(document.getElementById("source") as HTMLElement).textContent = `List from ${list.source.repository}`;
 
 let filter = "all";
 let chosen = "";

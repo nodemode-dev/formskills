@@ -21,8 +21,6 @@ pub struct App {
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct Source {
     pub repository: String,
-    pub version: String,
-    pub commit: String,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
@@ -49,11 +47,6 @@ impl Apps {
     }
 
     pub fn describe_source(&self) -> String {
-        let commit: String = self.source.commit.chars().take(7).collect();
-        if self.source.version.is_empty() {
-            format!("bundled list from {} at {commit}", self.source.repository)
-        } else {
-            format!("bundled list from {} {} ({commit})", self.source.repository, self.source.version)
-        }
+        format!("bundled list from {}", self.source.repository)
     }
 }

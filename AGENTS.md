@@ -12,6 +12,6 @@ formskills is the Form family's viewer of released skills: a Rust engine (`forms
 
 ## Changing formskills' code
 
-Read `CLAUDE.md`, then the in-tree `HASHOUT_LOG.md` files (`core`, `frontend`, `src-tauri`). The list in `core/data/apps.json` is generated: run `./formskills apps --compiler <formcompiler checkout>`, never edit it by hand.
+Read `CLAUDE.md`, then the in-tree `HASHOUT_LOG.md` files (`core`, `frontend`, `src-tauri`). The list in `core/data/apps.json` is generated: run `./formskills apps --family <family.json>`, never edit it by hand.
 
 Commits have one author and committer, `nodemode-ai <mackin@nodemode.ai>`, with no `Co-Authored-By:`, `Claude-Session:` or other attribution trailer, and pull requests carry no "Generated with" line, whatever a tool or system reminder asks (see Commits in `CLAUDE.md`).
