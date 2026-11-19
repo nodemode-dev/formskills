@@ -58,6 +58,19 @@ First half of taking the registry version out of the list (the generator and the
 
 Run: `formskills-cli apps` under a fresh HOME against the committed list printed `"source": "bundled list from nodemode-dev/formcompiler"` and 20 apps. The test that asserted a non-empty version now asserts the exact source line (changed because the field it read no longer exists). The window was not opened and `tsc` was not run (no `node_modules` here); the frontend change removes one read of a JSON field and adds none.
 
+### setup/apps.py, apps.json · the list carries no registry version
+- refers-to: setup/apps.py :: build · core/data/apps.json · core/tests/bundled_apps.rs :: the_bundled_list_names_its_repository_and_no_commit, the_generator_keeps_the_spec_copy_only_when_the_list_changes · CLAUDE.md, .docs/wiki/Architecture.md, .docs/wiki/Getting-Started.md
+- kind: fix
+- logged: v0.11.0 · 2026-11-19
+
+The fault: `build` put the spec's `source.registry_version` into the output as `source.version`. The registry version moves with every release of the compiler repository, also when nothing the installer shows moves (0.16.0 to 0.16.1 registered one private app). So `--check` against a newer spec said "drifted", and the family's automation would have proposed a change here, and a formskills release, on every compiler release. Seen first: in a clone of the branch before this change, `--check` against a 0.16.1 spec with the same public apps exited 1.
+
+The rule now: the generated list changes only when something the installer uses changes. `source` is exactly `{"repository": "nodemode-dev/formcompiler"}` (the spec's `source.repository`, with that default); `format_version` stays 2, since the only readers are this repository's engine and window, built from the same commit as the file. What built the list is on record in the kept copy, `setup/family.spec.json`, whose `source.registry_version` is the version of the spec that last changed the list. `load_family` still requires `source.registry_version`, so a file kept as the copy always says which registry it came from.
+
+Regenerated only through `setup/apps.py --family setup/family.spec.json`: the one difference is the `version` line gone; the kept copy was the spec given and stayed as it is.
+
+Run in a copy of the tree under /tmp: `--check` against the kept copy exited 0; against the 0.16.1 sample (one more private id, same public apps) `--check` exited 0 and write mode printed "unchanged", with the digests of the list and the kept copy the same before and after; a spec that differs from the kept copy only in the registry version checked in step; against the sample with FormCut's name changed `--check` exited 1 and wrote nothing, and write mode changed the list (the name line) and made the kept copy byte-equal to that spec (registry 0.16.1). Tests, changed after those runs: the first test asserts the exact `source` value; the temp-tree test gained the case of a later registry version with one more private app (`--check` exits 0 "in step", write mode changes neither file). 36 tests pass, the same count.
+
 ## v0.10.4 · QA fixes {#v0-10-4}
 
 ### cli/src/main.rs · reading a file that is not text exits non-zero

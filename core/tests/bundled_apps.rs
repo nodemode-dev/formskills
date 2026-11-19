@@ -6,7 +6,7 @@ fn the_bundled_list_names_its_repository_and_no_commit() {
     let apps = Apps::bundled().expect("the bundled list loads");
     assert_eq!(apps.source.repository, "nodemode-dev/formcompiler");
     let raw: serde_json::Value = serde_json::from_str(include_str!("../data/apps.json")).expect("valid json");
-    assert!(raw["source"].get("commit").is_none(), "formcompiler's HEAD must not be recorded");
+    assert_eq!(raw["source"], serde_json::json!({ "repository": "nodemode-dev/formcompiler" }), "the source names the repository and nothing that moves with a registry release");
     assert_eq!(apps.describe_source(), "bundled list from nodemode-dev/formcompiler");
 }
 
@@ -64,6 +64,18 @@ fn the_generator_keeps_the_spec_copy_only_when_the_list_changes() {
     assert_eq!(code, 0);
     assert_eq!(std::fs::read(&list).unwrap(), list_before, "fields the list does not use must not move it");
     assert_eq!(std::fs::read(&kept).unwrap(), kept_before, "an unchanged list must leave the kept copy alone");
+
+    let released = tree.join("released.json");
+    let mut private = spec["apps"].as_array().unwrap().iter().find(|a| a["public"] != true).cloned().unwrap();
+    private["id"] = "formskills-test-private".into();
+    spec["apps"].as_array_mut().unwrap().push(private);
+    spec["source"]["registry_version"] = "99.0.0".into();
+    std::fs::write(&released, serde_json::to_vec_pretty(&spec).unwrap()).unwrap();
+    let (code, out) = generator(&tree, &["--family".as_ref(), released.as_os_str(), "--check".as_ref()]).unwrap();
+    assert_eq!((code, out.trim()), (0, "apps: in step"), "a registry release that changes nothing listed is not drift");
+    let (code, _) = generator(&tree, &["--family".as_ref(), released.as_os_str()]).unwrap();
+    assert_eq!(code, 0);
+    assert_eq!((std::fs::read(&list).unwrap(), std::fs::read(&kept).unwrap()), (list_before.clone(), kept_before.clone()), "a later registry version and a private app change neither file");
 
     let changed = tree.join("changed.json");
     let index = spec["apps"].as_array().unwrap().iter().position(|a| a["public"] == true && !a["agents"]["skills"].as_str().unwrap_or("").is_empty()).unwrap();

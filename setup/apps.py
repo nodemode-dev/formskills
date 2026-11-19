@@ -83,7 +83,7 @@ def build(family):
     return {
         "format": FORMAT,
         "format_version": 2,
-        "source": {"repository": family["source"].get("repository") or "nodemode-dev/formcompiler", "version": family["source"]["registry_version"]},
+        "source": {"repository": family["source"].get("repository") or "nodemode-dev/formcompiler"},
         "topics": list(TOPICS),
         "apps": apps,
     }

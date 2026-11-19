@@ -108,7 +108,7 @@ The list is generated from the family spec, `family.json` on formadaptor's `spec
 
 `setup/family.spec.json` is the copy of the spec the committed list was built from. The generator writes it itself, and only when the spec it was given changes the list: the same spec again, or one that differs only in fields the list does not use (such as `generated`), leaves both files as they are. CI runs `--check` against the copy, so a list edited by hand, or a generator change that moves the output, fails the build.
 
-The file records the formcompiler registry version the spec was built from; the window's footer shows it.
+The list names the registry's repository and no version: the registry version moves with every release of the compiler repository, so a list that carried it would drift on releases that change nothing listed. The registry version the list was built from is in `setup/family.spec.json` (`source.registry_version`); the window's footer shows the repository only.
 
 ## Building the app
 

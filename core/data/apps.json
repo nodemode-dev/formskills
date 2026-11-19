@@ -2,8 +2,7 @@
   "format": "formskills-apps",
   "format_version": 2,
   "source": {
-    "repository": "nodemode-dev/formcompiler",
-    "version": "0.16.0"
+    "repository": "nodemode-dev/formcompiler"
   },
   "topics": [
     "Media",
