@@ -1,5 +1,14 @@
 # Changelog
 
+## v0.11.0 · 2026-11-19
+
+- The list of Form apps is now built from the family's published spec, so it can no longer drift from the apps themselves. form.ext, FormCel, FormTxt and FormTools now appear because they ship skills, and FormDeck is shown under its current name (it was FormSlide).
+- The list names public apps only. FormPromo, FormSculpt and FormSurface are no longer shown; an app that becomes public and ships skills appears with the formskills release that follows.
+- The window's footer and `formskills cli apps` say where the list came from (`nodemode-dev/formcompiler`) with no commit and no version number. The list now changes only when something about a listed app changes.
+- For people who rebuild the list: `./formskills apps --family PATH` replaces `--compiler PATH`, and `--check` compares without writing anything. An app of a kind the list does not know no longer stops the list from being built; it is grouped under Family.
+- The repository keeps the copy of the spec the list was last built from (`setup/family.spec.json`). Building the list replaces that copy only when the list itself changes, and the automatic checks compare the two on every change.
+- The README's site and download links use the app's current id, `formskills`. The security policy names the current release line, and counts stated in the documents were made true or removed.
+
 ## v0.10.4 · 2026-11-11
 
 - `edit read yours <skill> <file>`, `edit read <app> <skill> <file>` and `read <app> <path>` on the command line now exit with an error when the file is not text or too large to show, instead of printing the reason and exiting as if it had worked.
