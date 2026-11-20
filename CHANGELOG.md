@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.12.0 · 2026-11-20
+
+- The Install page and the skill format page now say where Antigravity stands: it reads no skills and gets an app's MCP server only, so it is not offered as a place to install a skill. Claude Code, Codex and Cursor are offered as before.
+- The window takes the Form family's shared colours, borders, corner radii and shadows, the same as FormVis's Studio Dark look and its light look. Borders are a shade lighter, the larger corners are a little tighter, and in the light look panels and buttons are a touch warmer. The orange accent, the text size and the window frame stay as they were.
+- The browser demo was rebuilt with these changes and with the skills of each app's current release.
+
 ## v0.11.0 · 2026-11-19
 
 - The list of Form apps is now built from the family's published spec, so it can no longer drift from the apps themselves. form.ext, FormCel, FormTxt and FormTools now appear because they ship skills, and FormDeck is shown under its current name (it was FormSlide).

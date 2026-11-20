@@ -2,8 +2,17 @@
 
 Living log for the browser demo. Source files stay comment-free; what they would have said lives here.
 
-Current build version: v0.11.0
-Last updated: 2026-11-19 · v0.11.0 version bump only; 2026-11-11 · v0.10.4 version bump only; 2026-11-10 · front matter and the new-skill template follow core 0.10.3 (source only); 2026-11-07 · real skills, icons and screenshots; the demo
+Current build version: v0.12.0
+Last updated: 2026-11-20 · Antigravity named in the window's markup; rebuilt with the family token values; 2026-11-19 · v0.11.0 version bump only; 2026-11-11 · v0.10.4 version bump only; 2026-11-10 · front matter and the new-skill template follow core 0.10.3 (source only); 2026-11-07 · real skills, icons and screenshots; the demo
+
+## v0.12.0 · the four agent programs {#v0-12-0}
+
+### index.html · Antigravity named where the window lists the agent programs
+- refers-to: index.html :: #install-hint, #guide · ../frontend/index.html
+- kind: decision
+- logged: v0.12.0 · 2026-11-20
+
+The demo's copy of the window markup takes the same two sentences as `frontend/index.html`: Antigravity reads no skills and gets an app's MCP server only, so it is not an install choice. The stand-in's `AGENTS` table lists install targets and stays at three.
 
 ## v0.10.3 · the parser port follows core {#v0-10-3}
 

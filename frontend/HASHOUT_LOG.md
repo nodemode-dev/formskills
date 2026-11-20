@@ -2,8 +2,24 @@
 
 Living log for formskills' window. Source files stay comment-free; what they would have said lives here.
 
-Current build version: v0.11.0
-Last updated: 2026-11-19 · the footer names the list's repository with no commit and no version (the entries are in the core log); 2026-11-11 · v0.10.4 version bump only; 2026-11-10 · skill lists notice a changed name or description; the extension check command for your own skills; FORM_FAMILY_DIR without a trailing slash; the reader's front matter quotes and comments; the dev engine bridge refuses foreign pages; v0.10.2 version bump only; 2026-10-25 · the Install and Installed pages; Your skills, the Release row, Trust; search, topics, the format page and Check; editing your own copy; the reader and downloads; where each app's skills come from; chips, cards and the detail pane
+Current build version: v0.12.0
+Last updated: 2026-11-20 · Antigravity named where the window lists the agent programs; FormVis's token names and values, own names as aliases; 2026-11-19 · the footer names the list's repository with no commit and no version (the entries are in the core log); 2026-11-11 · v0.10.4 version bump only; 2026-11-10 · skill lists notice a changed name or description; the extension check command for your own skills; FORM_FAMILY_DIR without a trailing slash; the reader's front matter quotes and comments; the dev engine bridge refuses foreign pages; v0.10.2 version bump only; 2026-10-25 · the Install and Installed pages; Your skills, the Release row, Trust; search, topics, the format page and Check; editing your own copy; the reader and downloads; where each app's skills come from; chips, cards and the detail pane
+
+## v0.12.0 · the four agent programs {#v0-12-0}
+
+### index.html · the window names Antigravity where it lists the agent programs
+- refers-to: index.html :: #install-hint, #guide
+- kind: decision
+- logged: v0.12.0 · 2026-11-20
+
+The family names four agent programs: Claude Code, Codex, Cursor and Antigravity. Antigravity reads no skills (an app gives it its MCP server only), so it is not an install target and gets no checkbox. The install pane's hint now says so in one sentence, and the format page's sentence on which programs read the format adds that Antigravity reads none, so no list in the window leaves it out without a word. `demo/index.html` carries the same two sentences. The `AGENT_DIRS` table in `main.ts` and the stand-in's table are install targets and stay at three.
+
+### styles/tokens.css · FormVis's token names, own names as aliases
+- refers-to: src/styles/tokens.css :: :root
+- kind: decision
+- logged: v0.12.0 · 2026-11-20
+
+The family's token names are FormVis's (DESIGN_W7.md). The file now declares FormVis's names with Studio Dark values (accent, surfaces, borders, text, shadows, spacing, radii, type, control heights, the derived surfaces and the semantic colours), and every name of our own is an alias of the FormVis name it corresponds to, so no stylesheet changed. Resolved changes, dark: `--edge` #222124 to `--border-color` #2a2a2a, `--control-hover` #222124 to `--bg-tertiary` #222127, `--radius-m` 14px and `--radius-l` 22px to `--radius-xl` 12px, `--shadow` to `--shadow-lg`; everything else resolves to the value it had. `--radius-xl` was ours at 28px and FormVis's at 12px; FormVis's value is taken and nothing used ours. `--ground` (#050505) is `--group-head`, FormVis's darkest derived surface, which resolves to the same value; the light block points it at `--bg-tertiary`, because `--group-head` is a mix with black there. The light block sets FormVis's first light profile ("Light" in its themes.ts) on the FormVis names, so the light surfaces, borders and text follow it (`--float` and `--control` #f9f8f4 to #f4f3ed, `--control-press` and `--edge-strong` one step darker, `--edge` #d6d2c6 to #d1cdc1). Kept ours on purpose: the accent and its tints (`--accent-soft` keeps our value although FormVis has the name, because the accent stays the app's), `--accent-2`, `--fault`, `--live`, `--select`, `--sheen`, the glass fills, `--font` and the base size 13px, `--fs-l`, `--fs-xl`, `--sp-7` (48px, no FormVis step), the icon sizes and the motion. The z-index scale in layers.css is unchanged (FormVis has `--z-raised`, `--z-overlay` and `--z-toast` at 8, 50000 and 3000; ours stay 10, 30 and 40). The window frame stays native. Checked with the demo build (the real window) at 1040x720, dark and light, five views each, before and after: the token dump diff and the pixel counts are in the wave 8 report.
 
 ## v0.10.3 · review fixes {#v0-10-3}
 
