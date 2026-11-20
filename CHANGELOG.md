@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.13.0 · 2026-11-20
+
+- The install and author demos now say where Antigravity stands, as the window does: it reads no skills and gets an app's MCP server only, so it is not offered as a place to install a skill. Both demos were rebuilt and carry the window's current colours and this version.
+- The README now says FormSkills is released, built and bundled for macOS, Windows and Linux and tested on all three.
+- The browser demo was rebuilt so it shows this version.
+
 ## v0.12.0 · 2026-11-20
 
 - The Install page and the skill format page now say where Antigravity stands: it reads no skills and gets an app's MCP server only, so it is not offered as a place to install a skill. Claude Code, Codex and Cursor are offered as before.
