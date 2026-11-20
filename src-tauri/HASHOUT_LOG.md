@@ -2,8 +2,8 @@
 
 Living log for formskills' desktop shell. Source files stay comment-free; what they would have said lives here.
 
-Current build version: v0.12.0
-Last updated: 2026-11-20 · v0.12.0 version bump only; 2026-11-19 · v0.11.0 version bump only; 2026-11-11 · the unused BACKGROUND colour removed; 2026-11-10 · install_remove for a project folder that is gone; 2026-11-03 · v0.7.5 the bundle names the publisher and the licence; 2026-10-25 · the install commands; one app at a time, pins, your own skills; search and the check commands; the edit commands; read_file and download; library and refresh; the shell
+Current build version: v0.13.0
+Last updated: 2026-11-20 · v0.13.0 version bump only; v0.12.0 version bump only; 2026-11-19 · v0.11.0 version bump only; 2026-11-11 · the unused BACKGROUND colour removed; 2026-11-10 · install_remove for a project folder that is gone; 2026-11-03 · v0.7.5 the bundle names the publisher and the licence; 2026-10-25 · the install commands; one app at a time, pins, your own skills; search and the check commands; the edit commands; read_file and download; library and refresh; the shell
 
 ## v0.10.4 · QA fixes {#v0-10-4}
 

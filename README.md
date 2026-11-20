@@ -11,12 +11,12 @@
 </p>
 
 <p align="center">
-  <img alt="version 0.12.0" src="https://img.shields.io/badge/version-0.12.0-eef0f4?style=flat-square">
+  <img alt="version 0.13.0" src="https://img.shields.io/badge/version-0.13.0-eef0f4?style=flat-square">
   <img alt="Rust" src="https://img.shields.io/badge/Rust-stable-B7410E?style=flat-square&logo=rust&logoColor=white">
   <img alt="Tauri 2" src="https://img.shields.io/badge/Tauri-2-24C8DB?style=flat-square">
   <img alt="macOS, Windows, Linux" src="https://img.shields.io/badge/macOS%20%C2%B7%20Windows%20%C2%B7%20Linux-native-2f7bf5?style=flat-square">
   <img alt="License: GPL-3.0-only" src="https://img.shields.io/badge/license-GPL--3.0--only-3a3a3a?style=flat-square">
-  <img alt="Status: early" src="https://img.shields.io/badge/status-early-d69e2e?style=flat-square">
+  <img alt="Status: released" src="https://img.shields.io/badge/status-released-d69e2e?style=flat-square">
 </p>
 
 <p align="center">
@@ -143,7 +143,7 @@ The window needs its Tauri shell to read skills; the interface alone in a browse
 On Windows run `formskills_oc_install.bat`, then `formskills.bat`. Ports: 5630 (Vite dev server) and 5631 (preview), localhost only.
 
 > [!IMPORTANT]
-> **Status:** early. Agents loading installed skills is taken from each agent's docs, not tried here.
+> **Status:** released. FormSkills is built and bundled for macOS, Windows and Linux and has been tested on all three. Agents loading installed skills is taken from each agent's docs, not tried here.
 
 **Contributing:** branch from `main`, keep changes to source here, and leave packaging and releases to formcompiler. See [`.docs/BRANCHING.md`](.docs/BRANCHING.md) and [`AGENTS.md`](AGENTS.md).
 
