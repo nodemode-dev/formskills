@@ -11,7 +11,7 @@ const NOTES: Record<string, string> = {
   installed: "Five installs in virtual agent folders. Both formportal skills were installed from an earlier release, so the list offers Update.",
   update: "Choose an install and a file to read exactly what an update would change. Nothing is replaced until you press Update in the list.",
   pin: "FormPortal has two releases with skills. Choose Keep 0.54.3 in the Release row to hold an app back, or Latest to follow it again.",
-  install: "Tick Claude Code, Codex or Cursor, for you or one project folder; the path each skill lands in is written out before you press Install.",
+  install: "Tick Claude Code, Codex or Cursor, for you or one project folder; the path each skill lands in is written out before you press Install. Antigravity reads no skills, so it is not a choice.",
   trust: "What the app checks before it writes a file. This demo reads no catalogue and verifies no signature; it only shows installs matching releases.",
 };
 

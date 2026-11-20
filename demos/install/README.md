@@ -1,6 +1,6 @@
 # FormSkills demo 3: install
 
-Installing and managing skills in FormSkills: install into Claude Code, Codex and Cursor targets, see what an update changes file by file, pin an app to an earlier release, and read what the Trust page promises. The window is FormSkills' real one (`frontend/src/main.ts` with its own tokens, layers and styles) running against the same TypeScript stand-in for the engine as demo 1.
+Installing and managing skills in FormSkills: install into Claude Code, Codex and Cursor targets (Antigravity reads no skills and gets an app's MCP server only, so it is not a target), see what an update changes file by file, pin an app to an earlier release, and read what the Trust page promises. The window is FormSkills' real one (`frontend/src/main.ts` with its own tokens, layers and styles) running against the same TypeScript stand-in for the engine as demo 1.
 
 ## Open it
 
@@ -17,7 +17,7 @@ and open `/demos/install/`. No backend, no Tauri, no network and no CDN.
 - Installed: five installs in virtual agent folders (Claude Code and Codex for you, Cursor for you, Claude Code in a project folder). Both formportal skills were installed from an earlier release, so the list offers Update.
 - What an update changes: under the list, pick an install and a file and read the diff between what is installed and the release you follow, with a status per file (changed, new, removed, same), line counts and SHA-256 digests. Press Update in the list and the install settles to "all files match the release".
 - Pin a release: on FormPortal's page choose Keep 0.54.3; installs and updates then follow that release, and the page says the newer one is not taken.
-- Install more: Install all on any app, tick Claude Code, Codex and Cursor, choose you or a project folder, and read the path each skill lands in before pressing Install. Installed saves the virtual folders as a real zip.
+- Install more: Install all on any app, tick Claude Code, Codex and Cursor, choose you or a project folder, and read the path each skill lands in before pressing Install; the hint says why Antigravity is not a choice. Installed saves the virtual folders as a real zip.
 - Trust: the real Trust page, with a header note on what this demo does and does not verify.
 
 ## What is sample and what is real

@@ -2,8 +2,17 @@
 
 Living log for demo 3. Source files stay comment-free; what they would have said lives here.
 
-Current build version: v0.8.3
-Last updated: 2026-11-07 · the install demo
+Current build version: v0.13.0
+Last updated: 2026-11-20 · Antigravity named where the page lists the agent programs; 2026-11-07 · the install demo
+
+## v0.13.0 · Antigravity {#v0-13-0}
+
+### index.html, src/install.ts · Antigravity is named, not offered
+- refers-to: index.html :: #install-hint, #guide, .demo-hero-sub · src/install.ts :: NOTES.install
+- kind: decision
+- logged: v0.13.0 · 2026-11-20
+
+The page carries the window's markup by hand, so it takes the window's two sentences of 0.12.0 as they are: the install hint says Antigravity is not a choice because it reads no skills and gets an app's MCP server only, and the format page adds that Antigravity reads no skills. The opening text and the Install more step note say the same in a few words. The checkboxes, the stand-in's targets and `AGENTS` in src/inspect.ts are install targets and stay at three. `assets/` is rebuilt by the two commands of README.md, so the bundle also carries the window's tokens and the version of this release.
 
 ## v0.8.3 · the install demo {#v0-8-3}
 
