@@ -5,6 +5,15 @@ Living log for formskills' window. Source files stay comment-free; what they wou
 Current build version: v0.11.0
 Last updated: 2026-11-19 · the footer names the list's repository with no commit and no version (the entries are in the core log); 2026-11-11 · v0.10.4 version bump only; 2026-11-10 · skill lists notice a changed name or description; the extension check command for your own skills; FORM_FAMILY_DIR without a trailing slash; the reader's front matter quotes and comments; the dev engine bridge refuses foreign pages; v0.10.2 version bump only; 2026-10-25 · the Install and Installed pages; Your skills, the Release row, Trust; search, topics, the format page and Check; editing your own copy; the reader and downloads; where each app's skills come from; chips, cards and the detail pane
 
+## v0.12.0 · the four agent programs {#v0-12-0}
+
+### index.html · the window names Antigravity where it lists the agent programs
+- refers-to: index.html :: #install-hint, #guide
+- kind: decision
+- logged: v0.12.0 · 2026-11-20
+
+The family names four agent programs: Claude Code, Codex, Cursor and Antigravity. Antigravity reads no skills (an app gives it its MCP server only), so it is not an install target and gets no checkbox. The install pane's hint now says so in one sentence, and the format page's sentence on which programs read the format adds that Antigravity reads none, so no list in the window leaves it out without a word. `demo/index.html` carries the same two sentences. The `AGENT_DIRS` table in `main.ts` and the stand-in's table are install targets and stay at three.
+
 ## v0.10.3 · review fixes {#v0-10-3}
 
 ### vite.engine.ts · the dev engine bridge answers only its own page
