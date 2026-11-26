@@ -51,6 +51,19 @@
       "released": true
     },
     {
+      "id": "formcad",
+      "app": "formCAD",
+      "name": "FormCAD",
+      "kind": "cad",
+      "topic": "Family",
+      "licence": "Apache-2.0",
+      "summary": "CAD studio: 2D drafting, parametric parts, NURBS surfaces and automation on OpenCascade.",
+      "repository": "https://github.com/nodemode-dev/formCAD",
+      "skills": "skills",
+      "state": "prelaunch",
+      "released": true
+    },
+    {
       "id": "formcel",
       "app": "formcel",
       "name": "FormCel",
@@ -116,6 +129,19 @@
       "released": true
     },
     {
+      "id": "formfabric",
+      "app": "formfabric",
+      "name": "FormFabric",
+      "kind": "garment",
+      "topic": "Family",
+      "licence": "Apache-2.0",
+      "summary": "Garment pattern design and cloth simulation: draw patterns, sew, drape and export.",
+      "repository": "https://github.com/nodemode-dev/formfabric",
+      "skills": ".claude/skills",
+      "state": "prelaunch",
+      "released": true
+    },
+    {
       "id": "formlit",
       "app": "formlit",
       "name": "FormLit",
@@ -137,6 +163,19 @@
       "licence": "GPL-3.0-only",
       "summary": "One MCP connection from Claude Code, Codex and Cursor to every Form app.",
       "repository": "https://github.com/nodemode-dev/formMCP",
+      "skills": ".claude/skills",
+      "state": "prelaunch",
+      "released": true
+    },
+    {
+      "id": "formnet",
+      "app": "formNET",
+      "name": "FormNET",
+      "kind": "network",
+      "topic": "Family",
+      "licence": "Apache-2.0",
+      "summary": "The network tab for the whole computer: what websites, apps and the machine actually send.",
+      "repository": "https://github.com/nodemode-dev/formNET",
       "skills": ".claude/skills",
       "state": "prelaunch",
       "released": true
@@ -181,6 +220,19 @@
       "released": true
     },
     {
+      "id": "formpublisher",
+      "app": "formpublisher",
+      "name": "FormPublisher",
+      "kind": "publisher",
+      "topic": "Family",
+      "licence": "GPL-3.0-only",
+      "summary": "Open FormWeb sites, check every route, package them and prepare them for hosts.",
+      "repository": "https://github.com/nodemode-dev/formpublisher",
+      "skills": ".claude/skills",
+      "state": "prelaunch",
+      "released": true
+    },
+    {
       "id": "formref",
       "app": "formref",
       "name": "FormRef",
@@ -189,6 +241,58 @@
       "licence": "Apache-2.0",
       "summary": "Reference boards for images, ideas and creative work.",
       "repository": "https://github.com/nodemode-dev/formref",
+      "skills": ".claude/skills",
+      "state": "prelaunch",
+      "released": true
+    },
+    {
+      "id": "formsculpt",
+      "app": "formsculpt",
+      "name": "FormSculpt",
+      "kind": "sculpt",
+      "topic": "Design",
+      "licence": "Apache-2.0",
+      "summary": "3D sculpting and modeling, with a Rust engine and a command set agents can drive.",
+      "repository": "https://github.com/nodemode-dev/formsculpt",
+      "skills": ".claude/skills",
+      "state": "prelaunch",
+      "released": true
+    },
+    {
+      "id": "formslot",
+      "app": "formslot",
+      "name": "FormSlot",
+      "kind": "memory",
+      "topic": "Family",
+      "licence": "GPL-3.0-only",
+      "summary": "Codebase memory for coding agents: what is built, where it lives and the rules it follows.",
+      "repository": "https://github.com/nodemode-dev/formslot",
+      "skills": "plugin/formslot/skills",
+      "state": "prelaunch",
+      "released": true
+    },
+    {
+      "id": "formsubstrate",
+      "app": "formsubstrate",
+      "name": "FormSubstrate",
+      "kind": "workbench",
+      "topic": "Family",
+      "licence": "GPL-3.0-only",
+      "summary": "A code and text editor that runs Claude Code agents, each in its own git worktree.",
+      "repository": "https://github.com/nodemode-dev/formsubstrate",
+      "skills": ".claude/skills",
+      "state": "prelaunch",
+      "released": true
+    },
+    {
+      "id": "formsurface",
+      "app": "formsurface",
+      "name": "FormSurface",
+      "kind": "texture",
+      "topic": "Design",
+      "licence": "Apache-2.0",
+      "summary": "Paint textures and materials straight onto 3D models.",
+      "repository": "https://github.com/nodemode-dev/formsurface",
       "skills": ".claude/skills",
       "state": "prelaunch",
       "released": true
